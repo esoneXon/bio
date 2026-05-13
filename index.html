@@ -1,60 +1,460 @@
 <!DOCTYPE html>
-<html lang="en-id">
-
+<html lang="id">
 <head>
-    <!-- Meta Tags -->
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="assets/imgs/favicon.png">
-
-    <!-- Title -->
-    <title>🌴 ・ Esone</title>
-
-    <!-- Css -->
-    <link rel="stylesheet" href="assets/css/style.css">
-
-    <!-- Javascript -->
-    
-
+    <title>Digital Scrapbook 2025-2026</title>
     <!-- Fonts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
-        integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
-        crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Poppins:wght@400;600;800&family=Rock+Salt&family=Bangers&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & GLOBAL --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: #111; color: #fff; overflow-x: hidden; }
 
+        .texture-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://www.transparenttextures.com/patterns/crumpled-paper.png'); opacity: 0.6; z-index: 1; pointer-events: none; mix-blend-mode: overlay; }
+
+        section { min-height: 120vh; padding: 100px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 5px dashed rgba(255,255,255,0.4); box-shadow: inset 0 0 80px rgba(0,0,0,0.6); }
+
+        /* --- BACKGROUND MOTIF BULANAN --- */
+        .bg-sep { background-color: #451a03; background-image: radial-gradient(#78350f 2px, transparent 2px); background-size: 30px 30px; } 
+        .bg-oct { background-color: #92400e; background-image: linear-gradient(rgba(255,255,255,0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.1) 2px, transparent 2px); background-size: 100px 100px; }
+        .bg-nov { background-color: #881337; background-image: radial-gradient(rgba(255,255,255,0.15) 15%, transparent 16%); background-size: 60px 60px; }
+        .bg-dec { background-color: #0f172a; background-image: repeating-linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%); background-size: 40px 40px; }
+        .bg-jan { background-color: #f8fafc; background-image: repeating-linear-gradient(transparent, transparent 39px, #93c5fd 40px); }
+        .bg-jan .texture-overlay { mix-blend-mode: multiply; opacity: 0.3; } .bg-jan .month-script { color: #0284c7; text-shadow: none; } .bg-jan .year-serif { -webkit-text-stroke: 2px #0f172a; color: transparent; text-shadow: 4px 4px 10px rgba(0,0,0,0.1); }
+        .bg-feb { background-color: #be185d; background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 25%, transparent 25%); background-size: 40px 40px; }
+        .bg-mar { background-color: #065f46; background-image: repeating-linear-gradient(transparent, transparent 50px, rgba(255,255,255,0.08) 50px, rgba(255,255,255,0.08) 100px); }
+        .bg-apr { background-color: #3b0764; background-image: radial-gradient(rgba(255,255,255,0.3) 2px, transparent 2px); background-size: 40px 40px; }
+        .bg-may { background-color: #ca8a04; background-image: repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 30px); }
+
+        /* --- TIPOGRAFI --- */
+        .title-group { position: relative; z-index: 50; text-align: center; margin-bottom: 40px; }
+        .month-script { font-family: 'Rock Salt', cursive; font-size: 3rem; color: rgba(255,255,255,0.9); transform: rotate(-5deg); margin-bottom: -40px; display: inline-block; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        .year-serif { font-family: 'Playfair Display', serif; font-size: 7.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 5px; line-height: 0.8; color: transparent; -webkit-text-stroke: 2px #fff; text-shadow: 10px 10px 20px rgba(0,0,0,0.4); }
+
+        /* --- LAYOUT CENTRAL PILE (DESKTOP) --- */
+        .gallery-container { position: relative; width: 100%; max-width: 1100px; height: 750px; z-index: 10; margin: 0 auto; }
+        
+        .photo-item { position: absolute; box-shadow: 10px 15px 35px rgba(0,0,0,0.5); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); cursor: pointer; opacity: 0; transform: translateY(100px) scale(0.8) rotate(var(--rot, 0deg)); z-index: 10;}
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
+        /* Variasi Ukuran */
+        .size-s { width: 180px; height: 200px; } 
+        .size-m { width: 220px; height: 260px; } 
+        .size-l { width: 280px; height: 340px; } 
+        .size-wide { width: 320px; height: 220px; }
+        .size-square { width: 250px; height: 250px; }
+        
+        .tape { position: absolute; height: 25px; width: 90px; top: -12px; left: 50%; margin-left: -45px; background-color: rgba(255, 255, 255, 0.6); box-shadow: 0 1px 3px rgba(0,0,0,0.2); backdrop-filter: blur(4px); z-index: 5; clip-path: polygon(0 5%, 5% 0, 95% 5%, 100% 0, 95% 95%, 100% 100%, 5% 95%, 0 100%); }
+        
+        .photo-item:hover { transform: scale(1.15) rotate(0deg) !important; z-index: 100 !important; box-shadow: 15px 30px 50px rgba(0,0,0,0.9); filter: brightness(1.05); }
+
+        /* ========================================= */
+        /* LIBRARY BINGKAI UNIK (30+ VARIASI)        */
+        /* ========================================= */
+        .f-win95 { background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; padding: 4px; padding-top: 25px; } .f-win95::before { content: 'IMG_01.jpg'; position: absolute; top: 3px; left: 3px; right: 3px; height: 18px; background: #0000a0; color: #fff; font-family: monospace; font-size: 11px; line-height: 18px; padding-left: 5px; font-weight: bold; }
+        .f-music-dark { background: #282828; border-radius: 15px; padding: 15px; padding-bottom: 70px; } .f-music-dark img { border-radius: 8px; } .f-music-dark::after { content: '────●───────\A ⏪   ⏸   ⏩'; white-space: pre; position: absolute; bottom: 15px; width: 100%; left: 0; text-align: center; color: #fff; font-size: 14px; line-height: 1.5; font-family: sans-serif; }
+        .f-polaroid-basic { background: #fff; padding: 12px 12px 45px 12px; }
+        .f-gold-thick { background: #fff; padding: 15px; border: 12px ridge #d4af37; box-shadow: inset 0 0 8px rgba(0,0,0,0.5); }
+        .f-digicam-silver { background: linear-gradient(135deg, #e0e0e0, #999); border-radius: 8px; padding: 10px 45px 10px 10px; border: 1px solid #666; } .f-digicam-silver img { border: 4px solid #111; } .f-digicam-silver::after { content: ''; position: absolute; right: 12px; top: 50%; width: 22px; height: 22px; margin-top:-11px; background: radial-gradient(circle, #ccc, #555); border-radius: 50%; border: 1px solid #333; box-shadow: 0 4px 0 -2px #888; }
+        .f-film-black { background: #111; padding: 20px 10px; border-left: 12px dotted #fff; border-right: 12px dotted #fff; }
+        .f-paint { background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; padding: 4px; padding-top: 25px; padding-left: 25px; } .f-paint::before { content: 'Paint'; position: absolute; top: 3px; left: 3px; right: 3px; height: 18px; background: #0000a0; color: #fff; font-family: sans-serif; font-size: 11px; line-height: 18px; padding-left: 5px; } .f-paint::after { content: '🎨\A🖌\A✒'; white-space: pre; position: absolute; left: 5px; top: 30px; font-size: 10px; line-height: 1.8; }
+        .f-red-sweet { background: #fff; border: 15px solid #b91c1c; } .f-red-sweet::before { content: 'S W E E T'; position: absolute; top: -15px; left: 0; width: 100%; text-align: center; color: #fff; font-family: monospace; font-weight: bold; letter-spacing: 5px; background: #b91c1c; padding: 2px 0; }
+        .f-album-black { background: #1a1a1a; padding: 15px; position: relative; } .f-album-black::before { content: ''; position: absolute; top: 5px; left: 5px; width: 20px; height: 20px; border-top: 2px solid #ddd; border-left: 2px solid #ddd; } .f-album-black::after { content: ''; position: absolute; bottom: 5px; right: 5px; width: 20px; height: 20px; border-bottom: 2px solid #ddd; border-right: 2px solid #ddd; }
+        .f-music-light { background: #f0f0f0; border-radius: 15px; padding: 15px; padding-bottom: 70px; border: 1px solid #ddd; } .f-music-light img { border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } .f-music-light::after { content: '────●───────\A ⏪   ⏸   ⏩'; white-space: pre; position: absolute; bottom: 15px; width: 100%; left: 0; text-align: center; color: #333; font-size: 14px; line-height: 1.5; font-family: sans-serif; }
+        .f-macos { background: #fff; border: 1px solid #000; padding: 2px; padding-top: 20px; } .f-macos::before { content: '≡ System'; position: absolute; top: 0; left: 0; width: 100%; height: 18px; border-bottom: 1px solid #000; text-align: center; font-family: sans-serif; font-size: 10px; line-height: 18px; color: #000; background: repeating-linear-gradient(transparent, transparent 1px, #000 1px, #000 2px); background-size: 100% 4px; }
+        .f-film-orange { background: #d97706; padding: 20px 10px; border-left: 10px dashed #fff; border-right: 10px dashed #fff; }
+        .f-polaroid-kiss { background: #fff; padding: 12px 12px 55px 12px; } .f-polaroid-kiss::after { content: 'With love 💋'; font-family: 'Caveat', cursive; position: absolute; bottom: 12px; left: 15px; color: #111; font-size: 1.8rem; }
+        .f-digicam-black { background: #222; border-radius: 6px; padding: 10px 10px 35px 10px; border: 2px solid #444; } .f-digicam-black::after { content: 'SONY'; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); color: #888; font-family: sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+        .f-notepad { background: #fff; border: 2px solid #c0c0c0; border-top: 25px solid #0000a0; padding: 10px; } .f-notepad::before { content: 'Notes.txt'; position: absolute; top: -20px; left: 5px; color: #fff; font-family: sans-serif; font-size: 11px; }
+        .f-browser { background: #fff; border: 2px solid #808080; border-top: 30px solid #0000a0; padding: 2px; } .f-browser::before { content: 'e Explorer'; position: absolute; top: -25px; left: 5px; color: #fff; font-family: sans-serif; font-size: 12px; font-weight: bold; } .f-browser::after { content: 'File Edit View Go'; position: absolute; top: -10px; left: 5px; color: #111; background: #c0c0c0; width: calc(100% - 4px); padding: 2px; font-family: sans-serif; font-size: 9px; }
+        .f-wood { background: #fff; padding: 10px; border: 15px solid #654321; outline: 2px solid #3e2723; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
+        .f-polaroid-black { background: #111; border: 1px solid #333; padding: 12px 12px 50px 12px; color: #fff; } .f-polaroid-black::after { content: 'midnight ⋆'; font-family: 'Rock Salt', cursive; position: absolute; bottom: 15px; left: 0; width: 100%; text-align: center; font-size: 1rem; }
+        .f-stamp { background: #fdfdfd; padding: 15px; border: 4px dotted #ccc; box-shadow: 0 0 0 8px #fdfdfd; }
+        .f-torn { background: #fff; padding: 10px; padding-bottom: 30px; clip-path: polygon(0 0, 100% 0, 100% 95%, 95% 100%, 90% 95%, 85% 100%, 80% 95%, 75% 100%, 70% 95%, 65% 100%, 60% 95%, 55% 100%, 50% 95%, 45% 100%, 40% 95%, 35% 100%, 30% 95%, 25% 100%, 20% 95%, 15% 100%, 10% 95%, 5% 100%, 0 95%); }
+        .f-gold-thin { background: #fff; padding: 5px; border: 4px double #b8860b; outline: 4px solid #daa520; }
+        .f-blueprint { background: #1e3a8a; padding: 15px; border: 2px dashed #60a5fa; }
+        .f-neon { background: #000; padding: 10px; border: 4px solid #ec4899; box-shadow: 0 0 15px #ec4899, inset 0 0 10px #ec4899; }
+        .f-tape-only { background: transparent; padding: 0; box-shadow: 5px 5px 15px rgba(0,0,0,0.5); } .f-tape-only img { border-radius: 4px; }
+        .f-hologram { background: linear-gradient(45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb); padding: 8px; border-radius: 4px; }
+        .f-polaroid-love { background: #fff; padding: 12px 12px 50px 12px; } .f-polaroid-love::after { content: 'i love you <3'; font-family: 'Caveat', cursive; position: absolute; bottom: 8px; left: 0; width: 100%; text-align: center; color: #111; font-size: 1.8rem; }
+        .f-error { background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; padding: 4px; padding-top: 25px; padding-bottom: 30px; } .f-error::before { content: 'Error'; position: absolute; top: 3px; left: 3px; right: 3px; height: 18px; background: #0000a0; color: #fff; font-family: sans-serif; font-size: 11px; line-height: 18px; padding-left: 5px; } .f-error::after { content: '[ OK ]'; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); border: 1px solid #111; padding: 2px 10px; font-family: sans-serif; font-size: 10px; background: #c0c0c0; }
+        .f-polaroid-doodle { background: #fff; padding: 12px 12px 50px 12px; } .f-polaroid-doodle::after { content: '★ ★ ★'; font-family: 'Caveat', cursive; position: absolute; bottom: 10px; right: 15px; color: #eab308; font-size: 1.5rem; }
+        .f-folder { background: #fef08a; padding: 5px; border-radius: 0 5px 5px 5px; border: 1px solid #ca8a04; padding-top: 20px;} .f-folder::before { content: ''; position: absolute; top: -10px; left: -1px; width: 40%; height: 15px; background: #fef08a; border: 1px solid #ca8a04; border-bottom: none; border-radius: 5px 5px 0 0; }
+        .f-film-blue { background: #1e3a8a; padding: 20px 10px; border-left: 10px dashed #93c5fd; border-right: 10px dashed #93c5fd; }
+
+        /* --- STIKER & DEKORASI --- */
+        .sticker-item { position: absolute; opacity: 0; transform: scale(0) rotate(var(--rot, 0deg)); filter: drop-shadow(4px 6px 8px rgba(0,0,0,0.5)); transition: all 0.3s ease; cursor: pointer; transform-origin: center;}
+        .sticker-item:hover { transform: scale(1.1) rotate(0deg) !important; z-index: 101 !important; filter: drop-shadow(8px 12px 12px rgba(0,0,0,0.6)); }
+
+        .vintage-cutout { background: #fff; padding: 6px; border-radius: 8px; border: 1px solid #ddd; } .vintage-cutout img { width: 100%; height: auto; display: block; border-radius: 4px; filter: grayscale(40%) contrast(110%); }
+        .pop-art { font-family: 'Bangers', cursive; font-size: 4.5rem; color: #fde047; text-shadow: 3px 3px 0 #ef4444, 6px 6px 0 #111; letter-spacing: 2px; }
+        .pop-art.blue { color: #93c5fd; text-shadow: 3px 3px 0 #1e3a8a, 6px 6px 0 #111; }
+        .dymo-label { background: #222; color: #fff; font-family: monospace; font-size: 1.1rem; padding: 4px 12px; letter-spacing: 2px; box-shadow: 2px 2px 0px rgba(0,0,0,0.5); transform: scale(0); opacity: 0; border-radius: 2px; }
+        .doodle-heart { font-size: 3.5rem; color: transparent; text-shadow: 0 0 0 #f43f5e; filter: drop-shadow(2px 2px 0px #fff); font-family: sans-serif; }
+
+        /* --- ANIMASI --- */
+        .show .photo-item { transform: translateY(0) scale(1) rotate(var(--rot, 0deg)); opacity: 1; }
+        .show .dymo-label, .show .sticker-item { animation: popSticker 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .show .month-script { animation: slideRight 1s ease-out forwards; }
+        .show .year-serif { animation: slideLeft 1s ease-out forwards; }
+
+        @keyframes popSticker { 0% { opacity: 0; transform: scale(0) rotate(0deg); } 100% { opacity: 1; transform: scale(1) rotate(var(--rot)); } }
+        @keyframes slideRight { from { opacity: 0; transform: translateX(-50px) rotate(-5deg); } to { opacity: 1; transform: translateX(0) rotate(-5deg); } }
+        @keyframes slideLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* ========================================= */
+        /* RESPONSIVE MOBILE (Rahasia Scrapbook HP)  */
+        /* ========================================= */
+        @media (max-width: 768px) {
+            .year-serif { font-size: 4.5rem; } 
+            .month-script { font-size: 2.5rem; margin-bottom: -20px; }
+            section { padding: 60px 0; min-height: 90vh; }
+            
+            /* Kunci Utama: Tetap gunakan Absolute tapi di dalam wadah yang lebih kecil dan proporsional */
+            .gallery-container { height: 600px; width: 100%; max-width: 100vw; margin: 0 auto; overflow: visible; display: block; }
+            
+            /* Susutkan ukuran Frame agar muat bertumpuk di layar HP */
+            .size-s { width: 120px; height: 140px; } 
+            .size-m { width: 140px; height: 160px; } 
+            .size-l { width: 160px; height: 200px; } 
+            .size-wide { width: 170px; height: 130px; }
+            .size-square { width: 140px; height: 140px; }
+            
+            /* Susutkan Teks & Stiker */
+            .pop-art { font-size: 2.5rem; }
+            .doodle-heart { font-size: 2.5rem; }
+            .dymo-label { font-size: 0.7rem; padding: 2px 6px; }
+            .vintage-cutout { padding: 3px; border-radius: 4px; }
+            /* Paksa gambar stiker lebih kecil di HP */
+            .gallery-container .vintage-cutout { width: 80px !important; } 
+            
+            /* Penyesuaian Font di dalam Frame yang ikut mengecil */
+            .f-polaroid-love::after, .f-polaroid-kiss::after, .f-polaroid-doodle::after { font-size: 1.1rem; bottom: 5px; }
+            .f-music-dark::after, .f-music-light::after { font-size: 9px; bottom: 8px; }
+            .f-music-dark, .f-music-light { padding-bottom: 45px; padding: 10px;}
+            .f-win95::before, .f-paint::before, .f-error::before { font-size: 8px; line-height: 14px; height: 14px; }
+            .f-win95, .f-paint, .f-error { padding-top: 20px; }
+            .f-browser::before { font-size: 9px; top: -18px; }
+            .f-browser::after { font-size: 7px; top: -6px; }
+            .f-browser { border-top: 22px solid #0000a0; }
+            .f-polaroid-black::after { font-size: 0.8rem; bottom: 8px; }
+            
+            /* Susutkan ukuran selotip */
+            .tape { width: 60px; height: 18px; margin-left: -30px; top: -8px;}
+        }
+    </style>
 </head>
-
 <body>
 
-    <header>
-        <nav>
-            <div class="header_logo">
-                <img src="assets/imgs/prof.jpg" alt="" srcset="">
+    <!-- ============================================== -->
+    <!-- SEPTEMBER 2025 (5 Frames)                      -->
+    <!-- ============================================== -->
+    <section class="bg-sep hidden-section">
+        <div class="texture-overlay"></div>
+        <div class="title-group">
+            <span class="month-script">September</span><br>
+            <h1 class="year-serif">2025</h1>
+        </div>
+        <div class="gallery-container">
+            <div class="sticker-item pop-art" style="--rot: -10deg; bottom: 15%; right: 10%; z-index: 25; transition-delay: 1s;">START!</div>
+            <div class="dymo-label" style="--rot: -4deg; top: 5%; left: 18%; z-index: 20; position: absolute; transition-delay: 0.8s;">EARLY STORE DAYS</div>
+            
+            <div class="photo-item f-win95 size-m" style="--rot: -5deg; top: 12%; left: 10%; z-index: 11; transition-delay: 0.2s;">
+                <img style="filter: sepia(0.3);" src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=500&q=80" alt="Retail Store">
             </div>
-            <div class="header_links">
-                <ul class="nav_links">
-                    <li class="nav_link"><a href="#">Home</a></li>
-                    <li class="nav_link"><a href="#">Download</a></li>
-                    <li class="nav_link"><a href="#">Leaked</a></li>
-                    <li class="nav_link"><a href="#">Tentang</a></li>
-                    <!-- <li class="nav_link"><a href="#">Shop</a></li> -->
-                    <!-- <li class="nav_link"><a href="#">Repos</a></li> -->
-                </ul>
+            <div class="photo-item f-music-dark size-l" style="--rot: 4deg; top: 5%; left: 40%; z-index: 12; transition-delay: 0.3s;">
+                <div class="tape" style="background: rgba(253, 224, 71, 0.6);"></div>
+                <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=500&q=80" alt="Shelves">
             </div>
-        </nav>
-    </header>
-
-    <section class="main">
-        <img src="assets/imgs/prof.jpg" alt="" srcset="">
-        <span>Esone</span>
-        <p>Kamu naenyaee ? Kamu bertaenyeee" ?</p><br>
-        <ul>
-            <li><a target="_blank" href="https://instagram.com/esone.s1"><i class="fab fa-instagram"></i></a></li>
-            <li><a target="_blank" href="https://github.com/esoneXon"><i class="fab fa-github"></i></a></li>
-            <li><a target="_blank" href="https://wa.me/+6281268204954"><i
-                        class="fab fa-whatsapp"></i></a></li>
-        </ul>
+            <div class="photo-item f-polaroid-basic size-wide" style="--rot: -2deg; top: 45%; left: 15%; z-index: 15; transition-delay: 0.4s;">
+                <div class="tape"></div>
+                <img src="https://images.unsplash.com/photo-1601598851547-4302969d0614?w=600&q=80" alt="Work">
+            </div>
+            <div class="photo-item f-digicam-silver size-s" style="--rot: 8deg; top: 30%; right: 12%; z-index: 13; transition-delay: 0.5s;">
+                <img src="https://images.unsplash.com/photo-1580913428706-c3e1e6a39420?w=400&q=80" alt="Coffee Break">
+            </div>
+            <div class="photo-item f-folder size-m" style="--rot: -6deg; top: 60%; left: 55%; z-index: 16; transition-delay: 0.6s;">
+                <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=500&q=80" alt="Notes">
+            </div>
+        </div>
     </section>
-</body>
 
+    <!-- ============================================== -->
+    <!-- OKTOBER 2025 (6 Frames)                        -->
+    <!-- ============================================== -->
+    <section class="bg-oct hidden-section">
+        <div class="texture-overlay"></div>
+        <div class="title-group">
+            <span class="month-script">Oktober</span><br>
+            <h1 class="year-serif">2025</h1>
+        </div>
+        <div class="gallery-container">
+            <div class="sticker-item pop-art blue" style="--rot: 12deg; top: 15%; right: 18%; z-index: 5; transition-delay: 0.8s;">OUCH!</div>
+            
+            <div class="photo-item f-gold-thick size-l" style="--rot: -4deg; top: 10%; left: 8%; z-index: 10; transition-delay: 0.2s;">
+                <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500&q=80" alt="Airport">
+            </div>
+            <div class="photo-item f-polaroid-doodle size-s" style="--rot: 5deg; top: 5%; left: 40%; z-index: 11; transition-delay: 0.3s;">
+                <div class="tape" style="background: rgba(244, 63, 94, 0.4);"></div>
+                <img src="https://images.unsplash.com/photo-1519923834699-ef0b7cde4712?w=400&q=80" alt="Luggage">
+            </div>
+            <div class="photo-item f-film-black size-wide" style="--rot: -2deg; top: 38%; left: 25%; z-index: 15; transition-delay: 0.4s;">
+                <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&q=80" alt="Journey">
+            </div>
+            <div class="photo-item f-error size-m" style="--rot: -10deg; top: 55%; left: 5%; z-index: 16; transition-delay: 0.5s;">
+                <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=500&q=80" alt="Traffic">
+            </div>
+            <div class="photo-item f-tape-only size-s" style="--rot: 8deg; top: 40%; right: 10%; z-index: 12; transition-delay: 0.6s;">
+                <div class="tape" style="transform: rotate(-10deg);"></div>
+                <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=400&q=80" alt="Rain">
+            </div>
+            <div class="photo-item f-wood size-square" style="--rot: 3deg; top: 65%; left: 45%; z-index: 17; transition-delay: 0.7s;">
+                <img src="https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?w=500&q=80" alt="Autumn">
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- NOVEMBER 2025 (5 Frames)                       -->
+    <!-- ============================================== -->
+    <section class="bg-nov hidden-section">
+        <div class="texture-overlay"></div>
+        <div class="title-group">
+            <span class="month-script">November</span><br>
+            <h1 class="year-serif">2025</h1>
+        </div>
+        <div class="gallery-container">
+            <div class="sticker-item doodle-heart" style="--rot: -15deg; top: 5%; left: 22%; z-index: 25; transition-delay: 0.8s;">🖤</div>
+            
+            <div class="photo-item f-paint size-wide" style="--rot: 4deg; top: 12%; left: 15%; z-index: 10; transition-delay: 0.2s;">
+                <img style="filter: grayscale(0.5);" src="https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&q=80" alt="Warmth">
+            </div>
+            <div class="photo-item f-red-sweet size-l" style="--rot: -5deg; top: 18%; left: 55%; z-index: 11; transition-delay: 0.3s;">
+                <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=500&q=80" alt="Home">
+            </div>
+            <div class="photo-item f-album-black size-m" style="--rot: 2deg; top: 45%; left: 10%; z-index: 15; transition-delay: 0.4s;">
+                <img src="https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=500&q=80" alt="Coffee">
+            </div>
+            <div class="photo-item f-polaroid-love size-s" style="--rot: -8deg; top: 50%; left: 40%; z-index: 16; transition-delay: 0.5s;">
+                <div class="tape"></div>
+                <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&q=80" alt="Family">
+            </div>
+            <div class="photo-item f-hologram size-square" style="--rot: 6deg; top: 60%; right: 15%; z-index: 14; transition-delay: 0.6s;">
+                <img src="https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=500&q=80" alt="Peace">
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- DESEMBER 2025 (6 Frames)                       -->
+    <!-- ============================================== -->
+    <section class="bg-dec hidden-section">
+        <div class="texture-overlay"></div>
+        <div class="title-group">
+            <span class="month-script">Desember</span><br>
+            <h1 class="year-serif">2025</h1>
+        </div>
+        <div class="gallery-container">
+            <div class="dymo-label" style="--rot: 10deg; top: 8%; left: 10%; background: #eee; color: #111; z-index: 25; position: absolute; transition-delay: 0.8s;">SKETCHWARE & JAVA</div>
+            
+            <div class="photo-item f-music-light size-m" style="--rot: -6deg; top: 15%; left: 15%; z-index: 10; transition-delay: 0.2s;">
+                <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&q=80" alt="Code">
+            </div>
+            <div class="photo-item f-macos size-wide" style="--rot: 5deg; top: 10%; left: 45%; z-index: 11; transition-delay: 0.3s;">
+                <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80" alt="Laptop">
+            </div>
+            <div class="photo-item f-film-orange size-l" style="--rot: -2deg; top: 45%; left: 10%; z-index: 15; transition-delay: 0.4s;">
+                <img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?w=500&q=80" alt="Study">
+            </div>
+            <div class="photo-item f-polaroid-black size-s" style="--rot: 8deg; top: 38%; left: 45%; z-index: 16; transition-delay: 0.5s;">
+                <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&q=80" alt="Matrix">
+            </div>
+            <div class="photo-item f-digicam-black size-square" style="--rot: -5deg; top: 55%; left: 60%; z-index: 14; transition-delay: 0.6s;">
+                <img src="https://images.unsplash.com/photo-1607799279861-4dd99b853823?w=500&q=80" alt="Screen">
+            </div>
+            <div class="photo-item f-tape-only size-s" style="--rot: -12deg; top: 25%; right: 5%; z-index: 13; transition-delay: 0.7s;">
+                <div class="tape" style="transform: rotate(15deg);"></div>
+                <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&q=80" alt="Tech">
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- JANUARI 2026 (5 Frames)                        -->
+    <!-- ============================================== -->
+    <section class="bg-jan hidden-section">
+        <div class="texture-overlay"></div>
+        <div class="title-group">
+            <span class="month-script">Januari</span><br>
+            <h1 class="year-serif">2026</h1>
+        </div>
+        <div class="gallery-container">
+            <div class="sticker-item pop-art" style="--rot: -15deg; top: 5%; right: 20%; z-index: 25; transition-delay: 1s;">SCAN!</div>
+
+            <div class="photo-item f-polaroid-kiss size-l" style="--rot: -3deg; top: 12%; left: 10%; z-index: 10; transition-delay: 0.2s;">
+                <div class="tape"></div>
+                <img src="https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=500&q=80" alt="Retail">
+            </div>
+            <div class="photo-item f-blueprint size-s" style="--rot: 5deg; top: 8%; left: 45%; z-index: 11; transition-delay: 0.3s;">
+                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80" alt="Barcode">
+            </div>
+            <div class="photo-item f-notepad size-wide" style="--rot: -4deg; top: 45%; left: 15%; z-index: 15; transition-delay: 0.4s;">
+                <img src="https://images.unsplash.com/photo-1601598851547-4302969d0614?w=600&q=80" alt="Store">
+            </div>
+            <div class="photo-item f-stamp size-square" style="--rot: 7deg; top: 40%; left: 55%; z-index: 14; transition-delay: 0.5s;">
+                <img src="https://images.unsplash.com/photo-1580913428735-bd3c269d6a82?w=500&q=80" alt="Inventory">
+            </div>
+            <div class="photo-item f-torn size-m" style="--rot: -8deg; top: 65%; left: 40%; z-index: 16; transition-delay: 0.6s;">
+                <img style="filter: sepia(0.5);" src="https://images.unsplash.com/photo-1556740714-a8395b3bf30f?w=500&q=80" alt="Register">
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- FEBRUARI 2026 (6 Frames)                       -->
+    <!-- ============================================== -->
+    <section class="bg-feb hidden-section">
+        <div class="texture-overlay"></div>
+        <div class="title-group">
+            <span class="month-script">Februari</span><br>
+            <h1 class="year-serif">2026</h1>
+        </div>
+        <div class="gallery-container">
+            <div class="dymo-label" style="--rot: -3deg; top: 8%; left: 15%; z-index: 25; position: absolute; transition-delay: 0.8s;">XAUUSD / BTCUSD</div>
+
+            <div class="photo-item f-browser size-wide" style="--rot: -5deg; top: 15%; left: 12%; z-index: 10; transition-delay: 0.2s;">
+                <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=80" alt="Trading">
+            </div>
+            <div class="photo-item f-wood size-l" style="--rot: 4deg; top: 8%; left: 52%; z-index: 11; transition-delay: 0.3s;">
+                <img src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=500&q=80" alt="Finance">
+            </div>
+            <div class="photo-item f-polaroid-basic size-m" style="--rot: -2deg; top: 45%; left: 5%; z-index: 15; transition-delay: 0.4s;">
+                <div class="tape" style="background: rgba(16, 185, 129, 0.4);"></div>
+                <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=500&q=80" alt="Focus">
+            </div>
+            <div class="photo-item f-neon size-s" style="--rot: 10deg; top: 38%; left: 38%; z-index: 16; transition-delay: 0.5s;">
+                <img src="https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=400&q=80" alt="Crypto">
+            </div>
+            <div class="photo-item f-gold-thin size-square" style="--rot: -6deg; top: 60%; left: 50%; z-index: 14; transition-delay: 0.6s;">
+                <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=500&q=80" alt="Bitcoin">
+            </div>
+            <div class="photo-item f-tape-only size-s" style="--rot: 5deg; top: 70%; left: 25%; z-index: 17; transition-delay: 0.7s;">
+                <div class="tape"></div>
+                <img style="filter: grayscale(1);" src="https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&q=80" alt="Stock">
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- MARET 2026 (5 Frames)                          -->
+    <!-- ============================================== -->
+    <section class="bg-mar hidden-section">
+        <div class="texture-overlay"></div>
+        <div class="title-group">
+            <span class="month-script">Maret</span><br>
+            <h1 class="year-serif">2026</h1>
+        </div>
+        <div class="gallery-container">
+            <div class="dymo-label" style="--rot: 8deg; top: 10%; right: 15%; background: #fff; color: #111; z-index: 25; position: absolute; transition-delay: 1s;">ULTRA MILK Rp12.800!</div>
+
+            <div class="photo-item f-stamp size-m" style="--rot: -4deg; top: 15%; left: 12%; z-index: 10; transition-delay: 0.2s;">
+                <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&q=80" alt="Milk">
+            </div>
+            <div class="photo-item f-torn size-wide" style="--rot: 6deg; top: 12%; left: 45%; z-index: 11; transition-delay: 0.3s;">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80" alt="Grocery">
+            </div>
+            <div class="photo-item f-gold-thin size-l" style="--rot: -2deg; top: 45%; left: 20%; z-index: 15; transition-delay: 0.4s;">
+                <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=500&q=80" alt="Market">
+            </div>
+            <div class="photo-item f-polaroid-doodle size-square" style="--rot: 8deg; top: 42%; left: 55%; z-index: 14; transition-delay: 0.5s;">
+                <div class="tape" style="background: rgba(59, 130, 246, 0.4);"></div>
+                <img src="https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=500&q=80" alt="Store Aisle">
+            </div>
+            <div class="photo-item f-film-blue size-s" style="--rot: -6deg; top: 65%; left: 45%; z-index: 16; transition-delay: 0.6s;">
+                <img src="https://images.unsplash.com/photo-1506617420156-8e4536971650?w=400&q=80" alt="Receipt">
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- APRIL 2026 (6 Frames)                          -->
+    <!-- ============================================== -->
+    <section class="bg-apr hidden-section">
+        <div class="texture-overlay"></div>
+        <div class="title-group">
+            <span class="month-script">April</span><br>
+            <h1 class="year-serif">2026</h1>
+        </div>
+        <div class="gallery-container">
+            <div class="sticker-item pop-art" style="--rot: 10deg; bottom: 15%; left: 10%; z-index: 25; transition-delay: 1.2s;">ART!</div>
+            <div class="dymo-label" style="--rot: -12deg; top: 12%; left: 15%; z-index: 20; position: absolute; transition-delay: 0.8s;">NANO BANANA / VEO</div>
+            
+            <div class="photo-item f-blueprint size-l" style="--rot: -4deg; top: 15%; left: 20%; z-index: 10; transition-delay: 0.2s;">
+                <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=500&q=80" alt="Art">
+            </div>
+            <div class="photo-item f-neon size-m" style="--rot: 5deg; top: 10%; left: 55%; z-index: 11; transition-delay: 0.3s;">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80" alt="Abstract">
+            </div>
+            <div class="photo-item f-tape-only size-wide" style="--rot: -2deg; top: 48%; left: 10%; z-index: 15; transition-delay: 0.4s;">
+                <div class="tape"></div>
+                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80" alt="Digital">
+            </div>
+            <div class="photo-item f-macos size-square" style="--rot: 8deg; top: 40%; left: 45%; z-index: 14; transition-delay: 0.5s;">
+                <img src="https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?w=500&q=80" alt="Render">
+            </div>
+            <div class="photo-item f-polaroid-black size-s" style="--rot: -6deg; top: 65%; left: 60%; z-index: 16; transition-delay: 0.6s;">
+                <img src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&q=80" alt="VFX">
+            </div>
+            <div class="photo-item f-win95 size-s" style="--rot: 4deg; top: 25%; right: 5%; z-index: 13; transition-delay: 0.7s;">
+                <img style="filter: invert(1);" src="https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=400&q=80" alt="Colors">
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- MEI 2026 (5 Frames)                            -->
+    <!-- ============================================== -->
+    <section class="bg-may hidden-section">
+        <div class="texture-overlay"></div>
+        <div class="title-group">
+            <span class="month-script">Mei</span><br>
+            <h1 class="year-serif">2026</h1>
+        </div>
+        <div class="gallery-container">
+            <div class="dymo-label" style="--rot: 5deg; top: 8%; right: 20%; z-index: 25; position: absolute; transition-delay: 1s;">BATAM VIBES</div>
+
+            <div class="photo-item f-hologram size-wide" style="--rot: 5deg; top: 15%; left: 12%; z-index: 10; transition-delay: 0.2s;">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80" alt="Beach">
+            </div>
+            <div class="photo-item f-polaroid-love size-m" style="--rot: -4deg; top: 10%; left: 52%; z-index: 11; transition-delay: 0.3s;">
+                <div class="tape" style="background: rgba(234, 179, 8, 0.4);"></div>
+                <img src="https://images.unsplash.com/photo-1516483638261-f4085ee6b633?w=500&q=80" alt="City">
+            </div>
+            <div class="photo-item f-error size-l" style="--rot: -1deg; top: 45%; left: 20%; z-index: 15; transition-delay: 0.4s;">
+                <img src="https://images.unsplash.com/photo-1499678329028-101435549a4e?w=500&q=80" alt="Sun">
+            </div>
+            <div class="photo-item f-album-black size-square" style="--rot: 6deg; top: 40%; left: 55%; z-index: 14; transition-delay: 0.5s;">
+                <img src="https://images.unsplash.com/photo-1540155945626-669aa50ef8eb?w=500&q=80" alt="Tropical">
+            </div>
+            <div class="photo-item f-film-orange size-s" style="--rot: -8deg; top: 68%; left: 45%; z-index: 16; transition-delay: 0.6s;">
+                <img src="https://images.unsplash.com/photo-1596422846543-75c6fc19b22a?w=400&q=80" alt="Sunset">
+            </div>
+        </div>
+    </section>
+
+    <!-- SCRIPT ANIMASI -->
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.hidden-section').forEach((el) => observer.observe(el));
+    </script>
+</body>
 </html>
