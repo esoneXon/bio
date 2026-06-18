@@ -3,204 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Created & Developed by Sadewa</title>
+<title>Sadewa</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-    --bg1:#0f172a;
-    --bg2:#1e293b;
-    --bg3:#020617;
-    --primary:#60a5fa;
-    --secondary:#a78bfa;
-    --accent:#22d3ee;
-}
-
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
 }
 
-html{
-    font-size:16px;
-}
-
 body{
     min-height:100vh;
     min-height:100dvh;
     display:flex;
-    align-items:center;
     justify-content:center;
+    align-items:center;
     padding:20px;
-    overflow:hidden;
     font-family:'Poppins',sans-serif;
-    background:linear-gradient(
-        135deg,
-        var(--bg1),
-        var(--bg2),
-        var(--bg3)
-    );
-    position:relative;
+    background:#f8fafc;
 }
 
-/* Background Effects */
-.glow{
-    position:absolute;
-    border-radius:50%;
-    filter:blur(80px);
-    opacity:.4;
-    z-index:0;
-}
-
-.glow-1{
-    width:min(40vw,400px);
-    height:min(40vw,400px);
-    background:#3b82f6;
-    top:-10%;
-    right:-10%;
-}
-
-.glow-2{
-    width:min(35vw,350px);
-    height:min(35vw,350px);
-    background:#8b5cf6;
-    bottom:-10%;
-    left:-10%;
-}
-
-/* Card */
-.card{
-    position:relative;
-    z-index:1;
-    width:min(95vw,900px);
-    padding:clamp(24px,5vw,60px);
+.credit-box{
+    width:100%;
+    max-width:600px;
     text-align:center;
-
-    background:rgba(255,255,255,.06);
-    backdrop-filter:blur(16px);
-    -webkit-backdrop-filter:blur(16px);
-
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:28px;
-
-    box-shadow:
-        0 20px 60px rgba(0,0,0,.35),
-        inset 0 1px 0 rgba(255,255,255,.08);
-
-    animation:float 5s ease-in-out infinite;
+    padding:clamp(24px,5vw,48px);
+    background:#ffffff;
+    border-radius:24px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
 
-.badge{
-    display:inline-block;
-    padding:8px 18px;
-    border-radius:999px;
-    background:rgba(255,255,255,.08);
-    color:#cbd5e1;
-    font-size:clamp(.7rem,1vw,.9rem);
-    letter-spacing:2px;
-    text-transform:uppercase;
-    margin-bottom:20px;
+.icon{
+    font-size:clamp(2rem,6vw,3rem);
+    margin-bottom:12px;
 }
 
 .title{
-    font-size:clamp(2rem,8vw,5.5rem);
-    font-weight:800;
-    line-height:1.1;
-    margin-bottom:10px;
+    font-size:clamp(1.8rem,6vw,3rem);
+    font-weight:700;
+    color:#0f172a;
+    line-height:1.2;
+}
 
-    background:linear-gradient(
-        90deg,
-        var(--primary),
-        var(--secondary),
-        var(--accent),
-        var(--primary)
-    );
-
-    background-size:300% auto;
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-
-    animation:gradient 6s linear infinite;
+.name{
+    display:block;
+    margin-top:8px;
+    color:#2563eb;
 }
 
 .subtitle{
-    color:#94a3b8;
-    font-size:clamp(.9rem,2vw,1.2rem);
-    margin-top:10px;
+    margin-top:16px;
+    color:#64748b;
+    font-size:clamp(.9rem,2vw,1rem);
+    line-height:1.6;
 }
 
-.divider{
-    width:clamp(80px,15vw,140px);
-    height:5px;
-    margin:25px auto 0;
-    border-radius:999px;
-    background:linear-gradient(
-        90deg,
-        var(--primary),
-        var(--secondary)
-    );
-}
-
-/* Animations */
-@keyframes gradient{
-    from{
-        background-position:0% center;
-    }
-    to{
-        background-position:300% center;
-    }
-}
-
-@keyframes float{
-    0%,100%{
-        transform:translateY(0);
-    }
-    50%{
-        transform:translateY(-8px);
-    }
-}
-
-/* Small Phones */
 @media (max-width:480px){
-    .card{
-        border-radius:20px;
-    }
-
-    .badge{
-        letter-spacing:1px;
-    }
-}
-
-/* Large Screens */
-@media (min-width:1600px){
-    html{
-        font-size:18px;
+    .credit-box{
+        border-radius:18px;
+        padding:24px;
     }
 }
 </style>
 </head>
 <body>
 
-<div class="glow glow-1"></div>
-<div class="glow glow-2"></div>
-
-<div class="card">
-    <div class="badge">Official Credit</div>
+<div class="credit-box">
+    <div class="icon">👋</div>
 
     <h1 class="title">
-        Created &amp; Developed<br>
-        by Sadewa
+        Created &amp; Developed
+        <span class="name">by Sadewa</span>
     </h1>
 
     <p class="subtitle">
-        Modern • Responsive • Elegant
+        Thank you for visiting. This project was designed and developed with care to provide the best user experience across all devices.
     </p>
-
-    <div class="divider"></div>
 </div>
 
 </body>
