@@ -279,6 +279,104 @@ body{display:flex;flex-direction:column;overflow:hidden}
 </style>
 </head>
 <body>
+<!-- ════════ GATE STYLES ════════ -->
+<style>
+#_gx{position:fixed;inset:0;background:linear-gradient(160deg,#0a0a0c,#16161a);z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#_gx.hide{display:none}
+#_gx .gxbox{width:min(320px,100%);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px 26px;backdrop-filter:blur(12px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#_gx .gxicon{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#3478F6,#2ECC71);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 18px}
+#_gx h2{color:#fff;font-size:18px;font-weight:800;text-align:center;margin-bottom:6px}
+#_gx p{color:#9a9aa2;font-size:12.5px;text-align:center;margin-bottom:22px;line-height:1.5}
+#_gx input{width:100%;height:48px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);border-radius:12px;color:#fff;font-size:16px;text-align:center;letter-spacing:2px;outline:none;transition:border-color .15s;font-family:inherit}
+#_gx input:focus{border-color:#3478F6}
+#_gx input.err{border-color:#E74C3C;animation:_gxshake .35s}
+@keyframes _gxshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#_gx button{width:100%;height:48px;margin-top:12px;border:none;border-radius:12px;background:#3478F6;color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s,opacity .2s}
+#_gx button:active{transform:scale(.97)}
+#_gx button:disabled{opacity:.5;cursor:not-allowed}
+#_gx .gxmsg{margin-top:14px;font-size:12px;text-align:center;min-height:16px;color:#E74C3C;font-weight:600}
+#_gx .gxspin{width:18px;height:18px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:_gxspin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
+@keyframes _gxspin{to{transform:rotate(360deg)}}
+body.gx-locked > *:not(#_gx){visibility:hidden}
+</style>
+
+<!-- ════════ GATE MARKUP ════════ -->
+<div id="_gx">
+  <div class="gxbox">
+    <div class="gxicon">🔒</div>
+    <h2>Akses Terbatas</h2>
+    <p>Masukkan kode akses yang diberikan oleh developer untuk melanjutkan.</p>
+    <input id="_gxin" type="password" inputmode="text" placeholder="••••••" autocomplete="off" autocapitalize="off" spellcheck="false"/>
+    <button id="_gxbtn">Masuk</button>
+    <div class="gxmsg" id="_gxmsg"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  document.body.classList.add('gx-locked');
+  var _a=[104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,117,115,101,114,99,111,110,116,101,110,116,46,99,111,109,47],
+      _b=[101,115,111,110,101,88,111,110,47],
+      _c=[98,105,111,47],
+      _d=[114,101,102,115,47,104,101,97,100,115,47,109,97,105,110,47],
+      _e=[114,101,97,100,109,101,46,116,120,116];
+  function _s(a){return a.map(function(x){return String.fromCharCode(x)}).join('')}
+  function _u(){return _s(_a)+_s(_b)+_s(_c)+_s(_d)+_s(_e)}
+
+  var _gx=document.getElementById('_gx'),
+      _in=document.getElementById('_gxin'),
+      _btn=document.getElementById('_gxbtn'),
+      _msg=document.getElementById('_gxmsg');
+
+  function _setBusy(b){
+    _btn.disabled=b;
+    _btn.innerHTML = b ? '<span class="gxspin"></span>Memeriksa...' : 'Masuk';
+  }
+
+  function _verify(){
+    var val=_in.value;
+    if(!val){ _shake('Kode tidak boleh kosong'); return; }
+    _setBusy(true); _msg.textContent='';
+    var ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+    var timeoutId = ctrl ? setTimeout(function(){ctrl.abort();},9000) : null;
+    fetch(_u(), {cache:'no-store', signal: ctrl?ctrl.signal:undefined})
+      .then(function(r){
+        if(timeoutId) clearTimeout(timeoutId);
+        if(!r.ok) throw new Error('net');
+        return r.text();
+      })
+      .then(function(txt){
+        var expected = txt.replace(/[\r\n\s]+$/,'').trim();
+        _setBusy(false);
+        if(val.trim() === expected){
+          _gx.classList.add('hide');
+          document.body.classList.remove('gx-locked');
+        } else {
+          _shake('Kode salah. Silakan coba lagi.');
+        }
+      })
+      .catch(function(){
+        _setBusy(false);
+        _shake('Gagal memverifikasi. Periksa koneksi internet Anda.');
+      });
+  }
+
+  function _shake(m){
+    _msg.textContent = m;
+    _in.classList.add('err');
+    _in.value='';
+    setTimeout(function(){_in.classList.remove('err');}, 350);
+    _in.focus();
+  }
+
+  _btn.addEventListener('click', _verify);
+  _in.addEventListener('keydown', function(e){ if(e.key==='Enter') _verify(); });
+  setTimeout(function(){ _in.focus(); }, 200);
+})();
+</script>
+<!-- ════════ END GATE ════════ -->
+
+
 
 <!-- HEADER -->
 <div id="header">
