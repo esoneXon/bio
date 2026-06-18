@@ -2,9 +2,82 @@
 <html>
 <head>
 <style>
+:root{
+    --bg:#0a0b14;
+    --card:#111827;
+    --accent:#66d9ff;
+    --text:#ffffff;
+    --muted:#94a3b8;
+}
+  .card{
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(102,217,255,.15);
 
-/* CSS */
+    backdrop-filter:blur(20px);
 
+    border-radius:24px;
+
+    transition:.3s;
+}
+.navbar{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+
+    display:flex;
+    gap:10px;
+
+    background:rgba(255,255,255,.05);
+
+    padding:8px;
+
+    border-radius:999px;
+
+    backdrop-filter:blur(20px);
+}
+
+.nav-btn{
+    border:none;
+    background:none;
+
+    color:#94a3b8;
+
+    padding:10px 24px;
+
+    border-radius:999px;
+
+    cursor:pointer;
+}
+.page{
+    display:none;
+    animation:fade .4s ease;
+}
+
+.page.active{
+    display:block;
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+.nav-btn.active{
+    background:#66d9ff;
+    color:#000;
+}
+.card:hover{
+    transform:translateY(-5px);
+
+    box-shadow:
+        0 0 20px rgba(102,217,255,.2);
+}
 </style>
 </head>
 
@@ -23,9 +96,29 @@
 </section>
 
 <script>
+const buttons = document.querySelectorAll('.nav-btn');
+const pages = document.querySelectorAll('.page');
 
-/* Javascript */
+buttons.forEach(btn => {
 
+    btn.addEventListener('click', () => {
+
+        buttons.forEach(b =>
+            b.classList.remove('active')
+        );
+
+        pages.forEach(p =>
+            p.classList.remove('active')
+        );
+
+        btn.classList.add('active');
+
+        document
+            .getElementById(btn.dataset.page)
+            .classList.add('active');
+    });
+
+});
 </script>
 
 </body>
