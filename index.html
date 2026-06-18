@@ -1,470 +1,655 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Scrapbook 2025-2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Poppins:wght@400;600;800&family=Rock+Salt&family=Bangers&display=swap" rel="stylesheet">
-    
-    <style>
-        /* --- RESET & GLOBAL --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        /* --- UPDATE: DISABLE SELECTION & SMOOTH CLICK --- */
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: #111; 
-            color: #fff; 
-            overflow-x: hidden; 
-            -webkit-user-select: none; /* Safari */
-            -ms-user-select: none;     /* IE 10 and 11 */
-            user-select: none;         /* Standar (Chrome, Firefox, Edge) */
-            -webkit-tap-highlight-color: transparent; /* Hilangkan highlight abu-abu di HP */
-        }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>PLU Scanner</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--G:#2ECC71;--Gd:#27AE60;--R:#E74C3C;--g1:#1C1C1E;--g2:#8E8E93;--g3:#F2F2F7}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:var(--g1);overflow:hidden}
 
-        .texture-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://www.transparenttextures.com/patterns/crumpled-paper.png'); opacity: 0.6; z-index: 1; pointer-events: none; mix-blend-mode: overlay; }
+/* camera */
+#camWrap{position:fixed;inset:0;background:#000}
+#vid{width:100%;height:100%;object-fit:cover;display:block}
+#cvs{position:absolute;top:0;left:0;width:100%;height:100%;display:none}
 
-        section { min-height: 120vh; padding: 100px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 5px dashed rgba(255,255,255,0.4); box-shadow: inset 0 0 80px rgba(0,0,0,0.6); }
+/* frame */
+#frame{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(260px,70vw);height:min(260px,70vw);pointer-events:none}
+.c{position:absolute;width:40px;height:40px}.c::before,.c::after{content:'';position:absolute;background:#fff}
+.tl{top:0;left:0}.tl::before{top:0;left:0;width:40px;height:4px}.tl::after{top:0;left:0;width:4px;height:40px}
+.tr{top:0;right:0}.tr::before{top:0;right:0;width:40px;height:4px}.tr::after{top:0;right:0;width:4px;height:40px}
+.bl{bottom:0;left:0}.bl::before{bottom:0;left:0;width:40px;height:4px}.bl::after{bottom:0;left:0;width:4px;height:40px}
+.br{bottom:0;right:0}.br::before{bottom:0;right:0;width:14px;height:4px}.br::after{bottom:0;right:0;width:4px;height:40px}
+.wm{position:absolute;bottom:0;right:14px;color:#fff;font-size:11px;font-weight:700}
+#scanLine{position:absolute;left:0;width:100%;height:2px;background:rgba(46,204,113,.7);animation:sw 2s ease-in-out infinite}
+@keyframes sw{0%{top:10%;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:90%;opacity:0}}
 
-        /* --- BACKGROUND MOTIF BULANAN --- */
-        .bg-sep { background-color: #451a03; background-image: radial-gradient(#78350f 2px, transparent 2px); background-size: 30px 30px; } 
-        .bg-oct { background-color: #92400e; background-image: linear-gradient(rgba(255,255,255,0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.1) 2px, transparent 2px); background-size: 100px 100px; }
-        .bg-nov { background-color: #881337; background-image: radial-gradient(rgba(255,255,255,0.15) 15%, transparent 16%); background-size: 60px 60px; }
-        .bg-dec { background-color: #0f172a; background-image: repeating-linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%); background-size: 40px 40px; }
-        .bg-jan { background-color: #f8fafc; background-image: repeating-linear-gradient(transparent, transparent 39px, #93c5fd 40px); }
-        .bg-jan .texture-overlay { mix-blend-mode: multiply; opacity: 0.3; } .bg-jan .month-script { color: #0284c7; text-shadow: none; } .bg-jan .year-serif { -webkit-text-stroke: 2px #0f172a; color: transparent; text-shadow: 4px 4px 10px rgba(0,0,0,0.1); }
-        .bg-feb { background-color: #be185d; background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 25%, transparent 25%); background-size: 40px 40px; }
-        .bg-mar { background-color: #065f46; background-image: repeating-linear-gradient(transparent, transparent 50px, rgba(255,255,255,0.08) 50px, rgba(255,255,255,0.08) 100px); }
-        .bg-apr { background-color: #3b0764; background-image: radial-gradient(rgba(255,255,255,0.3) 2px, transparent 2px); background-size: 40px 40px; }
-        .bg-may { background-color: #ca8a04; background-image: repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 30px); }
+/* engine badge */
+#badge{position:fixed;top:12px;right:14px;background:rgba(0,0,0,.65);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:12px;backdrop-filter:blur(4px);z-index:20}
 
-        /* --- TIPOGRAFI --- */
-        .title-group { position: relative; z-index: 50; text-align: center; margin-bottom: 40px; }
-        .month-script { font-family: 'Rock Salt', cursive; font-size: 3rem; color: rgba(255,255,255,0.9); transform: rotate(-5deg); margin-bottom: -40px; display: inline-block; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
-        .year-serif { font-family: 'Playfair Display', serif; font-size: 7.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 5px; line-height: 0.8; color: transparent; -webkit-text-stroke: 2px #fff; text-shadow: 10px 10px 20px rgba(0,0,0,0.4); }
+/* top card */
+#topCard{position:fixed;top:28px;left:16px;right:16px;background:#fff;border-radius:18px;padding:16px 18px 14px;box-shadow:0 8px 32px rgba(0,0,0,.35);text-align:center}
+.lbl{font-size:11px;color:var(--g2);font-weight:600;letter-spacing:.4px;margin-bottom:6px}
+#tvItem{font-size:18px;font-weight:700;color:var(--g1);line-height:1.45;min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.pbadge{display:inline-block;background:var(--g3);border-radius:8px;padding:2px 10px;font-size:11px;font-weight:600;color:var(--g2)}
+.se{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;background:#FFF3CD;color:#856404}
+.sf{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;background:#D1F2E0;color:#155724}
 
-        /* --- LAYOUT CENTRAL PILE (DESKTOP) --- */
-        .gallery-container { position: relative; width: 100%; max-width: 1100px; height: 750px; z-index: 10; margin: 0 auto; }
-        
-        .photo-item { position: absolute; box-shadow: 10px 15px 35px rgba(0,0,0,0.5); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); cursor: pointer; opacity: 0; transform: translateY(100px) scale(0.8) rotate(var(--rot, 0deg)); z-index: 10;}
-        .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        
-        /* Variasi Ukuran */
-        .size-s { width: 180px; height: 200px; } 
-        .size-m { width: 220px; height: 260px; } 
-        .size-l { width: 280px; height: 340px; } 
-        .size-wide { width: 320px; height: 220px; }
-        .size-square { width: 250px; height: 250px; }
-        
-        .tape { position: absolute; height: 25px; width: 90px; top: -12px; left: 50%; margin-left: -45px; background-color: rgba(255, 255, 255, 0.6); box-shadow: 0 1px 3px rgba(0,0,0,0.2); backdrop-filter: blur(4px); z-index: 5; clip-path: polygon(0 5%, 5% 0, 95% 5%, 100% 0, 95% 95%, 100% 100%, 5% 95%, 0 100%); }
-        
-        .photo-item:hover { transform: scale(1.15) rotate(0deg) !important; z-index: 100 !important; box-shadow: 15px 30px 50px rgba(0,0,0,0.9); filter: brightness(1.05); }
+/* bottom card */
+#botCard{position:fixed;bottom:28px;left:16px;right:16px;background:#fff;border-radius:22px;padding:20px 20px 18px;box-shadow:0 -4px 40px rgba(0,0,0,.4)}
+#tvProg{font-size:13px;font-weight:700;color:var(--g2);text-align:center;margin-bottom:10px}
+.ptrack{width:100%;height:5px;background:var(--g3);border-radius:5px;margin-bottom:16px;overflow:hidden}
+#pbar{height:100%;background:var(--G);border-radius:5px;transition:width .4s ease;width:0%}
+.brow{display:flex;gap:10px;margin-bottom:12px}
+.btn{flex:1;height:50px;border:none;border-radius:14px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.96)}
+.bg{background:var(--g3);color:var(--g1)}
+#btnSave{width:100%;height:52px;background:var(--G);color:#fff;border:none;border-radius:16px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:transform .1s,background .2s}
+#btnSave:active{transform:scale(.97)}
+#btnSave.saved{background:var(--Gd)}
 
-        /* --- UPDATE: ACTIVE STATE UNTUK EFEK KLIK --- */
-        .photo-item:active, .sticker-item:active {
-            transform: scale(0.95) !important;
-            transition: transform 0.1s ease;
-        }
+/* manual input */
+#manualWrap{display:none;gap:8px;margin-top:12px}
+#manualWrap.show{display:flex}
+#manInput{flex:1;height:46px;border:2px solid var(--g3);border-radius:12px;padding:0 14px;font-size:15px;font-family:inherit;outline:none}
+#manInput:focus{border-color:var(--G)}
+#manBtn{height:46px;padding:0 18px;background:var(--G);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
 
-        /* ========================================= */
-        /* LIBRARY BINGKAI UNIK (30+ VARIASI)        */
-        /* ========================================= */
-        .f-win95 { background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; padding: 4px; padding-top: 25px; } .f-win95::before { content: 'IMG_01.jpg'; position: absolute; top: 3px; left: 3px; right: 3px; height: 18px; background: #0000a0; color: #fff; font-family: monospace; font-size: 11px; line-height: 18px; padding-left: 5px; font-weight: bold; }
-        .f-music-dark { background: #282828; border-radius: 15px; padding: 15px; padding-bottom: 70px; } .f-music-dark img { border-radius: 8px; } .f-music-dark::after { content: '────●───────\A ⏪   ⏸   ⏩'; white-space: pre; position: absolute; bottom: 15px; width: 100%; left: 0; text-align: center; color: #fff; font-size: 14px; line-height: 1.5; font-family: sans-serif; }
-        .f-polaroid-basic { background: #fff; padding: 12px 12px 45px 12px; }
-        .f-gold-thick { background: #fff; padding: 15px; border: 12px ridge #d4af37; box-shadow: inset 0 0 8px rgba(0,0,0,0.5); }
-        .f-digicam-silver { background: linear-gradient(135deg, #e0e0e0, #999); border-radius: 8px; padding: 10px 45px 10px 10px; border: 1px solid #666; } .f-digicam-silver img { border: 4px solid #111; } .f-digicam-silver::after { content: ''; position: absolute; right: 12px; top: 50%; width: 22px; height: 22px; margin-top:-11px; background: radial-gradient(circle, #ccc, #555); border-radius: 50%; border: 1px solid #333; box-shadow: 0 4px 0 -2px #888; }
-        .f-film-black { background: #111; padding: 20px 10px; border-left: 12px dotted #fff; border-right: 12px dotted #fff; }
-        .f-paint { background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; padding: 4px; padding-top: 25px; padding-left: 25px; } .f-paint::before { content: 'Paint'; position: absolute; top: 3px; left: 3px; right: 3px; height: 18px; background: #0000a0; color: #fff; font-family: sans-serif; font-size: 11px; line-height: 18px; padding-left: 5px; } .f-paint::after { content: '🎨\A🖌\A✒'; white-space: pre; position: absolute; left: 5px; top: 30px; font-size: 10px; line-height: 1.8; }
-        .f-red-sweet { background: #fff; border: 15px solid #b91c1c; } .f-red-sweet::before { content: 'S W E E T'; position: absolute; top: -15px; left: 0; width: 100%; text-align: center; color: #fff; font-family: monospace; font-weight: bold; letter-spacing: 5px; background: #b91c1c; padding: 2px 0; }
-        .f-album-black { background: #1a1a1a; padding: 15px; position: relative; } .f-album-black::before { content: ''; position: absolute; top: 5px; left: 5px; width: 20px; height: 20px; border-top: 2px solid #ddd; border-left: 2px solid #ddd; } .f-album-black::after { content: ''; position: absolute; bottom: 5px; right: 5px; width: 20px; height: 20px; border-bottom: 2px solid #ddd; border-right: 2px solid #ddd; }
-        .f-music-light { background: #f0f0f0; border-radius: 15px; padding: 15px; padding-bottom: 70px; border: 1px solid #ddd; } .f-music-light img { border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } .f-music-light::after { content: '────●───────\A ⏪   ⏸   ⏩'; white-space: pre; position: absolute; bottom: 15px; width: 100%; left: 0; text-align: center; color: #333; font-size: 14px; line-height: 1.5; font-family: sans-serif; }
-        .f-macos { background: #fff; border: 1px solid #000; padding: 2px; padding-top: 20px; } .f-macos::before { content: '≡ System'; position: absolute; top: 0; left: 0; width: 100%; height: 18px; border-bottom: 1px solid #000; text-align: center; font-family: sans-serif; font-size: 10px; line-height: 18px; color: #000; background: repeating-linear-gradient(transparent, transparent 1px, #000 1px, #000 2px); background-size: 100% 4px; }
-        .f-film-orange { background: #d97706; padding: 20px 10px; border-left: 10px dashed #fff; border-right: 10px dashed #fff; }
-        .f-polaroid-kiss { background: #fff; padding: 12px 12px 55px 12px; } .f-polaroid-kiss::after { content: 'With love 💋'; font-family: 'Caveat', cursive; position: absolute; bottom: 12px; left: 15px; color: #111; font-size: 1.8rem; }
-        .f-digicam-black { background: #222; border-radius: 6px; padding: 10px 10px 35px 10px; border: 2px solid #444; } .f-digicam-black::after { content: 'SONY'; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); color: #888; font-family: sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
-        .f-notepad { background: #fff; border: 2px solid #c0c0c0; border-top: 25px solid #0000a0; padding: 10px; } .f-notepad::before { content: 'Notes.txt'; position: absolute; top: -20px; left: 5px; color: #fff; font-family: sans-serif; font-size: 11px; }
-        .f-browser { background: #fff; border: 2px solid #808080; border-top: 30px solid #0000a0; padding: 2px; } .f-browser::before { content: 'e Explorer'; position: absolute; top: -25px; left: 5px; color: #fff; font-family: sans-serif; font-size: 12px; font-weight: bold; } .f-browser::after { content: 'File Edit View Go'; position: absolute; top: -10px; left: 5px; color: #111; background: #c0c0c0; width: calc(100% - 4px); padding: 2px; font-family: sans-serif; font-size: 9px; }
-        .f-wood { background: #fff; padding: 10px; border: 15px solid #654321; outline: 2px solid #3e2723; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
-        .f-polaroid-black { background: #111; border: 1px solid #333; padding: 12px 12px 50px 12px; color: #fff; } .f-polaroid-black::after { content: 'midnight ⋆'; font-family: 'Rock Salt', cursive; position: absolute; bottom: 15px; left: 0; width: 100%; text-align: center; font-size: 1rem; }
-        .f-stamp { background: #fdfdfd; padding: 15px; border: 4px dotted #ccc; box-shadow: 0 0 0 8px #fdfdfd; }
-        .f-torn { background: #fff; padding: 10px; padding-bottom: 30px; clip-path: polygon(0 0, 100% 0, 100% 95%, 95% 100%, 90% 95%, 85% 100%, 80% 95%, 75% 100%, 70% 95%, 65% 100%, 60% 95%, 55% 100%, 50% 95%, 45% 100%, 40% 95%, 35% 100%, 30% 95%, 25% 100%, 20% 95%, 15% 100%, 10% 95%, 5% 100%, 0 95%); }
-        .f-gold-thin { background: #fff; padding: 5px; border: 4px double #b8860b; outline: 4px solid #daa520; }
-        .f-blueprint { background: #1e3a8a; padding: 15px; border: 2px dashed #60a5fa; }
-        .f-neon { background: #000; padding: 10px; border: 4px solid #ec4899; box-shadow: 0 0 15px #ec4899, inset 0 0 10px #ec4899; }
-        .f-tape-only { background: transparent; padding: 0; box-shadow: 5px 5px 15px rgba(0,0,0,0.5); } .f-tape-only img { border-radius: 4px; }
-        .f-hologram { background: linear-gradient(45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb); padding: 8px; border-radius: 4px; }
-        .f-polaroid-love { background: #fff; padding: 12px 12px 50px 12px; } .f-polaroid-love::after { content: 'i love you <3'; font-family: 'Caveat', cursive; position: absolute; bottom: 8px; left: 0; width: 100%; text-align: center; color: #111; font-size: 1.8rem; }
-        .f-error { background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; padding: 4px; padding-top: 25px; padding-bottom: 30px; } .f-error::before { content: 'Error'; position: absolute; top: 3px; left: 3px; right: 3px; height: 18px; background: #0000a0; color: #fff; font-family: sans-serif; font-size: 11px; line-height: 18px; padding-left: 5px; } .f-error::after { content: '[ OK ]'; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); border: 1px solid #111; padding: 2px 10px; font-family: sans-serif; font-size: 10px; background: #c0c0c0; }
-        .f-polaroid-doodle { background: #fff; padding: 12px 12px 50px 12px; } .f-polaroid-doodle::after { content: '★ ★ ★'; font-family: 'Caveat', cursive; position: absolute; bottom: 10px; right: 15px; color: #eab308; font-size: 1.5rem; }
-        .f-folder { background: #fef08a; padding: 5px; border-radius: 0 5px 5px 5px; border: 1px solid #ca8a04; padding-top: 20px;} .f-folder::before { content: ''; position: absolute; top: -10px; left: -1px; width: 40%; height: 15px; background: #fef08a; border: 1px solid #ca8a04; border-bottom: none; border-radius: 5px 5px 0 0; }
-        .f-film-blue { background: #1e3a8a; padding: 20px 10px; border-left: 10px dashed #93c5fd; border-right: 10px dashed #93c5fd; }
+/* toast */
+#toast{position:fixed;bottom:220px;left:50%;transform:translateX(-50%) translateY(14px);background:rgba(28,28,30,.9);color:#fff;padding:10px 20px;border-radius:22px;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:88vw;text-align:center;backdrop-filter:blur(8px);z-index:999}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:rgba(231,76,60,.92)}
 
-        /* --- STIKER & DEKORASI --- */
-        .sticker-item { position: absolute; opacity: 0; transform: scale(0) rotate(var(--rot, 0deg)); filter: drop-shadow(4px 6px 8px rgba(0,0,0,0.5)); transition: all 0.3s ease; cursor: pointer; transform-origin: center;}
-        .sticker-item:hover { transform: scale(1.1) rotate(0deg) !important; z-index: 101 !important; filter: drop-shadow(8px 12px 12px rgba(0,0,0,0.6)); }
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .2s}
+.ov.open{opacity:1;pointer-events:all}
+.mb{background:#fff;border-radius:22px;padding:26px 22px 18px;width:min(340px,90vw);box-shadow:0 16px 60px rgba(0,0,0,.4);transform:scale(.95);transition:transform .2s}
+.ov.open .mb{transform:scale(1)}
+.mt{font-size:17px;font-weight:800;color:var(--g1);margin-bottom:8px}
+.mm{font-size:13px;color:var(--g2);line-height:1.6;margin-bottom:20px}
+.ma{display:flex;gap:10px}
+.mbtn{flex:1;height:46px;border:none;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s}
+.mbtn:active{transform:scale(.96)}
+.mg{background:var(--G);color:#fff}.ms{background:var(--g3);color:var(--g1)}
 
-        .vintage-cutout { background: #fff; padding: 6px; border-radius: 8px; border: 1px solid #ddd; } .vintage-cutout img { width: 100%; height: auto; display: block; border-radius: 4px; filter: grayscale(40%) contrast(110%); }
-        .pop-art { font-family: 'Bangers', cursive; font-size: 4.5rem; color: #fde047; text-shadow: 3px 3px 0 #ef4444, 6px 6px 0 #111; letter-spacing: 2px; }
-        .pop-art.blue { color: #93c5fd; text-shadow: 3px 3px 0 #1e3a8a, 6px 6px 0 #111; }
-        .dymo-label { background: #222; color: #fff; font-family: monospace; font-size: 1.1rem; padding: 4px 12px; letter-spacing: 2px; box-shadow: 2px 2px 0px rgba(0,0,0,0.5); transform: scale(0); opacity: 0; border-radius: 2px; }
-        .doodle-heart { font-size: 3.5rem; color: transparent; text-shadow: 0 0 0 #f43f5e; filter: drop-shadow(2px 2px 0px #fff); font-family: sans-serif; }
+/* upload */
+#upState{position:fixed;inset:0;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:36px;z-index:50}
+#upState h2{font-size:22px;font-weight:800;color:#fff;text-align:center}
+#upState p{font-size:13px;color:var(--g2);text-align:center;line-height:1.6}
+#fileIn{display:none}
+.upbtn{height:52px;padding:0 28px;background:var(--G);color:#fff;border:none;border-radius:16px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform .1s}
+.upbtn:active{transform:scale(.97)}
+.upico{width:70px;height:70px;background:rgba(46,204,113,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px}
 
-        /* --- ANIMASI --- */
-        .show .photo-item { transform: translateY(0) scale(1) rotate(var(--rot, 0deg)); opacity: 1; }
-        .show .dymo-label, .show .sticker-item { animation: popSticker 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .show .month-script { animation: slideRight 1s ease-out forwards; }
-        .show .year-serif { animation: slideLeft 1s ease-out forwards; }
-
-        @keyframes popSticker { 0% { opacity: 0; transform: scale(0) rotate(0deg); } 100% { opacity: 1; transform: scale(1) rotate(var(--rot)); } }
-        @keyframes slideRight { from { opacity: 0; transform: translateX(-50px) rotate(-5deg); } to { opacity: 1; transform: translateX(0) rotate(-5deg); } }
-        @keyframes slideLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-
-        /* ========================================= */
-        /* RESPONSIVE MOBILE (Rahasia Scrapbook HP)  */
-        /* ========================================= */
-        @media (max-width: 768px) {
-            .year-serif { font-size: 4.5rem; } 
-            .month-script { font-size: 2.5rem; margin-bottom: -20px; }
-            section { padding: 60px 0; min-height: 90vh; }
-            
-            /* Kunci Utama: Tetap gunakan Absolute tapi di dalam wadah yang lebih kecil dan proporsional */
-            .gallery-container { height: 600px; width: 100%; max-width: 100vw; margin: 0 auto; overflow: visible; display: block; }
-            
-            /* Susutkan ukuran Frame agar muat bertumpuk di layar HP */
-            .size-s { width: 120px; height: 140px; } 
-            .size-m { width: 140px; height: 160px; } 
-            .size-l { width: 160px; height: 200px; } 
-            .size-wide { width: 170px; height: 130px; }
-            .size-square { width: 140px; height: 140px; }
-            
-            /* Susutkan Teks & Stiker */
-            .pop-art { font-size: 2.5rem; }
-            .doodle-heart { font-size: 2.5rem; }
-            .dymo-label { font-size: 0.7rem; padding: 2px 6px; }
-            .vintage-cutout { padding: 3px; border-radius: 4px; }
-            /* Paksa gambar stiker lebih kecil di HP */
-            .gallery-container .vintage-cutout { width: 80px !important; } 
-            
-            /* Penyesuaian Font di dalam Frame yang ikut mengecil */
-            .f-polaroid-love::after, .f-polaroid-kiss::after, .f-polaroid-doodle::after { font-size: 1.1rem; bottom: 5px; }
-            .f-music-dark::after, .f-music-light::after { font-size: 9px; bottom: 8px; }
-            .f-music-dark, .f-music-light { padding-bottom: 45px; padding: 10px;}
-            .f-win95::before, .f-paint::before, .f-error::before { font-size: 8px; line-height: 14px; height: 14px; }
-            .f-win95, .f-paint, .f-error { padding-top: 20px; }
-            .f-browser::before { font-size: 9px; top: -18px; }
-            .f-browser::after { font-size: 7px; top: -6px; }
-            .f-browser { border-top: 22px solid #0000a0; }
-            .f-polaroid-black::after { font-size: 0.8rem; bottom: 8px; }
-            
-            /* Susutkan ukuran selotip */
-            .tape { width: 60px; height: 18px; margin-left: -30px; top: -8px;}
-        }
-    </style>
+/* loading */
+#ldState{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:200}
+#ldState p{color:#fff;font-size:14px;font-weight:600;text-align:center;padding:0 24px}
+.sp{width:38px;height:38px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--G);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+</style>
 </head>
 <body>
 
-    <section class="bg-sep hidden-section">
-        <div class="texture-overlay"></div>
-        <div class="title-group">
-            <span class="month-script">September</span><br>
-            <h1 class="year-serif">2025</h1>
-        </div>
-        <div class="gallery-container">
-            <div class="sticker-item pop-art" style="--rot: -10deg; bottom: 15%; right: 10%; z-index: 25; transition-delay: 1s;">START!</div>
-            <div class="dymo-label" style="--rot: -4deg; top: 5%; left: 18%; z-index: 20; position: absolute; transition-delay: 0.8s;">FIRST STORY ME AND HER</div>
-            
-            <div class="photo-item f-win95 size-m" style="--rot: -5deg; top: 12%; left: 10%; z-index: 11; transition-delay: 0.2s;">
-                <img style="filter: sepia(0.3);" src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/photo_2026-05-13_12-01-15.jpg" alt="Retail Store">
-            </div>
-            <div class="photo-item f-music-dark size-l" style="--rot: 4deg; top: 5%; left: 40%; z-index: 12; transition-delay: 0.3s;">
-                <div class="tape" style="background: rgba(253, 224, 71, 0.6);"></div>
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/photo_2026-05-13_12-01-05.jpg" alt="Shelves">
-            </div>
-            <div class="photo-item f-polaroid-basic size-wide" style="--rot: -2deg; top: 45%; left: 15%; z-index: 15; transition-delay: 0.4s;">
-                <div class="tape"></div>
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/photo_2026-05-13_12-01-22.jpg" alt="Work">
-            </div>
-            <div class="photo-item f-digicam-silver size-s" style="--rot: 8deg; top: 30%; right: 12%; z-index: 13; transition-delay: 0.5s;">
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/photo_2026-05-13_12-01-23.jpg" alt="Coffee Break">
-            </div>
-            <div class="photo-item f-folder size-m" style="--rot: -6deg; top: 60%; left: 55%; z-index: 16; transition-delay: 0.6s;">
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/photo_2026-05-13_12-01-28.jpg" alt="Notes">
-            </div>
-        </div>
-    </section>
+<div id="ldState"><div class="sp"></div><p id="ldTxt">Menginisialisasi...</p></div>
 
-    <section class="bg-oct hidden-section">
-        <div class="texture-overlay"></div>
-        <div class="title-group">
-            <span class="month-script">Oktober</span><br>
-            <h1 class="year-serif">2025</h1>
-        </div>
-        <div class="gallery-container">
-            <div class="sticker-item pop-art blue" style="--rot: 12deg; top: 15%; right: 18%; z-index: 5; transition-delay: 0.8s;">OUCH!</div>
-            
-            <div class="photo-item f-gold-thick size-l" style="--rot: -4deg; top: 10%; left: 8%; z-index: 10; transition-delay: 0.2s;">
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/osdohsdiwdsjdewhdsadwe/photo_2026-05-13_12-40-37.jpg" alt="Airport">
-            </div>
-            <div class="photo-item f-polaroid-doodle size-s" style="--rot: 5deg; top: 5%; left: 40%; z-index: 11; transition-delay: 0.3s;">
-                <div class="tape" style="background: rgba(244, 63, 94, 0.4);"></div>
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/osdohsdiwdsjdewhdsadwe/photo_2026-05-13_12-40-51.jpg" alt="Luggage">
-            </div>
-            <div class="photo-item f-film-black size-wide" style="--rot: -2deg; top: 38%; left: 25%; z-index: 15; transition-delay: 0.4s;">
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/osdohsdiwdsjdewhdsadwe/photo_2026-05-13_12-40-55.jpg" alt="Journey">
-            </div>
-            <div class="photo-item f-error size-m" style="--rot: -10deg; top: 55%; left: 5%; z-index: 16; transition-delay: 0.5s;">
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/osdohsdiwdsjdewhdsadwe/photo_2026-05-13_12-40-40.jpg" alt="Traffic">
-            </div>
-            <div class="photo-item f-tape-only size-s" style="--rot: 8deg; top: 40%; right: 10%; z-index: 12; transition-delay: 0.6s;">
-                <div class="tape" style="transform: rotate(-10deg);"></div>
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/osdohsdiwdsjdewhdsadwe/photo_2026-05-13_12-40-57.jpg" alt="Rain">
-            </div>
-            <div class="photo-item f-wood size-square" style="--rot: 3deg; top: 65%; left: 45%; z-index: 17; transition-delay: 0.7s;">
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/osdohsdiwdsjdewhdsadwe/photo_2026-05-13_12-40-49.jpg" alt="Autumn">
-            </div>
-        </div>
-    </section>
+<div id="upState" class="hidden">
+  <div class="upico">📂</div>
+  <h2>PLU Scanner</h2>
+  <p>Upload file <strong>pluid.csv</strong> untuk memulai pencocokan PLU produk.</p>
+  <p style="font-size:11px;color:#444">Kolom ke-4 = PLU ID &nbsp;|&nbsp; Kolom ke-5 = Nama Barang</p>
+  <label class="upbtn" for="fileIn">📄 Pilih File CSV</label>
+  <input type="file" id="fileIn" accept=".csv,text/csv"/>
+</div>
 
-    <section class="bg-nov hidden-section">
-        <div class="texture-overlay"></div>
-        <div class="title-group">
-            <span class="month-script">November</span><br>
-            <h1 class="year-serif">2025</h1>
-        </div>
-        <div class="gallery-container">
-            <div class="sticker-item doodle-heart" style="--rot: -15deg; top: 5%; left: 22%; z-index: 25; transition-delay: 0.8s;">🖤</div>
-            
-            <div class="photo-item f-paint size-wide" style="--rot: 4deg; top: 12%; left: 15%; z-index: 10; transition-delay: 0.2s;">
-                <img style="filter: grayscale(0.5);" src="https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&q=80" alt="Warmth">
-            </div>
-            <div class="photo-item f-red-sweet size-l" style="--rot: -5deg; top: 18%; left: 55%; z-index: 11; transition-delay: 0.3s;">
-                <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=500&q=80" alt="Home">
-            </div>
-            <div class="photo-item f-album-black size-m" style="--rot: 2deg; top: 45%; left: 10%; z-index: 15; transition-delay: 0.4s;">
-                <img src="https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=500&q=80" alt="Coffee">
-            </div>
-            <div class="photo-item f-polaroid-love size-s" style="--rot: -8deg; top: 50%; left: 40%; z-index: 16; transition-delay: 0.5s;">
-                <div class="tape"></div>
-                <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&q=80" alt="Family">
-            </div>
-            <div class="photo-item f-hologram size-square" style="--rot: 6deg; top: 60%; right: 15%; z-index: 14; transition-delay: 0.6s;">
-                <img src="https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=500&q=80" alt="Peace">
-            </div>
-        </div>
-    </section>
+<div id="camWrap">
+  <video id="vid" autoplay playsinline muted></video>
+  <canvas id="cvs"></canvas>
+</div>
 
-    <section class="bg-dec hidden-section">
-        <div class="texture-overlay"></div>
-        <div class="title-group">
-            <span class="month-script">Desember</span><br>
-            <h1 class="year-serif">2025</h1>
-        </div>
-        <div class="gallery-container">
-            <div class="dymo-label" style="--rot: 10deg; top: 8%; left: 10%; background: #eee; color: #111; z-index: 25; position: absolute; transition-delay: 0.8s;">SKETCHWARE & JAVA</div>
-            
-            <div class="photo-item f-music-light size-m" style="--rot: -6deg; top: 15%; left: 15%; z-index: 10; transition-delay: 0.2s;">
-                <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&q=80" alt="Code">
-            </div>
-            <div class="photo-item f-macos size-wide" style="--rot: 5deg; top: 10%; left: 45%; z-index: 11; transition-delay: 0.3s;">
-                <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80" alt="Laptop">
-            </div>
-            <div class="photo-item f-film-orange size-l" style="--rot: -2deg; top: 45%; left: 10%; z-index: 15; transition-delay: 0.4s;">
-                <img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?w=500&q=80" alt="Study">
-            </div>
-            <div class="photo-item f-polaroid-black size-s" style="--rot: 8deg; top: 38%; left: 45%; z-index: 16; transition-delay: 0.5s;">
-                <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&q=80" alt="Matrix">
-            </div>
-            <div class="photo-item f-digicam-black size-square" style="--rot: -5deg; top: 55%; left: 60%; z-index: 14; transition-delay: 0.6s;">
-                <img src="https://images.unsplash.com/photo-1607799279861-4dd99b853823?w=500&q=80" alt="Screen">
-            </div>
-            <div class="photo-item f-tape-only size-s" style="--rot: -12deg; top: 25%; right: 5%; z-index: 13; transition-delay: 0.7s;">
-                <div class="tape" style="transform: rotate(15deg);"></div>
-                <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&q=80" alt="Tech">
-            </div>
-        </div>
-    </section>
+<div id="frame">
+  <div class="c tl"></div><div class="c tr"></div>
+  <div class="c bl"></div><div class="c br"></div>
+  <div class="wm">be your self</div>
+  <div id="scanLine"></div>
+</div>
 
-    <section class="bg-jan hidden-section">
-        <div class="texture-overlay"></div>
-        <div class="title-group">
-            <span class="month-script">Januari</span><br>
-            <h1 class="year-serif">2026</h1>
-        </div>
-        <div class="gallery-container">
-            <div class="sticker-item pop-art" style="--rot: -15deg; top: 5%; right: 20%; z-index: 25; transition-delay: 1s;">SCAN!</div>
+<div id="badge">⏳ Memulai...</div>
 
-            <div class="photo-item f-polaroid-kiss size-l" style="--rot: -3deg; top: 12%; left: 10%; z-index: 10; transition-delay: 0.2s;">
-                <div class="tape"></div>
-                <img src="https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=500&q=80" alt="Retail">
-            </div>
-            <div class="photo-item f-blueprint size-s" style="--rot: 5deg; top: 8%; left: 45%; z-index: 11; transition-delay: 0.3s;">
-                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80" alt="Barcode">
-            </div>
-            <div class="photo-item f-notepad size-wide" style="--rot: -4deg; top: 45%; left: 15%; z-index: 15; transition-delay: 0.4s;">
-                <img src="https://images.unsplash.com/photo-1601598851547-4302969d0614?w=600&q=80" alt="Store">
-            </div>
-            <div class="photo-item f-stamp size-square" style="--rot: 7deg; top: 40%; left: 55%; z-index: 14; transition-delay: 0.5s;">
-                <img src="https://images.unsplash.com/photo-1580913428735-bd3c269d6a82?w=500&q=80" alt="Inventory">
-            </div>
-            <div class="photo-item f-torn size-m" style="--rot: -8deg; top: 65%; left: 40%; z-index: 16; transition-delay: 0.6s;">
-                <img style="filter: sepia(0.5);" src="https://images.unsplash.com/photo-1556740714-a8395b3bf30f?w=500&q=80" alt="Register">
-            </div>
-        </div>
-    </section>
+<div id="topCard">
+  <div class="lbl">SEDANG MENCARI</div>
+  <div id="tvItem">Memuat data...</div>
+</div>
 
-    <section class="bg-feb hidden-section">
-        <div class="texture-overlay"></div>
-        <div class="title-group">
-            <span class="month-script">Februari</span><br>
-            <h1 class="year-serif">2026</h1>
-        </div>
-        <div class="gallery-container">
-            <div class="dymo-label" style="--rot: -3deg; top: 8%; left: 15%; z-index: 25; position: absolute; transition-delay: 0.8s;">XAUUSD / BTCUSD</div>
+<div id="botCard">
+  <div id="tvProg">Progres: 0 / 0</div>
+  <div class="ptrack"><div id="pbar"></div></div>
+  <div class="brow">
+    <button class="btn bg" id="btnBack">← Kembali</button>
+    <button class="btn bg" id="btnNext">Lewati →</button>
+  </div>
+  <button id="btnSave">💾 Simpan &amp; Ekspor JSON</button>
+  <div id="manualWrap">
+    <input id="manInput" type="text" inputmode="numeric" placeholder="Ketik barcode lalu Enter..."/>
+    <button id="manBtn">✓ OK</button>
+  </div>
+</div>
 
-            <div class="photo-item f-browser size-wide" style="--rot: -5deg; top: 15%; left: 12%; z-index: 10; transition-delay: 0.2s;">
-                <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=80" alt="Trading">
-            </div>
-            <div class="photo-item f-wood size-l" style="--rot: 4deg; top: 8%; left: 52%; z-index: 11; transition-delay: 0.3s;">
-                <img src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=500&q=80" alt="Finance">
-            </div>
-            <div class="photo-item f-polaroid-basic size-m" style="--rot: -2deg; top: 45%; left: 5%; z-index: 15; transition-delay: 0.4s;">
-                <div class="tape" style="background: rgba(16, 185, 129, 0.4);"></div>
-                <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=500&q=80" alt="Focus">
-            </div>
-            <div class="photo-item f-neon size-s" style="--rot: 10deg; top: 38%; left: 38%; z-index: 16; transition-delay: 0.5s;">
-                <img src="https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=400&q=80" alt="Crypto">
-            </div>
-            <div class="photo-item f-gold-thin size-square" style="--rot: -6deg; top: 60%; left: 50%; z-index: 14; transition-delay: 0.6s;">
-                <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=500&q=80" alt="Bitcoin">
-            </div>
-            <div class="photo-item f-tape-only size-s" style="--rot: 5deg; top: 70%; left: 25%; z-index: 17; transition-delay: 0.7s;">
-                <div class="tape"></div>
-                <img style="filter: grayscale(1);" src="https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&q=80" alt="Stock">
-            </div>
-        </div>
-    </section>
+<div id="toast"></div>
 
-    <section class="bg-mar hidden-section">
-        <div class="texture-overlay"></div>
-        <div class="title-group">
-            <span class="month-script">Maret</span><br>
-            <h1 class="year-serif">2026</h1>
-        </div>
-        <div class="gallery-container">
-            <div class="dymo-label" style="--rot: 8deg; top: 10%; right: 15%; background: #fff; color: #111; z-index: 25; position: absolute; transition-delay: 1s;">ULTRA MILK Rp12.800!</div>
+<div class="ov" id="ovResume">
+  <div class="mb">
+    <div class="mt">Lanjutkan Pekerjaan?</div>
+    <div class="mm" id="resumeMsg"></div>
+    <div class="ma">
+      <button class="mbtn ms" id="btnNew">Mulai Baru</button>
+      <button class="mbtn mg" id="btnCont">Lanjutkan</button>
+    </div>
+  </div>
+</div>
 
-            <div class="photo-item f-stamp size-m" style="--rot: -4deg; top: 15%; left: 12%; z-index: 10; transition-delay: 0.2s;">
-                <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&q=80" alt="Milk">
-            </div>
-            <div class="photo-item f-torn size-wide" style="--rot: 6deg; top: 12%; left: 45%; z-index: 11; transition-delay: 0.3s;">
-                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80" alt="Grocery">
-            </div>
-            <div class="photo-item f-gold-thin size-l" style="--rot: -2deg; top: 45%; left: 20%; z-index: 15; transition-delay: 0.4s;">
-                <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/file/photo_2026-05-13_12-01-05.jpg" alt="Market">
-            </div>
-            <div class="photo-item f-polaroid-doodle size-square" style="--rot: 8deg; top: 42%; left: 55%; z-index: 14; transition-delay: 0.5s;">
-                <div class="tape" style="background: rgba(59, 130, 246, 0.4);"></div>
-                <img src="https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=500&q=80" alt="Store Aisle">
-            </div>
-            <div class="photo-item f-film-blue size-s" style="--rot: -6deg; top: 65%; left: 45%; z-index: 16; transition-delay: 0.6s;">
-                <img src="https://images.unsplash.com/photo-1506617420156-8e4536971650?w=400&q=80" alt="Receipt">
-            </div>
-        </div>
-    </section>
+<div class="ov" id="ovSave">
+  <div class="mb">
+    <div class="mt">Ekspor Data</div>
+    <div class="mm">Ekspor seluruh hasil pencocokan ke file <strong>result.json</strong>?</div>
+    <div class="ma">
+      <button class="mbtn ms" id="saveNo">Batal</button>
+      <button class="mbtn mg" id="saveYes">Simpan</button>
+    </div>
+  </div>
+</div>
 
-    <section class="bg-apr hidden-section">
-        <div class="texture-overlay"></div>
-        <div class="title-group">
-            <span class="month-script">April</span><br>
-            <h1 class="year-serif">2026</h1>
-        </div>
-        <div class="gallery-container">
-            <div class="sticker-item pop-art" style="--rot: 10deg; bottom: 15%; left: 10%; z-index: 25; transition-delay: 1.2s;">ART!</div>
-            <div class="dymo-label" style="--rot: -12deg; top: 12%; left: 15%; z-index: 20; position: absolute; transition-delay: 0.8s;">NANO BANANA / VEO</div>
-            
-            <div class="photo-item f-blueprint size-l" style="--rot: -4deg; top: 15%; left: 20%; z-index: 10; transition-delay: 0.2s;">
-                <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=500&q=80" alt="Art">
-            </div>
-            <div class="photo-item f-neon size-m" style="--rot: 5deg; top: 10%; left: 55%; z-index: 11; transition-delay: 0.3s;">
-                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80" alt="Abstract">
-            </div>
-            <div class="photo-item f-tape-only size-wide" style="--rot: -2deg; top: 48%; left: 10%; z-index: 15; transition-delay: 0.4s;">
-                <div class="tape"></div>
-                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80" alt="Digital">
-            </div>
-            <div class="photo-item f-macos size-square" style="--rot: 8deg; top: 40%; left: 45%; z-index: 14; transition-delay: 0.5s;">
-                <img src="https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?w=500&q=80" alt="Render">
-            </div>
-            <div class="photo-item f-polaroid-black size-s" style="--rot: -6deg; top: 65%; left: 60%; z-index: 16; transition-delay: 0.6s;">
-                <img src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&q=80" alt="VFX">
-            </div>
-            <div class="photo-item f-win95 size-s" style="--rot: 4deg; top: 25%; right: 5%; z-index: 13; transition-delay: 0.7s;">
-                <img style="filter: invert(1);" src="https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=400&q=80" alt="Colors">
-            </div>
-        </div>
-    </section>
+<script>
+// ════════════════════════════════════════════════════════
+//  PLU SCANNER — 100% MANDIRI, TANPA CDN EKSTERNAL
+//  Engine 1: BarcodeDetector API (native Chrome/Edge/Android)
+//  Engine 2: ImageData pixel analysis (pure JS, built-in)
+//  Engine 3: Manual input keyboard
+// ════════════════════════════════════════════════════════
 
-    <section class="bg-may hidden-section">
-        <div class="texture-overlay"></div>
-        <div class="title-group">
-            <span class="month-script">Mei</span><br>
-            <h1 class="year-serif">2026</h1>
-        </div>
-        <div class="gallery-container">
-            <div class="dymo-label" style="--rot: 5deg; top: 8%; right: 20%; z-index: 25; position: absolute; transition-delay: 1s;">BATAM VIBES</div>
+// ── STATE ──
+let csv=[], idx=0, scanning=false, dialogOpen=false;
+const SKI='plu_i', SKD='plu_d', SKC='plu_c';
 
-            <div class="photo-item f-hologram size-wide" style="--rot: 5deg; top: 15%; left: 12%; z-index: 10; transition-delay: 0.2s;">
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80" alt="Beach">
-            </div>
-            <div class="photo-item f-polaroid-love size-m" style="--rot: -4deg; top: 10%; left: 52%; z-index: 11; transition-delay: 0.3s;">
-                <div class="tape" style="background: rgba(234, 179, 8, 0.4);"></div>
-                <img src="https://images.unsplash.com/photo-1516483638261-f4085ee6b633?w=500&q=80" alt="City">
-            </div>
-            <div class="photo-item f-error size-l" style="--rot: -1deg; top: 45%; left: 20%; z-index: 15; transition-delay: 0.4s;">
-                <img src="https://images.unsplash.com/photo-1499678329028-101435549a4e?w=500&q=80" alt="Sun">
-            </div>
-            <div class="photo-item f-album-black size-square" style="--rot: 6deg; top: 40%; left: 55%; z-index: 14; transition-delay: 0.5s;">
-                <img src="https://images.unsplash.com/photo-1540155945626-669aa50ef8eb?w=500&q=80" alt="Tropical">
-            </div>
-            <div class="photo-item f-film-orange size-s" style="--rot: -8deg; top: 68%; left: 45%; z-index: 16; transition-delay: 0.6s;">
-                <img src="https://images.unsplash.com/photo-1596422846543-75c6fc19b22a?w=400&q=80" alt="Sunset">
-            </div>
-        </div>
-    </section>
+// ── DOM ──
+const $=id=>document.getElementById(id);
+const ld=$('ldState'), ldTxt=$('ldTxt'), up=$('upState');
+const vid=$('vid'), cvs=$('cvs'), ctx2d=cvs.getContext('2d',{willReadFrequently:true});
+const tvItem=$('tvItem'), tvProg=$('tvProg'), pbar=$('pbar');
+const badge=$('badge'), frame=$('frame'), topCard=$('topCard'), botCard=$('botCard');
+const ovResume=$('ovResume'), ovSave=$('ovSave');
+const manWrap=$('manualWrap'), manInput=$('manInput');
 
-    <script>
-        // 1. Inisialisasi Intersection Observer untuk animasi scroll
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('show');
-                }
-            });
-        }, { threshold: 0.15 });
+// ── BOOT ──
+window.addEventListener('load',()=>{
+  const sc=localStorage.getItem(SKC);
+  if(sc){parseCsv(sc);if(csv.length){hideLd();checkResume();startCam();return;}}
+  hideLd(); showUp();
+});
+const hideLd=()=>{ld.classList.add('hidden')};
+function showUp(){
+  up.classList.remove('hidden');
+  [frame,topCard,botCard,badge].forEach(e=>e.style.display='none');
+}
+function hideUp(){
+  up.classList.add('hidden');
+  [frame,topCard,botCard,badge].forEach(e=>e.style.display='');
+}
 
-        document.querySelectorAll('.hidden-section').forEach((el) => observer.observe(el));
+// ── CSV ──
+$('fileIn').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    parseCsv(ev.target.result);
+    if(!csv.length){toast('CSV tidak valid. Pastikan kolom 4=PLU, 5=Nama.',1);return;}
+    localStorage.setItem(SKC,ev.target.result);
+    localStorage.removeItem(SKI); localStorage.removeItem(SKD);
+    hideUp(); checkResume(); startCam();
+  };
+  r.readAsText(f,'UTF-8');
+});
 
-        // 2. Tambahkan Logika Klik untuk Interaktivitas
-        const photos = document.querySelectorAll('.photo-item, .sticker-item');
-        let topZIndex = 200;
+function parseCsv(t){
+  csv=[];
+  t.split('\n').slice(1).forEach(row=>{
+    const r=row.trim(); if(!r)return;
+    const c=csvRow(r);
+    if(c.length>=5){
+      const p=c[3].trim().replace(/"/g,''), n=c[4].trim().replace(/"/g,'');
+      if(p||n) csv.push({pid:p,nama:n,plu:''});
+    }
+  });
+}
+function csvRow(row){
+  const res=[]; let f='',q=false;
+  for(let i=0;i<row.length;i++){
+    const c=row[i];
+    if(c==='"')q=!q;
+    else if(c===','&&!q){res.push(f);f='';}
+    else f+=c;
+  }
+  res.push(f); return res;
+}
 
-        photos.forEach(item => {
-            item.addEventListener('click', function() {
-                // Naikkan z-index agar elemen yang diklik berada paling depan
-                this.style.zIndex = topZIndex++;
-                
-                // Tambahkan efek animasi kejutan (pop) saat diklik
-                this.animate([
-                    { transform: 'scale(1) rotate(var(--rot))' },
-                    { transform: 'scale(1.2) rotate(0deg)' },
-                    { transform: 'scale(1.1) rotate(var(--rot))' }
-                ], {
-                    duration: 300,
-                    easing: 'ease-out'
-                });
-            });
-        });
-    </script>
+// ── RESUME ──
+function checkResume(){
+  const si=parseInt(localStorage.getItem(SKI)||'0');
+  const sd=localStorage.getItem(SKD)||'';
+  if(si>0&&sd){
+    dialogOpen=true;
+    $('resumeMsg').textContent=`Ditemukan progres yang belum diekspor (${si} dari ${csv.length} produk). Lanjutkan dari posisi terakhir?`;
+    ovResume.classList.add('open');
+  } else { updateUI(); scanning=true; }
+}
+$('btnCont').addEventListener('click',()=>{
+  try{
+    JSON.parse(localStorage.getItem(SKD)||'[]').forEach((v,i)=>{if(i<csv.length)csv[i].plu=v||'';});
+    idx=parseInt(localStorage.getItem(SKI)||'0');
+  }catch(e){}
+  dialogOpen=false; scanning=true;
+  ovResume.classList.remove('open'); updateUI();
+});
+$('btnNew').addEventListener('click',()=>{
+  localStorage.removeItem(SKI); localStorage.removeItem(SKD);
+  csv.forEach(r=>r.plu=''); idx=0;
+  dialogOpen=false; scanning=true;
+  ovResume.classList.remove('open'); updateUI();
+});
+
+// ── CAMERA ──
+async function startCam(){
+  try{
+    const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}});
+    vid.srcObject=s;
+    await new Promise(res=>{vid.onloadedmetadata=res;});
+    await vid.play();
+    initEngine();
+  }catch(e){
+    toast('Kamera tidak dapat diakses: '+e.message,1);
+    tvItem.innerHTML='<span style="color:#E74C3C">Akses kamera ditolak — gunakan input manual</span>';
+    badge.textContent='⌨️ Mode Manual';
+    showManual();
+  }
+}
+
+// ── ENGINE SELECTION ──
+function initEngine(){
+  if('BarcodeDetector' in window){
+    BarcodeDetector.getSupportedFormats().then(fmts=>{
+      const want=['ean_13','ean_8','code_128','code_39'];
+      if(want.some(f=>fmts.includes(f))){
+        const bd=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','upc_a','upc_e','code_93']});
+        badge.textContent='🟢 Native BarcodeDetector';
+        startNative(bd);
+      } else { startPixel(); }
+    }).catch(()=>startPixel());
+  } else { startPixel(); }
+}
+
+// ── ENGINE 1: NATIVE BARCODE DETECTOR ──
+function startNative(bd){
+  let last=0;
+  async function loop(){
+    requestAnimationFrame(loop);
+    if(!scanning||dialogOpen||idx>=csv.length)return;
+    const now=Date.now(); if(now-last<150)return; last=now;
+    if(vid.readyState<2)return;
+    cvs.width=vid.videoWidth; cvs.height=vid.videoHeight;
+    ctx2d.drawImage(vid,0,0);
+    try{
+      const res=await bd.detect(cvs);
+      if(res&&res.length>0) onScan(res[0].rawValue.trim());
+    }catch(e){}
+  }
+  loop();
+}
+
+// ── ENGINE 2: PURE JS PIXEL SCANNER ──
+// Reads pixel rows from canvas, detects bar patterns for EAN-13/EAN-8/Code128
+function startPixel(){
+  badge.textContent='🟡 JS Pixel Scanner';
+  let last=0;
+  function loop(){
+    requestAnimationFrame(loop);
+    if(!scanning||dialogOpen||idx>=csv.length)return;
+    const now=Date.now(); if(now-last<200)return; last=now;
+    if(vid.readyState<2)return;
+    const W=vid.videoWidth, H=vid.videoHeight;
+    cvs.width=W; cvs.height=H;
+    ctx2d.drawImage(vid,0,0);
+    // Sample multiple rows in center band for robustness
+    const rows=[Math.floor(H*0.45), Math.floor(H*0.5), Math.floor(H*0.55)];
+    for(const y of rows){
+      const code=tryDecodeRow(W,H,y);
+      if(code){onScan(code);return;}
+    }
+  }
+  loop();
+}
+
+function tryDecodeRow(W,H,y){
+  const imgData=ctx2d.getImageData(0,y,W,1).data;
+  // Convert to grayscale + binary
+  const px=new Uint8Array(W);
+  for(let x=0;x<W;x++){
+    const i=x*4;
+    const g=(imgData[i]*77+imgData[i+1]*150+imgData[i+2]*29)>>8;
+    px[x]=g;
+  }
+  // Adaptive threshold
+  let sum=0; for(let x=0;x<W;x++)sum+=px[x];
+  const thr=sum/W;
+  const bin=new Uint8Array(W);
+  for(let x=0;x<W;x++) bin[x]=px[x]<thr?0:1;
+
+  // Extract run lengths
+  const runs=[];
+  let cur=bin[0], cnt=0;
+  for(let x=0;x<W;x++){
+    if(bin[x]===cur) cnt++;
+    else{runs.push({v:cur,n:cnt});cur=bin[x];cnt=1;}
+  }
+  runs.push({v:cur,n:cnt});
+
+  // Try EAN-13
+  const ean=tryEAN13(runs);
+  if(ean)return ean;
+  // Try Code128
+  const c128=tryCode128(runs);
+  if(c128)return c128;
+  return null;
+}
+
+// ── EAN-13 DECODER ──
+const L_CODES={
+  '0001101':'0','0011001':'1','0010011':'2','0111101':'3','0100011':'4',
+  '0110001':'5','0101111':'6','0111011':'7','0110111':'8','0001011':'9'
+};
+const G_CODES={
+  '0100111':'0','0110011':'1','0011011':'2','0100001':'3','0011101':'4',
+  '0111001':'5','0000101':'6','0010001':'7','0001001':'8','0010111':'9'
+};
+const R_CODES={
+  '1110010':'0','1100110':'1','1101100':'2','1000010':'3','1011100':'4',
+  '1001110':'5','1010000':'6','1000100':'7','1001000':'8','1110100':'9'
+};
+const FIRST_DIGIT={
+  'LLLLLL':'0','LLGLGG':'1','LLGGLG':'2','LLGGGL':'3','LGLLGG':'4',
+  'LGGLLG':'5','LGGGLL':'6','LGLGLG':'7','LGLGGL':'8','LGGLGL':'9'
+};
+
+function tryEAN13(runs){
+  // Find guard bars (narrow-narrow pattern of same color)
+  for(let s=0;s<runs.length-60;s++){
+    // start guard: bar-space-bar (3 runs same width approximately)
+    if(runs[s].v!==0)continue;
+    const u=runs[s].n;
+    if(u<2)continue;
+    // Check start guard 101
+    if(runs[s+1]&&runs[s+2]){
+      const ok=Math.abs(runs[s+1].n-u)<=Math.ceil(u*.5)&&Math.abs(runs[s+2].n-u)<=Math.ceil(u*.5);
+      if(!ok)continue;
+    }
+    // Try to decode 12 digits + compute checksum
+    const result=decodeEAN(runs,s,u);
+    if(result&&validateEAN(result))return result;
+  }
+  return null;
+}
+
+function decodeEAN(runs,s,unit){
+  // Left 6 digits start at runs[s+3]
+  let pos=s+3; const types=[];
+  const digits=[];
+  for(let d=0;d<6;d++){
+    if(pos+3>=runs.length)return null;
+    const b0=Math.round(runs[pos].n/unit);
+    const b1=Math.round(runs[pos+1].n/unit);
+    const b2=Math.round(runs[pos+2].n/unit);
+    const b3=Math.round(runs[pos+3].n/unit);
+    const bits=''+clamp(b0,1,4)+clamp(b1,1,4)+clamp(b2,1,4)+clamp(b3,1,4);
+    const bd=expandBits(bits);
+    let found=false;
+    for(const [code,val] of Object.entries(L_CODES)){if(code===bd){digits.push(val);types.push('L');found=true;break;}}
+    if(!found)for(const [code,val] of Object.entries(G_CODES)){if(code===bd){digits.push(val);types.push('G');found=true;break;}}
+    if(!found)return null;
+    pos+=4;
+  }
+  // Middle guard 01010
+  if(pos+1>=runs.length)return null;
+  pos+=5;
+  // Right 6 digits
+  for(let d=0;d<6;d++){
+    if(pos+3>=runs.length)return null;
+    const b0=Math.round(runs[pos].n/unit);
+    const b1=Math.round(runs[pos+1].n/unit);
+    const b2=Math.round(runs[pos+2].n/unit);
+    const b3=Math.round(runs[pos+3].n/unit);
+    const bits=''+clamp(b0,1,4)+clamp(b1,1,4)+clamp(b2,1,4)+clamp(b3,1,4);
+    const bd=expandBits(bits);
+    let found=false;
+    for(const [code,val] of Object.entries(R_CODES)){if(code===bd){digits.push(val);found=true;break;}}
+    if(!found)return null;
+    pos+=4;
+  }
+  if(digits.length!==12)return null;
+  const typeStr=types.join('');
+  const first=FIRST_DIGIT[typeStr];
+  if(first===undefined)return null;
+  return first+digits.join('');
+}
+
+function expandBits(widths){
+  // Convert width string like "1212" to binary "0110011" etc
+  let bits='', polarity=0;
+  for(const w of widths){
+    const n=parseInt(w);
+    for(let i=0;i<n;i++) bits+=polarity?'1':'0';
+    polarity=1-polarity;
+  }
+  return bits;
+}
+
+function validateEAN(s){
+  if(s.length!==13)return false;
+  let sum=0;
+  for(let i=0;i<12;i++) sum+=parseInt(s[i])*(i%2===0?1:3);
+  const check=(10-(sum%10))%10;
+  return check===parseInt(s[12]);
+}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+// ── CODE 128 DECODER (simplified) ──
+const C128_VALS=[
+  ' ','!','"','#','$','%','&',"'",'(',')','*','+',',','-','.','/',
+  '0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?',
+  '@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',
+  'P','Q','R','S','T','U','V','W','X','Y','Z','[','\\',']','^','_',
+  '`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+  'p','q','r','s','t','u','v','w','x','y','z','{','|','}','~','\x7f'
+];
+// Code128 bar patterns (11 bits each)
+const C128_BARS=[
+  '11011001100','11001101100','11001100110','10010011000','10010001100',
+  '10001001100','10011001000','10011000100','10001100100','11001001000',
+  '11001000100','11000100100','10110011100','10011011100','10011001110',
+  '10111001100','10011101100','10011100110','11001110010','11001011100',
+  '11001001110','11011100100','11001110100','11101101110','11101001100',
+  '11100101100','11100100110','11101100100','11100110100','11100110010',
+  '11011011000','11011000110','11000110110','10100011000','10001011000',
+  '10001000110','10110001000','10001101000','10001100010','11010001000',
+  '11000101000','11000100010','10110111000','10110001110','10001101110',
+  '10111011000','10111000110','10001110110','11101110110','11010001110',
+  '11000101110','11011101000','11011100010','11011101110','11101011000',
+  '11101000110','11100010110','11010111000','11010001110', // stops...
+  '11000010100','10001111010','10100111100','10010111100','10010011110',
+  '10111100100','10011110100','10011110010','11110100100','11110010100',
+  '11110010010','11011011110','11011110110','11110110110','10101111000',
+  '10100011110','10001011110','10111101000','10111100010','11110101000',
+  '11110100010','10111011110','10111101110','11101011110','11110101110',
+  '11010000100','11010010000','11010100000','10001001110'
+];
+
+function tryCode128(runs){
+  // Build bit string from runs (simplified approach)
+  // Find minimum run as module width
+  let minR=Infinity;
+  for(const r of runs) if(r.n<minR&&r.n>0)minR=r.n;
+  minR=Math.max(1,minR);
+  let bits='';
+  for(const r of runs){
+    const n=Math.max(1,Math.round(r.n/minR));
+    bits+=(r.v===0?'1':'0').repeat(Math.min(n,8));
+  }
+  // Search for start codes
+  const starts={START_A:'11010000100',START_B:'11010010000',START_C:'11010100000'};
+  for(const [name,pat] of Object.entries(starts)){
+    const si=bits.indexOf(pat);
+    if(si<0)continue;
+    const result=decodeC128(bits,si+11,name);
+    if(result&&result.length>=4)return result;
+  }
+  return null;
+}
+
+function decodeC128(bits,pos,startMode){
+  let mode=startMode==='START_A'?'A':startMode==='START_B'?'B':'C';
+  let result=''; let checksum=startMode==='START_A'?103:startMode==='START_B'?104:105;
+  let sym=1;
+  while(pos+11<=bits.length){
+    const seg=bits.substr(pos,11); pos+=11;
+    const vi=C128_BARS.indexOf(seg); if(vi<0)break;
+    checksum+=vi*sym; sym++;
+    if(vi===106){// STOP
+      break;
+    }
+    if(vi===100){mode='B';continue;}
+    if(vi===101){mode='A';continue;}
+    if(mode==='C'){
+      result+=String(vi).padStart(2,'0');
+    } else if(vi<96){
+      result+=C128_VALS[vi]||'';
+    }
+    if(result.length>50)break;
+  }
+  // Only return if looks like a numeric barcode
+  if(/^\d{4,}$/.test(result))return result;
+  return null;
+}
+
+// ── SCAN HANDLER ──
+let cooldown=false;
+function onScan(code){
+  if(cooldown||!scanning||dialogOpen||idx>=csv.length)return;
+  if(!/^[\d\w\-]{4,}$/.test(code))return; // filter noise
+  cooldown=true; scanning=false;
+  if(dupCheck(code,idx)){
+    beep(false);
+    toast('⚠️ PLU Duplikat: '+code,1);
+    setTimeout(()=>{cooldown=false;scanning=true;},2500);
+  } else {
+    beep(true);
+    doMerge(code);
+    setTimeout(()=>{cooldown=false;scanning=true;},3500);
+  }
+}
+function dupCheck(plu,skip){
+  return csv.some((r,i)=>i!==skip&&r.plu&&r.plu===plu);
+}
+function doMerge(plu){
+  csv[idx].plu=plu;
+  toast('✓ '+csv[idx].nama);
+  if(idx<csv.length-1)idx++;
+  else toast('🎉 Semua baris telah terisi!');
+  save(); updateUI();
+}
+
+// ── UI ──
+function updateUI(){
+  if(!csv.length)return;
+  const filled=csv.filter(r=>r.plu).length;
+  const pct=Math.round(filled/csv.length*100);
+  tvProg.textContent=`Progres: ${idx+1} / ${csv.length}  (${pct}% terisi)`;
+  pbar.style.width=pct+'%';
+  if(idx<csv.length){
+    const it=csv[idx], ok=!!it.plu;
+    tvItem.innerHTML=`<span>${it.nama||'—'}</span>
+      <span class="pbadge">PLU ID: ${it.pid||'—'}</span>
+      <span class="${ok?'sf':'se'}">${ok?'✓ '+it.plu:'Belum di-scan'}</span>`;
+  }
+}
+
+// ── NAV ──
+$('btnBack').addEventListener('click',()=>{
+  if(idx>0){idx--;updateUI();save();}else toast('Sudah di baris pertama');
+});
+$('btnNext').addEventListener('click',()=>{
+  if(idx<csv.length-1){idx++;updateUI();save();}else toast('Sudah di baris terakhir');
+});
+
+// ── SAVE ──
+$('btnSave').addEventListener('click',()=>{
+  if(!csv.length){toast('Tidak ada data.',1);return;}
+  ovSave.classList.add('open');
+});
+$('saveNo').addEventListener('click',()=>ovSave.classList.remove('open'));
+$('saveYes').addEventListener('click',()=>{ovSave.classList.remove('open');exportJson();});
+function exportJson(){
+  try{
+    const out=csv.map(r=>({'plu_id':r.pid,'Nama Brg':r.nama,'plu_produk':r.plu}));
+    const b=new Blob([JSON.stringify(out,null,4)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='result.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    localStorage.removeItem(SKI); localStorage.removeItem(SKD);
+    $('btnSave').textContent='✓ Berhasil Disimpan'; $('btnSave').classList.add('saved');
+    toast('✓ Tersimpan sebagai result.json');
+    setTimeout(()=>{$('btnSave').textContent='💾 Simpan & Ekspor JSON';$('btnSave').classList.remove('saved');},4000);
+  }catch(e){toast('Gagal ekspor',1);}
+}
+
+// ── LOCAL STORAGE ──
+function save(){
+  try{
+    localStorage.setItem(SKI,String(idx));
+    localStorage.setItem(SKD,JSON.stringify(csv.map(r=>r.plu||'')));
+  }catch(e){}
+}
+
+// ── MANUAL INPUT ──
+function showManual(){
+  manWrap.classList.add('show');
+  badge.textContent='⌨️ Mode Manual Aktif';
+}
+$('manBtn').addEventListener('click',()=>{
+  const v=manInput.value.trim(); if(v){onScan(v);manInput.value='';}
+});
+manInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const v=e.target.value.trim();if(v){onScan(v);e.target.value='';}}
+});
+
+// ── BEEP ──
+let actx=null;
+function beep(ok){
+  try{
+    if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.connect(g); g.connect(actx.destination);
+    o.frequency.value=ok?1050:360; o.type='square';
+    const t=actx.currentTime, dur=ok?.15:.28;
+    g.gain.setValueAtTime(.22,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.start(t); o.stop(t+dur);
+  }catch(e){}
+}
+
+// ── TOAST ──
+let ttm=null;
+function toast(msg,err=0){
+  const el=$('toast'); el.textContent=msg;
+  el.className='show'+(err?' err':'');
+  clearTimeout(ttm); ttm=setTimeout(()=>el.className='',err?3200:2500);
+}
+</script>
 </body>
 </html>
