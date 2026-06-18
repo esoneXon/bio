@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Sadewa Portfolio</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,19 +29,19 @@ body{
     font-family:'Poppins',sans-serif;
     background:var(--bg);
     color:white;
-    min-height:100vh;
     overflow-x:hidden;
+    min-height:100vh;
 }
 
-/* Background Glow */
+/* Background */
 
 body::before{
     content:"";
     position:fixed;
     width:500px;
     height:500px;
-    border-radius:50%;
     background:#5ee7ff20;
+    border-radius:50%;
     filter:blur(120px);
     top:-200px;
     right:-100px;
@@ -52,8 +53,8 @@ body::after{
     position:fixed;
     width:400px;
     height:400px;
-    border-radius:50%;
     background:#7c5cff20;
+    border-radius:50%;
     filter:blur(120px);
     bottom:-150px;
     left:-100px;
@@ -130,65 +131,54 @@ body::after{
 .hero{
     min-height:100vh;
     display:flex;
-    align-items:center;
     justify-content:center;
-    padding:120px 20px;
+    align-items:center;
+    padding:20px;
 }
 
-.profile-card{
-    width:min(100%,900px);
-
-    background:rgba(255,255,255,.04);
-
-    border:1px solid rgba(255,255,255,.08);
-
-    backdrop-filter:blur(20px);
-
-    border-radius:30px;
-
-    padding:40px;
-
+.hero-title{
     text-align:center;
 }
 
-.avatar{
-    width:140px;
-    height:140px;
-    margin:auto;
+.small-text{
+    color:#94a3b8;
+    letter-spacing:6px;
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:20px;
+    font-size:.9rem;
+}
 
-    border-radius:50%;
+.hero-title h1{
+    font-size:clamp(3rem,10vw,7rem);
+    font-weight:800;
+    line-height:1.1;
 
     background:linear-gradient(
-        135deg,
-        var(--primary),
-        var(--secondary)
+        90deg,
+        #5ee7ff,
+        #7c5cff,
+        #5ee7ff
     );
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    background-size:300% auto;
 
-    font-size:60px;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+
+    animation:gradient 8s linear infinite;
 }
 
-.name{
-    margin-top:20px;
-    font-size:clamp(2rem,5vw,4rem);
-    font-weight:800;
+@keyframes gradient{
+    from{
+        background-position:0% center;
+    }
+    to{
+        background-position:300% center;
+    }
 }
 
-.role{
-    margin-top:10px;
-    color:var(--primary);
-}
-
-.desc{
-    margin-top:20px;
-    color:var(--muted);
-    line-height:1.8;
-}
-
-/* Container */
+/* Content */
 
 .container{
     max-width:1200px;
@@ -206,7 +196,7 @@ body::after{
 
 .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
     gap:25px;
 }
 
@@ -230,11 +220,11 @@ body::after{
     transform:translateY(-8px);
 
     box-shadow:
-    0 10px 30px rgba(94,231,255,.15);
+    0 15px 40px rgba(94,231,255,.15);
 }
 
 .card-icon{
-    font-size:42px;
+    font-size:40px;
     margin-bottom:15px;
 }
 
@@ -247,7 +237,7 @@ body::after{
     line-height:1.8;
 }
 
-/* Project Button */
+/* Button */
 
 .project-btn{
     display:inline-block;
@@ -256,9 +246,9 @@ body::after{
 
     padding:12px 24px;
 
-    border-radius:12px;
-
     text-decoration:none;
+
+    border-radius:12px;
 
     color:white;
 
@@ -300,19 +290,29 @@ body::after{
         font-size:.9rem;
     }
 
-    .profile-card{
-        padding:30px 20px;
+    .grid{
+        grid-template-columns:1fr;
     }
-
 }
+
 </style>
 </head>
 <body>
 
 <nav class="navbar">
-    <button class="nav-btn active" data-page="home">Home</button>
-    <button class="nav-btn" data-page="projects">Projects</button>
-    <button class="nav-btn" data-page="hobby">Hobby</button>
+
+<button class="nav-btn active" data-page="home">
+Home
+</button>
+
+<button class="nav-btn" data-page="projects">
+Projects
+</button>
+
+<button class="nav-btn" data-page="hobby">
+Hobby
+</button>
+
 </nav>
 
 <!-- HOME -->
@@ -321,23 +321,17 @@ body::after{
 
 <div class="hero">
 
-<div class="profile-card">
+<div class="hero-title">
 
-<div class="avatar">👨‍💻</div>
+<span class="small-text">
+OFFICIAL PORTFOLIO
+</span>
 
-<h1 class="name">Sadewa</h1>
-
-<div class="role">
-Created & Developed by Sadewa
-</div>
-
-<p class="desc">
-Selamat datang di portfolio saya.
-Saya mengembangkan website, aplikasi Android,
-otomasi sistem, dan berbagai solusi digital
-yang berfokus pada performa, kemudahan penggunaan,
-serta desain modern.
-</p>
+<h1>
+Created &amp; Developed
+<br>
+by Sadewa
+</h1>
 
 </div>
 
@@ -351,7 +345,9 @@ serta desain modern.
 
 <div class="container">
 
-<h2 class="section-title">Projects</h2>
+<h2 class="section-title">
+Projects
+</h2>
 
 <div class="grid">
 
@@ -364,13 +360,12 @@ serta desain modern.
 <p>
 Project berbasis Web dan APK yang digunakan
 untuk membuat serta mengelola data.
-Data yang dihasilkan dapat digunakan
-sebagai sumber data utama untuk project
-BepEx dan berbagai kebutuhan integrasi.
+Data yang dihasilkan dapat digunakan sebagai
+sumber data utama untuk project BepEx
+dan kebutuhan integrasi lainnya.
 </p>
 
-<a href="https://example.com"
-target="_blank"
+<a href="#"
 class="project-btn">
 Open Project
 </a>
@@ -379,29 +374,27 @@ Open Project
 
 <div class="card">
 
-    <div class="card-icon">📦</div>
+<div class="card-icon">📦</div>
 
-    <h3>BepEx</h3>
+<h3>BepEx</h3>
 
-    <p>
-        Project yang dibuat untuk mengatasi
-        permasalahan Expired (EXP) dan Retur Barang
-        di dunia retail. Sistem ini membantu proses
-        monitoring, pencatatan, pelaporan, serta
-        pengelolaan barang secara lebih cepat,
-        akurat, dan terstruktur.
-    </p>
+<p>
+Project yang dibuat untuk mengatasi masalah
+Expired (EXP) dan Retur Barang di dunia retail.
+Sistem membantu monitoring, pencatatan,
+pengelolaan, dan pelaporan barang secara
+lebih cepat dan akurat.
+</p>
 
-    <a href="https://example.com"
-       target="_blank"
-       class="project-btn">
-       Open Project
-    </a>
+<a href="#"
+class="project-btn">
+Open Project
+</a>
 
 </div>
 
 </div>
-    
+
 </div>
 
 </section>
@@ -412,7 +405,9 @@ Open Project
 
 <div class="container">
 
-<h2 class="section-title">Hobby</h2>
+<h2 class="section-title">
+Hobby
+</h2>
 
 <div class="grid">
 
@@ -420,9 +415,8 @@ Open Project
 <div class="card-icon">💻</div>
 <h3>Coding</h3>
 <p>
-Membuat project baru,
-eksperimen teknologi,
-dan mempelajari framework terbaru.
+Membuat aplikasi, website,
+dan mempelajari teknologi baru.
 </p>
 </div>
 
@@ -431,7 +425,7 @@ dan mempelajari framework terbaru.
 <h3>Gaming</h3>
 <p>
 Menikmati game strategi,
-simulation, dan multiplayer online.
+simulasi, dan multiplayer online.
 </p>
 </div>
 
@@ -440,7 +434,7 @@ simulation, dan multiplayer online.
 <h3>Photography</h3>
 <p>
 Mengabadikan momen dan
-mencari perspektif visual menarik.
+mencari sudut pandang visual menarik.
 </p>
 </div>
 
@@ -456,20 +450,28 @@ mencari perspektif visual menarik.
 
 <script>
 
-const buttons=document.querySelectorAll('.nav-btn');
-const pages=document.querySelectorAll('.page');
+const buttons =
+document.querySelectorAll('.nav-btn');
+
+const pages =
+document.querySelectorAll('.page');
 
 buttons.forEach(button=>{
 
 button.addEventListener('click',()=>{
 
-buttons.forEach(btn=>btn.classList.remove('active'));
-pages.forEach(page=>page.classList.remove('active'));
+buttons.forEach(btn=>
+btn.classList.remove('active'));
+
+pages.forEach(page=>
+page.classList.remove('active'));
 
 button.classList.add('active');
 
 document
-.getElementById(button.dataset.page)
+.getElementById(
+button.dataset.page
+)
 .classList.add('active');
 
 });
@@ -480,4 +482,3 @@ document
 
 </body>
 </html>
-```
