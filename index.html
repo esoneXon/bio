@@ -1,5 +1,6 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,35 +25,31 @@
     box-sizing:border-box;
 }
 
-html{
-    scroll-behavior:smooth;
-}
-
 body{
     font-family:'Poppins',sans-serif;
     background:var(--bg);
     color:white;
-    overflow-x:hidden;
     min-height:100vh;
+    overflow-x:hidden;
 }
 
-/* BACKGROUND */
+/* Background Glow */
 
 body::before{
-    content:'';
+    content:"";
     position:fixed;
     width:500px;
     height:500px;
     border-radius:50%;
     background:#5ee7ff20;
     filter:blur(120px);
-    top:-150px;
+    top:-200px;
     right:-100px;
     z-index:-1;
 }
 
 body::after{
-    content:'';
+    content:"";
     position:fixed;
     width:400px;
     height:400px;
@@ -64,24 +61,22 @@ body::after{
     z-index:-1;
 }
 
-/* NAVBAR */
+/* Navbar */
 
 .navbar{
     position:fixed;
     top:20px;
     left:50%;
     transform:translateX(-50%);
-    z-index:999;
-
     display:flex;
-    gap:8px;
+    gap:10px;
+    padding:8px;
+    z-index:999;
 
     background:rgba(255,255,255,.05);
     backdrop-filter:blur(20px);
 
     border:1px solid rgba(255,255,255,.08);
-
-    padding:8px;
     border-radius:999px;
 }
 
@@ -89,11 +84,9 @@ body::after{
     border:none;
     background:transparent;
     color:var(--muted);
-    cursor:pointer;
-
     padding:12px 24px;
     border-radius:999px;
-
+    cursor:pointer;
     transition:.3s;
     font-weight:500;
 }
@@ -108,15 +101,14 @@ body::after{
         var(--primary),
         var(--secondary)
     );
-
     color:white;
 }
 
-/* PAGE */
+/* Pages */
 
 .page{
     display:none;
-    animation:fade .5s ease;
+    animation:fade .4s ease;
 }
 
 .page.active{
@@ -134,15 +126,13 @@ body::after{
     }
 }
 
-/* HOME */
+/* Home */
 
 .hero{
     min-height:100vh;
-
     display:flex;
-    justify-content:center;
     align-items:center;
-
+    justify-content:center;
     padding:120px 20px;
 }
 
@@ -151,21 +141,22 @@ body::after{
 
     background:rgba(255,255,255,.04);
 
-    backdrop-filter:blur(20px);
-
     border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(20px);
 
     border-radius:30px;
 
     padding:40px;
+
     text-align:center;
 }
 
 .avatar{
     width:140px;
     height:140px;
-
     margin:auto;
+
     border-radius:50%;
 
     background:linear-gradient(
@@ -188,18 +179,17 @@ body::after{
 }
 
 .role{
-    color:var(--primary);
     margin-top:10px;
+    color:var(--primary);
 }
 
 .desc{
     margin-top:20px;
     color:var(--muted);
-    max-width:700px;
-    margin-inline:auto;
+    line-height:1.8;
 }
 
-/* GRID */
+/* Container */
 
 .container{
     max-width:1200px;
@@ -209,15 +199,19 @@ body::after{
 
 .section-title{
     text-align:center;
-    margin-bottom:50px;
+    margin-bottom:40px;
     font-size:2rem;
 }
 
+/* Grid */
+
 .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
     gap:25px;
 }
+
+/* Card */
 
 .card{
     background:rgba(255,255,255,.04);
@@ -237,11 +231,11 @@ body::after{
     transform:translateY(-8px);
 
     box-shadow:
-    0 10px 40px rgba(94,231,255,.15);
+    0 10px 30px rgba(94,231,255,.15);
 }
 
 .card-icon{
-    font-size:40px;
+    font-size:42px;
     margin-bottom:15px;
 }
 
@@ -251,11 +245,40 @@ body::after{
 
 .card p{
     color:var(--muted);
-    font-size:.95rem;
-    line-height:1.7;
+    line-height:1.8;
 }
 
-/* FOOTER */
+/* Project Button */
+
+.project-btn{
+    display:inline-block;
+
+    margin-top:20px;
+
+    padding:12px 24px;
+
+    border-radius:12px;
+
+    text-decoration:none;
+
+    color:white;
+
+    font-weight:600;
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--secondary)
+    );
+
+    transition:.3s;
+}
+
+.project-btn:hover{
+    transform:translateY(-3px);
+}
+
+/* Footer */
 
 .footer{
     text-align:center;
@@ -263,7 +286,7 @@ body::after{
     color:var(--muted);
 }
 
-/* MOBILE */
+/* Mobile */
 
 @media(max-width:768px){
 
@@ -274,7 +297,7 @@ body::after{
 
     .nav-btn{
         flex:1;
-        padding:12px 10px;
+        padding:12px;
         font-size:.9rem;
     }
 
@@ -283,117 +306,81 @@ body::after{
     }
 
 }
-
 </style>
 </head>
 <body>
 
 <nav class="navbar">
-
-    <button class="nav-btn active"
-            data-page="home">
-        Home
-    </button>
-
-    <button class="nav-btn"
-            data-page="projects">
-        Projects
-    </button>
-
-    <button class="nav-btn"
-            data-page="hobby">
-        Hobby
-    </button>
-
+    <button class="nav-btn active" data-page="home">Home</button>
+    <button class="nav-btn" data-page="projects">Projects</button>
+    <button class="nav-btn" data-page="hobby">Hobby</button>
 </nav>
 
 <!-- HOME -->
 
 <section id="home" class="page active">
 
-    <div class="hero">
+<div class="hero">
 
-        <div class="profile-card">
+<div class="profile-card">
 
-            <div class="avatar">
-                👨‍💻
-            </div>
+<div class="avatar">👨‍💻</div>
 
-            <h1 class="name">
-                Sadewa
-            </h1>
+<h1 class="name">Sadewa</h1>
 
-            <div class="role">
-                Web Developer • UI Designer
-            </div>
+<div class="role">
+Created & Developed by Sadewa
+</div>
 
-            <p class="desc">
-                Welcome to my digital space.
-                I build websites, applications, and
-                creative solutions with modern design,
-                clean code, and great user experience.
-            </p>
+<p class="desc">
+Selamat datang di portfolio saya.
+Saya mengembangkan website, aplikasi Android,
+otomasi sistem, dan berbagai solusi digital
+yang berfokus pada performa, kemudahan penggunaan,
+serta desain modern.
+</p>
 
-        </div>
+</div>
 
-    </div>
+</div>
 
 </section>
 
-<!-- PROJECT -->
+<!-- PROJECTS -->
 
 <section id="projects" class="page">
 
-    <div class="container">
+<div class="container">
 
-        <h2 class="section-title">
-            Projects
-        </h2>
+<h2 class="section-title">Projects</h2>
 
-        <div class="grid">
+<div class="grid">
 
 <div class="card">
-    <div class="card-icon">🗄️</div>
-    <h3>Data Baserak</h3>
-    <p>
-        Platform berbasis Web dan Android untuk
-        pengelolaan data terstruktur. Data yang
-        dikumpulkan dan diproses dapat dimanfaatkan
-        sebagai sumber utama dalam project BepEx
-        untuk mendukung integrasi dan otomatisasi.
-    </p>
+
+<div class="card-icon">🗄️</div>
+
+<h3>Data Baserak</h3>
+
+<p>
+Project berbasis Web dan APK yang digunakan
+untuk membuat serta mengelola data.
+Data yang dihasilkan dapat digunakan
+sebagai sumber data utama untuk project
+BepEx dan berbagai kebutuhan integrasi.
+</p>
+
+<a href="https://example.com"
+target="_blank"
+class="project-btn">
+Open Project
+</a>
+
 </div>
 
-            <div class="card">
-                <div class="card-icon">📱</div>
-                <h3>Mobile App</h3>
-                <p>
-                    Android application built for
-                    productivity and automation.
-                </p>
-            </div>
+</div>
 
-            <div class="card">
-                <div class="card-icon">🌐</div>
-                <h3>Company Profile</h3>
-                <p>
-                    Professional website for businesses
-                    and organizations.
-                </p>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">🤖</div>
-                <h3>Automation Tools</h3>
-                <p>
-                    Scripts and systems to automate
-                    repetitive workflows.
-                </p>
-            </div>
-
-        </div>
-
-    </div>
+</div>
 
 </section>
 
@@ -401,89 +388,69 @@ body::after{
 
 <section id="hobby" class="page">
 
-    <div class="container">
+<div class="container">
 
-        <h2 class="section-title">
-            Hobby
-        </h2>
+<h2 class="section-title">Hobby</h2>
 
-        <div class="grid">
+<div class="grid">
 
-            <div class="card">
-                <div class="card-icon">🎮</div>
-                <h3>Gaming</h3>
-                <p>
-                    Exploring strategy, RPG,
-                    and competitive games.
-                </p>
-            </div>
+<div class="card">
+<div class="card-icon">💻</div>
+<h3>Coding</h3>
+<p>
+Membuat project baru,
+eksperimen teknologi,
+dan mempelajari framework terbaru.
+</p>
+</div>
 
-            <div class="card">
-                <div class="card-icon">📷</div>
-                <h3>Photography</h3>
-                <p>
-                    Capturing landscapes,
-                    architecture and street moments.
-                </p>
-            </div>
+<div class="card">
+<div class="card-icon">🎮</div>
+<h3>Gaming</h3>
+<p>
+Menikmati game strategi,
+simulation, dan multiplayer online.
+</p>
+</div>
 
-            <div class="card">
-                <div class="card-icon">💻</div>
-                <h3>Coding</h3>
-                <p>
-                    Building side projects and
-                    learning new technologies.
-                </p>
-            </div>
+<div class="card">
+<div class="card-icon">📷</div>
+<h3>Photography</h3>
+<p>
+Mengabadikan momen dan
+mencari perspektif visual menarik.
+</p>
+</div>
 
-            <div class="card">
-                <div class="card-icon">✈️</div>
-                <h3>Traveling</h3>
-                <p>
-                    Visiting new places and
-                    experiencing local cultures.
-                </p>
-            </div>
+</div>
 
-        </div>
-
-    </div>
+</div>
 
 </section>
 
 <div class="footer">
-    Created & Developed by Sadewa
+© 2026 Created & Developed by Sadewa
 </div>
 
 <script>
 
-const buttons =
-document.querySelectorAll('.nav-btn');
-
-const pages =
-document.querySelectorAll('.page');
+const buttons=document.querySelectorAll('.nav-btn');
+const pages=document.querySelectorAll('.page');
 
 buttons.forEach(button=>{
 
-    button.addEventListener('click',()=>{
+button.addEventListener('click',()=>{
 
-        buttons.forEach(btn=>
-            btn.classList.remove('active')
-        );
+buttons.forEach(btn=>btn.classList.remove('active'));
+pages.forEach(page=>page.classList.remove('active'));
 
-        pages.forEach(page=>
-            page.classList.remove('active')
-        );
+button.classList.add('active');
 
-        button.classList.add('active');
+document
+.getElementById(button.dataset.page)
+.classList.add('active');
 
-        document
-        .getElementById(
-            button.dataset.page
-        )
-        .classList.add('active');
-
-    });
+});
 
 });
 
@@ -491,3 +458,4 @@ buttons.forEach(button=>{
 
 </body>
 </html>
+```
