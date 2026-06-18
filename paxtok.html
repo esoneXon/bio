@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Stock Opname</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#3478F6;--green:#34C759;--red:#FF4B3A;--orange:#FF9500;--wa:#25D366;
+  --g1:#1C1C1E;--g2:#8E8E93;--g3:#F2F2F7;--g4:#E5E5EA;--white:#FFFFFF;
+  --radius:16px;
+}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--g3);color:var(--g1);overscroll-behavior:none}
+body{display:flex;flex-direction:column;overflow:hidden}
+
+/* ── HEADER ── */
+#header{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;background:var(--white);
+  border-bottom:1px solid var(--g4);flex-shrink:0;
+  box-shadow:0 1px 0 var(--g4);
+  position:relative;z-index:10;
+}
+#header h1{flex:1;font-size:19px;font-weight:800;color:var(--g1);letter-spacing:-.3px}
+.hbtn{
+  height:36px;padding:0 14px;border:none;border-radius:10px;
+  font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;
+  transition:transform .1s,opacity .1s;-webkit-tap-highlight-color:transparent;
+}
+.hbtn:active{transform:scale(.95)}
+#btnUploadCsv{background:var(--g1);color:#fff}
+
+/* ── INPUT BAR ── */
+#inputBar{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;background:var(--white);
+  border-bottom:1px solid var(--g4);flex-shrink:0;
+  position:relative;
+}
+.inp{
+  height:42px;border:none;border-radius:10px;background:var(--g3);
+  padding:0 12px;font-family:inherit;font-size:13px;color:var(--g1);
+  outline:none;transition:box-shadow .15s;
+}
+.inp:focus{box-shadow:0 0 0 2px var(--blue)}
+#inpPlu{flex:1;min-width:0}
+#inpItem{flex:1.5;min-width:0}
+#btnAdd{
+  height:42px;padding:0 14px;border:none;border-radius:10px;
+  background:var(--blue);color:#fff;font-family:inherit;
+  font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
+  transition:transform .1s;flex-shrink:0;
+}
+#btnAdd:active{transform:scale(.95)}
+
+/* autocomplete dropdown */
+#autocomplete-list{
+  position:absolute;top:100%;left:0;right:0;z-index:100;
+  background:#fff;border-radius:0 0 12px 12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+  max-height:200px;overflow-y:auto;display:none;
+}
+.ac-item{
+  padding:11px 16px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--g4);
+  transition:background .1s;
+}
+.ac-item:last-child{border:none}
+.ac-item:hover,.ac-item:active{background:var(--g3)}
+
+/* ── GLOBAL ACTIONS ── */
+#globalActions{
+  display:none;justify-content:flex-end;align-items:center;gap:4px;
+  padding:6px 12px;background:var(--g3);flex-shrink:0;
+}
+.gact{
+  background:none;border:none;font-family:inherit;font-size:11px;font-weight:700;
+  padding:6px 10px;border-radius:8px;cursor:pointer;transition:background .1s;
+}
+.gact:active{background:var(--g4)}
+#btnResetStok{color:var(--orange);display:none}
+#btnResetAll{color:var(--red)}
+
+/* ── MAIN SCROLL ── */
+#mainScroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:90px}
+
+/* ── ITEM LIST ── */
+#containerList{padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+
+/* ── ITEM CARD ── */
+.item-card{
+  background:var(--white);border-radius:var(--radius);
+  box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;
+}
+.card-actions{
+  display:flex;align-items:center;justify-content:flex-end;gap:0;
+  padding:8px 14px 0;
+}
+.ca{
+  background:none;border:none;font-family:inherit;font-size:10px;font-weight:700;
+  padding:3px 10px;cursor:pointer;transition:opacity .1s;
+}
+.ca:active{opacity:.6}
+.ca-reset{color:var(--g2);display:none}
+.ca-up{color:var(--blue)}
+.ca-down{color:var(--blue)}
+.ca-del{color:var(--red)}
+
+.card-body{padding:0 16px 16px}
+.card-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-name{font-size:16px;font-weight:700;color:var(--g1);line-height:1.3}
+.card-plu{font-size:11px;color:var(--g2);margin-top:2px}
+.selisih{font-size:22px;font-weight:800;color:var(--g1)}
+.selisih.plus{color:var(--green)}
+.selisih.minus{color:var(--red)}
+
+/* barcode canvas */
+.barcode-wrap{margin:10px 0;height:48px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.barcode-wrap canvas{max-width:100%;height:48px}
+
+.inputs-row{display:flex;gap:10px}
+.input-group{flex:1;display:flex;flex-direction:column;gap:4px}
+.input-lbl{font-size:10px;font-weight:700;text-align:center;color:var(--g2)}
+.input-lbl.fisik-lbl{color:var(--blue)}
+.et-stok,.et-fisik{
+  height:45px;border:none;border-radius:10px;
+  text-align:center;font-family:inherit;font-size:16px;font-weight:700;
+  color:var(--g1);outline:none;transition:box-shadow .15s;
+}
+.et-stok{background:var(--g3)}
+.et-fisik{background:#E5F0FF}
+.et-stok:focus,.et-fisik:focus{box-shadow:0 0 0 2px var(--blue)}
+
+/* ── REVIEW PANEL ── */
+#containerReview{display:none;margin:12px;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.review-header{
+  display:grid;grid-template-columns:1.2fr 1.5fr 1.2fr .8fr .8fr .8fr;
+  padding:10px 12px;background:var(--g4);gap:4px;
+}
+.rh{font-size:10px;font-weight:700;color:var(--g1);text-align:center}
+.rh:first-child{text-align:left}
+#reviewRows{display:flex;flex-direction:column}
+.review-row{
+  display:grid;grid-template-columns:1.2fr 1.5fr 1.2fr .8fr .8fr .8fr;
+  padding:10px 12px;gap:4px;align-items:center;
+  border-bottom:1px solid var(--g4);
+}
+.review-row:last-child{border:none}
+.rc{font-size:11px;color:var(--g1);text-align:center;word-break:break-all}
+.rc-plu{text-align:left;color:#555;font-size:10px}
+.rc-item{text-align:left;font-weight:700;font-size:10px}
+.rc-harga{color:var(--blue);font-weight:700;cursor:pointer;text-decoration:underline;font-size:10px;text-align:center}
+.rc-selisih-plus{color:var(--green);font-weight:700}
+.rc-selisih-minus{color:var(--red);font-weight:700}
+#btnShareWa{
+  width:calc(100% - 32px);margin:14px 16px;height:46px;
+  background:var(--wa);color:#fff;border:none;border-radius:12px;
+  font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  transition:transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+#btnShareWa:active{transform:scale(.98)}
+
+/* ── FAB ── */
+#fab{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  height:48px;padding:0 28px;
+  background:var(--blue);color:#fff;border:none;border-radius:24px;
+  font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 16px rgba(52,120,246,.4);
+  transition:transform .15s,background .2s,box-shadow .2s;
+  z-index:30;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+#fab:active{transform:translateX(-50%) scale(.96)}
+#fab.review-mode{background:var(--red);box-shadow:0 4px 16px rgba(255,75,58,.4)}
+
+/* ── UNDO BAR ── */
+#undoBar{
+  position:fixed;bottom:84px;left:16px;right:16px;
+  background:#323232;color:#fff;border-radius:10px;
+  height:46px;display:none;align-items:center;justify-content:space-between;
+  padding:0 16px;box-shadow:0 4px 16px rgba(0,0,0,.3);z-index:29;
+  animation:slideUp .2s ease;
+}
+#undoBar.show{display:flex}
+@keyframes slideUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+#undoMsg{font-size:13px}
+#btnUndo{background:none;border:none;color:var(--green);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:8px 0 8px 16px}
+
+/* ── MODAL ── */
+.modal-ov{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);
+  display:none;align-items:center;justify-content:center;z-index:200;
+  backdrop-filter:blur(2px);padding:24px;
+}
+.modal-ov.open{display:flex;animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{
+  background:var(--g3);border-radius:14px;overflow:hidden;
+  width:min(320px,100%);box-shadow:0 16px 48px rgba(0,0,0,.25);
+  animation:scaleIn .15s ease;
+}
+@keyframes scaleIn{from{transform:scale(.95)}to{transform:scale(1)}}
+.modal-title{font-size:17px;font-weight:800;text-align:center;padding:20px 16px 4px}
+.modal-msg{font-size:13px;color:#3C3C43;text-align:center;padding:0 16px 0}
+.modal-input-wrap{margin:14px 16px;background:#fff;border-radius:8px;overflow:hidden}
+.modal-input{
+  width:100%;height:42px;border:none;text-align:center;
+  font-family:inherit;font-size:15px;color:var(--g1);outline:none;
+  background:transparent;padding:0 12px;
+}
+.modal-sep{height:1px;background:rgba(60,60,67,.24);margin:0 0}
+.modal-btns{display:flex;height:46px}
+.modal-btn{
+  flex:1;border:none;background:none;font-family:inherit;font-size:16px;
+  color:#007AFF;cursor:pointer;transition:background .1s;
+}
+.modal-btn:active{background:var(--g4)}
+.modal-btn.bold{font-weight:700}
+.modal-btn-sep{width:1px;background:rgba(60,60,67,.24);flex-shrink:0}
+
+/* confirm modal */
+.confirm-box{background:#fff;border-radius:14px;overflow:hidden;width:min(280px,100%);box-shadow:0 16px 48px rgba(0,0,0,.25);animation:scaleIn .15s ease}
+.confirm-title{font-size:17px;font-weight:800;text-align:center;padding:20px 16px 8px}
+.confirm-msg{font-size:14px;color:var(--g2);text-align:center;padding:0 16px 20px;line-height:1.5}
+.confirm-sep{height:1px;background:var(--g4)}
+.confirm-btns{display:flex;height:48px}
+.confirm-btn{flex:1;border:none;background:none;font-family:inherit;font-size:16px;color:#007AFF;cursor:pointer}
+.confirm-btn.danger{color:var(--red);font-weight:700}
+.confirm-btn-sep{width:1px;background:var(--g4);flex-shrink:0}
+
+/* ── LOADING ── */
+#loadingOv{
+  position:fixed;inset:0;background:rgba(255,255,255,.75);
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:12px;z-index:300;backdrop-filter:blur(2px);
+}
+#loadingOv.show{display:flex}
+.spin{width:36px;height:36px;border:3px solid var(--g4);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadingMsg{font-size:14px;font-weight:600;color:var(--g1)}
+
+/* ── EMPTY ── */
+#emptyState{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 32px;gap:12px;text-align:center;
+}
+#emptyState.show{display:flex}
+.empty-ico{font-size:48px}
+.empty-title{font-size:16px;font-weight:700;color:var(--g2)}
+.empty-sub{font-size:13px;color:var(--g4)}
+
+/* ── FILE INPUT ── */
+#fileIn{display:none}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-8px);
+  background:rgba(28,28,30,.9);color:#fff;padding:9px 18px;border-radius:20px;
+  font-size:13px;font-weight:600;opacity:0;transition:opacity .2s,transform .2s;
+  pointer-events:none;max-width:85vw;text-align:center;backdrop-filter:blur(8px);z-index:999;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── REPORT PREVIEW (copy text) ── */
+#reportModal .modal-box{max-height:80vh;display:flex;flex-direction:column;width:min(380px,100%)}
+#reportTextArea{
+  flex:1;width:100%;min-height:200px;max-height:50vh;
+  border:none;background:var(--g3);font-family:'Courier New',monospace;
+  font-size:11px;padding:12px;resize:none;outline:none;color:var(--g1);
+  border-radius:0;
+}
+
+@media(min-width:640px){
+  #containerList{padding:16px 20px}
+  .item-card .card-body{padding:0 20px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <h1>Stock Opname</h1>
+  <label class="hbtn" id="btnUploadCsv" for="fileIn">📂 UPLOAD CSV</label>
+  <input type="file" id="fileIn" accept=".csv,text/csv,text/plain"/>
+</div>
+
+<!-- INPUT BAR -->
+<div id="inputBar">
+  <input class="inp" id="inpPlu" type="number" inputmode="numeric" placeholder="PLU" autocomplete="off"/>
+  <input class="inp" id="inpItem" placeholder="Nama Item" autocomplete="off" style="text-transform:uppercase"/>
+  <button id="btnAdd">TAMBAH</button>
+  <div id="autocomplete-list"></div>
+</div>
+
+<!-- GLOBAL ACTIONS -->
+<div id="globalActions">
+  <button class="gact" id="btnResetStok">↺ Kosongkan Stok</button>
+  <button class="gact" id="btnResetAll">✖ Hapus Semua</button>
+</div>
+
+<!-- MAIN SCROLL -->
+<div id="mainScroll">
+  <div id="containerList"></div>
+
+  <!-- EMPTY STATE -->
+  <div id="emptyState">
+    <div class="empty-ico">📋</div>
+    <div class="empty-title">Belum ada item</div>
+    <div style="font-size:13px;color:var(--g2);margin-top:4px">Upload CSV atau tambah item secara manual</div>
+  </div>
+
+  <!-- REVIEW PANEL -->
+  <div id="containerReview">
+    <div class="review-header">
+      <div class="rh" style="text-align:left">PLU</div>
+      <div class="rh" style="text-align:left">ITEM</div>
+      <div class="rh">HRG</div>
+      <div class="rh">STK</div>
+      <div class="rh">FSK</div>
+      <div class="rh">SLS</div>
+    </div>
+    <div id="reviewRows"></div>
+    <button id="btnShareWa">📤 BAGIKAN KE WHATSAPP</button>
+  </div>
+</div>
+
+<!-- FAB -->
+<button id="fab">Review Selisih</button>
+
+<!-- UNDO BAR -->
+<div id="undoBar">
+  <span id="undoMsg">Item berhasil dihapus</span>
+  <button id="btnUndo">BATAL</button>
+</div>
+
+<!-- LOADING -->
+<div id="loadingOv">
+  <div class="spin"></div>
+  <div id="loadingMsg">Memproses...</div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MODAL: Price Input -->
+<div class="modal-ov" id="priceModal">
+  <div class="modal-box">
+    <div class="modal-title">Input Harga</div>
+    <div class="modal-msg" id="priceModalMsg">PLU - NAMA BARANG</div>
+    <div class="modal-input-wrap">
+      <input class="modal-input" id="priceInput" type="number" inputmode="numeric" placeholder="Rp 0"/>
+    </div>
+    <div class="modal-sep"></div>
+    <div class="modal-btns">
+      <button class="modal-btn" id="priceBtnSkip">Lewati</button>
+      <div class="modal-btn-sep"></div>
+      <button class="modal-btn bold" id="priceBtnSave">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Confirm -->
+<div class="modal-ov" id="confirmModal">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle">Konfirmasi</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-sep"></div>
+    <div class="confirm-btns">
+      <button class="confirm-btn" id="confirmNo">Batal</button>
+      <div class="confirm-btn-sep"></div>
+      <button class="confirm-btn danger" id="confirmYes">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Report Preview -->
+<div class="modal-ov" id="reportModal">
+  <div class="modal-box" style="max-height:80vh;display:flex;flex-direction:column;width:min(380px,100%)">
+    <div class="modal-title">Laporan SO RH</div>
+    <div style="padding:8px 16px;font-size:12px;color:var(--g2);text-align:center">
+      WhatsApp tidak tersedia — salin teks di bawah ini
+    </div>
+    <textarea id="reportTextArea" readonly></textarea>
+    <div class="modal-sep"></div>
+    <div class="modal-btns">
+      <button class="modal-btn" id="reportBtnClose">Tutup</button>
+      <div class="modal-btn-sep"></div>
+      <button class="modal-btn bold" id="reportBtnCopy">📋 Salin</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  STOCK OPNAME — Web Version
+//  Converted from Android Java/XML
+// ════════════════════════════════════════════════════════════════
+
+// ── STATE ──
+let items = [];          // [{plu, nama, stok, fisik, harga}]
+let masterProducts = {}; // {plu: nama}
+let isReviewMode = false;
+let undoPending = null;  // {type, snapshot, deletedItem, deletedIndex}
+let undoTimer = null;
+let priceCallback = null;// resolve fn for price dialog promise
+let confirmCallback = null;
+const STORAGE_KEY = 'stockopname_data';
+const PRICE_KEY   = 'stockopname_prices';
+
+// ── DOM ──
+const $  = id => document.getElementById(id);
+const containerList   = $('containerList');
+const containerReview = $('containerReview');
+const globalActions   = $('globalActions');
+const fab             = $('fab');
+const undoBar         = $('undoBar');
+const emptyState      = $('emptyState');
+
+// ── BOOT ──
+window.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  bindEvents();
+  renderAll();
+});
+
+// ════════════════════════════════════════════════════════════════
+//  PERSISTENCE
+// ════════════════════════════════════════════════════════════════
+function saveData() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch(e){}
+}
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      items = JSON.parse(raw);
+      items.forEach(it => { masterProducts[it.plu] = it.nama; });
+      return;
+    }
+  } catch(e){}
+  // Sample data
+  items = [
+    {plu:'20024079',nama:'TELUR AYAM',stok:'',fisik:'',harga:0},
+    {plu:'20020184',nama:'ASIN MATANG',stok:'',fisik:'',harga:0},
+    {plu:'10004977',nama:'AYAM KAMPUNG',stok:'',fisik:'',harga:0},
+    {plu:'20134344',nama:'SOSIS ORI',stok:'',fisik:'',harga:0},
+    {plu:'20134345',nama:'SOSIS KEJU',stok:'',fisik:'',harga:0},
+  ];
+  items.forEach(it => masterProducts[it.plu] = it.nama);
+}
+function getPrice(plu) {
+  try { const p = JSON.parse(localStorage.getItem(PRICE_KEY)||'{}'); return p[plu]||0; } catch(e){ return 0; }
+}
+function setPrice(plu, val) {
+  try {
+    const p = JSON.parse(localStorage.getItem(PRICE_KEY)||'{}');
+    p[plu] = val; localStorage.setItem(PRICE_KEY, JSON.stringify(p));
+  } catch(e){}
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════════════════
+function renderAll() {
+  containerList.innerHTML = '';
+  items.forEach((it, i) => addCardDOM(it, i));
+  updateGlobalActions();
+  updateEmptyState();
+}
+
+function addCardDOM(it, idx) {
+  const div = document.createElement('div');
+  div.className = 'item-card';
+  div.dataset.idx = idx;
+
+  const selisih = calcSelisih(it.stok, it.fisik);
+  const selClass = selisih > 0 ? 'plus' : selisih < 0 ? 'minus' : '';
+  const selTxt   = selisih > 0 ? '+'+selisih : String(selisih);
+  const hasValues = it.stok !== '' || it.fisik !== '';
+
+  div.innerHTML = `
+    <div class="card-actions">
+      <button class="ca ca-reset" style="${hasValues?'display:inline':'display:none'}" title="Reset">↺ RESET</button>
+      <button class="ca ca-up">▲ NAIK</button>
+      <button class="ca ca-down">▼ TURUN</button>
+      <button class="ca ca-del">✖ HAPUS</button>
+    </div>
+    <div class="card-body">
+      <div class="card-info">
+        <div>
+          <div class="card-name">${esc(it.nama.toUpperCase())}</div>
+          <div class="card-plu">PLU: ${esc(it.plu)}</div>
+        </div>
+        <div class="selisih ${selClass}">${selTxt}</div>
+      </div>
+      <div class="barcode-wrap"><canvas class="bc-canvas"></canvas></div>
+      <div class="inputs-row">
+        <div class="input-group">
+          <div class="input-lbl">STOK SISTEM</div>
+          <input class="et-stok" type="number" inputmode="numeric" value="${esc(it.stok)}" placeholder=""/>
+        </div>
+        <div class="input-group">
+          <div class="input-lbl fisik-lbl">CEK FISIK</div>
+          <input class="et-fisik" type="number" inputmode="numeric" value="${esc(it.fisik)}" placeholder=""/>
+        </div>
+      </div>
+    </div>`;
+
+  // Draw barcode
+  const canvas = div.querySelector('.bc-canvas');
+  drawBarcode(canvas, it.plu);
+
+  // Input events
+  const etStok  = div.querySelector('.et-stok');
+  const etFisik = div.querySelector('.et-fisik');
+  const selDiv  = div.querySelector('.selisih');
+  const resetBtn= div.querySelector('.ca-reset');
+
+  function onInput() {
+    it.stok  = etStok.value;
+    it.fisik = etFisik.value;
+    const s = calcSelisih(it.stok, it.fisik);
+    const cl = s > 0 ? 'plus' : s < 0 ? 'minus' : '';
+    selDiv.className = 'selisih ' + cl;
+    selDiv.textContent = s > 0 ? '+'+s : String(s);
+    resetBtn.style.display = (it.stok!==''||it.fisik!=='') ? 'inline' : 'none';
+    updateGlobalActions();
+    saveData();
+  }
+  etStok.addEventListener('input', onInput);
+  etFisik.addEventListener('input', onInput);
+
+  // Tab / Enter navigation
+  etStok.addEventListener('keydown', e => {
+    if(e.key==='Enter'||e.key==='Tab'){
+      e.preventDefault();
+      const all = [...document.querySelectorAll('.et-stok')];
+      const ni = all.indexOf(etStok)+1;
+      if(ni < all.length) all[ni].focus();
+      else { const f=[...document.querySelectorAll('.et-fisik')]; if(f.length)f[0].focus(); }
+    }
+  });
+  etFisik.addEventListener('keydown', e => {
+    if(e.key==='Enter'||e.key==='Tab'){
+      e.preventDefault();
+      const all = [...document.querySelectorAll('.et-fisik')];
+      const ni = all.indexOf(etFisik)+1;
+      if(ni < all.length) all[ni].focus();
+      else etFisik.blur();
+    }
+  });
+
+  // Buttons
+  resetBtn.addEventListener('click', () => {
+    it.stok=''; it.fisik='';
+    etStok.value=''; etFisik.value='';
+    onInput(); etStok.focus();
+  });
+
+  div.querySelector('.ca-del').addEventListener('click', () => {
+    commitUndo();
+    const realIdx = items.indexOf(it);
+    const snapshot = JSON.stringify(items);
+    items.splice(realIdx,1);
+    saveData();
+    renderAll();
+    showUndo('Item berhasil dihapus', {type:'item', snapshot});
+  });
+
+  div.querySelector('.ca-up').addEventListener('click', () => {
+    commitUndo();
+    const i = items.indexOf(it);
+    if(i > 0) { [items[i-1], items[i]] = [items[i], items[i-1]]; saveData(); renderAll(); }
+  });
+
+  div.querySelector('.ca-down').addEventListener('click', () => {
+    commitUndo();
+    const i = items.indexOf(it);
+    if(i < items.length-1) { [items[i], items[i+1]] = [items[i+1], items[i]]; saveData(); renderAll(); }
+  });
+
+  containerList.appendChild(div);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  BARCODE (CODE-128 pure JS — no library)
+// ════════════════════════════════════════════════════════════════
+const C128B=[
+  '11011001100','11001101100','11001100110','10010011000','10010001100','10001001100',
+  '10011001000','10011000100','10001100100','11001001000','11001000100','11000100100',
+  '10110011100','10011011100','10011001110','10111001100','10011101100','10011100110',
+  '11001110010','11001011100','11001001110','11011100100','11001110100','11101101110',
+  '11101001100','11100101100','11100100110','11101100100','11100110100','11100110010',
+  '11011011000','11011000110','11000110110','10100011000','10001011000','10001000110',
+  '10110001000','10001101000','10001100010','11010001000','11000101000','11000100010',
+  '10110111000','10110001110','10001101110','10111011000','10111000110','10001110110',
+  '11101110110','11010001110','11000101110','11011101000','11011100010','11011101110',
+  '11101011000','11101000110','11100010110','11010111000','11010001110','11000101110',
+  '10111101000','10111100010','11110101000','11110100010','10111011110','10111101110',
+  '11101011110','11110101110','11010000100','11010010000','11010100000','10001111010',
+  '10100111100','10010111100','10010011110','10111100100','10011110100','10011110010',
+  '11110100100','11110010100','11110010010','11011011110','11011110110','11110110110',
+  '10101111000','10100011110','10001011110','10111101000','10111100010','11110101000',
+  '11110100010','10111011110','10111101110','11101011110','11110101110','11010000100',
+  '11010010000','11010100000','10001111010','10100111100','10010111100','10010011110',
+  '10111100100','10011110100','10011110010','11110100100','11110010100','11110010010',
+];
+// Start B=104, Stop=106
+function drawBarcode(canvas, data) {
+  try {
+    // Encode as Code128-B
+    const startB = 104;
+    const codes = [startB];
+    let checksum = startB;
+    for(let i=0;i<data.length;i++){
+      const v = data.charCodeAt(i) - 32;
+      if(v<0||v>95) continue;
+      codes.push(v); checksum += v*(i+1);
+    }
+    codes.push(checksum % 103); // check
+    // stop = fixed pattern
+    const stopPat = '1100011101011';
+    let bits = '';
+    codes.forEach(c => { bits += C128B[c]||''; });
+    bits += stopPat;
+
+    const mw = 2, h = 48, quiet = 10;
+    const W = bits.length * mw + quiet * 2;
+    canvas.width  = W;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,h);
+    ctx.fillStyle = '#000';
+    let x = quiet;
+    for(let i=0;i<bits.length;i++){
+      if(bits[i]==='1') ctx.fillRect(x, 0, mw, h);
+      x += mw;
+    }
+  } catch(e) {}
+}
+
+// ════════════════════════════════════════════════════════════════
+//  EVENTS
+// ════════════════════════════════════════════════════════════════
+function bindEvents() {
+  // CSV upload
+  $('fileIn').addEventListener('change', e => {
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      const text = ev.target.result.replace(/\uFEFF/g,'');
+      const err  = validateCsv(text);
+      if(err){ toast('GAGAL: '+err); return; }
+      commitUndo();
+      processCsv(text);
+      saveData();
+      toast('Berhasil memuat CSV ('+items.length+' item)');
+    };
+    r.readAsText(f,'UTF-8');
+    e.target.value='';
+  });
+
+  // Manual add
+  $('btnAdd').addEventListener('click', performAdd);
+  $('inpItem').addEventListener('keydown', e => { if(e.key==='Enter') performAdd(); });
+
+  // Autocomplete PLU
+  $('inpPlu').addEventListener('input', e => {
+    const q = e.target.value.trim();
+    if(!q){ hideAC(); return; }
+    const matches = Object.entries(masterProducts)
+      .filter(([plu,nm]) => plu.includes(q) || nm.toLowerCase().includes(q.toLowerCase()))
+      .slice(0,8);
+    if(!matches.length){ hideAC(); return; }
+    const list = $('autocomplete-list');
+    list.innerHTML = matches.map(([plu,nm]) =>
+      `<div class="ac-item" data-plu="${esc(plu)}" data-nm="${esc(nm)}">${esc(plu)} — ${esc(nm.toUpperCase())}</div>`
+    ).join('');
+    list.style.display = 'block';
+  });
+  $('autocomplete-list').addEventListener('click', e => {
+    const item = e.target.closest('.ac-item');
+    if(!item) return;
+    $('inpPlu').value  = item.dataset.plu;
+    $('inpItem').value = item.dataset.nm.toUpperCase();
+    hideAC();
+    $('inpItem').focus();
+  });
+  document.addEventListener('click', e => {
+    if(!e.target.closest('#inputBar')) hideAC();
+  });
+
+  // Global actions
+  $('btnResetStok').addEventListener('click', () => {
+    showConfirm('Kosongkan Stok & Fisik?','Semua angka stok dan cek fisik akan dihapus. Nama barang tetap ada.','KOSONGKAN',() => {
+      commitUndo();
+      const snapshot = JSON.stringify(items);
+      items.forEach(it => { it.stok=''; it.fisik=''; });
+      saveData(); renderAll();
+      showUndo('Stok & Fisik dikosongkan', {type:'bulk', snapshot});
+    });
+  });
+  $('btnResetAll').addEventListener('click', () => {
+    if(!items.length) return;
+    showConfirm('Hapus Semua Data?','Seluruh barang dan isian di layar akan dihapus bersih.','HAPUS',() => {
+      commitUndo();
+      const snapshot = JSON.stringify(items);
+      items = []; masterProducts = {};
+      saveData(); renderAll();
+      showUndo('Semua item dihapus', {type:'bulk', snapshot});
+    });
+  });
+
+  // FAB
+  fab.addEventListener('click', toggleReview);
+
+  // Undo
+  $('btnUndo').addEventListener('click', doUndo);
+
+  // Price modal
+  $('priceBtnSkip').addEventListener('click', () => {
+    closeModal('priceModal');
+    if(priceCallback){ priceCallback({skipped:true}); priceCallback=null; }
+  });
+  $('priceBtnSave').addEventListener('click', () => {
+    const v = parseInt($('priceInput').value)||0;
+    if(!v){ toast('Harga wajib diinput atau klik Lewati'); return; }
+    closeModal('priceModal');
+    if(priceCallback){ priceCallback({price:v}); priceCallback=null; }
+  });
+  $('priceInput').addEventListener('keydown', e => {
+    if(e.key==='Enter') $('priceBtnSave').click();
+  });
+
+  // Share WA
+  $('btnShareWa').addEventListener('click', onShareWa);
+
+  // Report modal
+  $('reportBtnClose').addEventListener('click', () => closeModal('reportModal'));
+  $('reportBtnCopy').addEventListener('click', () => {
+    const ta = $('reportTextArea');
+    ta.select();
+    try{ navigator.clipboard.writeText(ta.value).then(()=>toast('Teks disalin!')); }
+    catch(e){ document.execCommand('copy'); toast('Teks disalin!'); }
+  });
+
+  // Confirm modal
+  $('confirmNo').addEventListener('click',  () => { closeModal('confirmModal'); confirmCallback=null; });
+  $('confirmYes').addEventListener('click', () => { closeModal('confirmModal'); if(confirmCallback){ confirmCallback(); confirmCallback=null; } });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MANUAL ADD
+// ════════════════════════════════════════════════════════════════
+function performAdd() {
+  commitUndo();
+  const plu  = $('inpPlu').value.trim();
+  const nama = $('inpItem').value.trim().toUpperCase();
+  if(!plu||!nama){ toast('PLU dan Nama Item harus diisi'); return; }
+  if(!/^\d+$/.test(plu)){ toast('PLU harus berupa angka bulat'); return; }
+  items.push({plu, nama, stok:'', fisik:'', harga:0});
+  masterProducts[plu] = nama;
+  saveData();
+  renderAll();
+  $('inpPlu').value=''; $('inpItem').value='';
+  $('inpPlu').focus();
+  updateAutoComplete();
+  toast('Barang berhasil ditambahkan');
+}
+
+// ════════════════════════════════════════════════════════════════
+//  CSV
+// ════════════════════════════════════════════════════════════════
+function validateCsv(text) {
+  const lines = text.split('\n');
+  for(let i=0;i<lines.length;i++){
+    const ln = lines[i].trim(); if(!ln) continue;
+    const parts = ln.split(',');
+    if(i===0 && parts[0].trim().toLowerCase()==='plu') continue;
+    if(parts.length<2) return `Format salah pada baris ke-${i+1}`;
+    if(!/^\d+$/.test(parts[0].trim())) return `PLU tidak valid baris ke-${i+1}: ${parts[0]}`;
+  }
+  return null;
+}
+function processCsv(text) {
+  items=[]; masterProducts={};
+  const lines = text.split('\n');
+  lines.forEach((ln,i) => {
+    ln = ln.trim(); if(!ln) return;
+    const parts = ln.split(',');
+    if(parts[0].trim().toLowerCase()==='plu') return;
+    if(parts.length>=2){
+      const plu  = parts[0].trim();
+      const nama = parts.slice(1).join(',').trim().replace(/^"|"$/g,'');
+      masterProducts[plu] = nama;
+      items.push({plu, nama, stok:'', fisik:'', harga:0});
+    }
+  });
+  renderAll();
+  updateAutoComplete();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  REVIEW / FAB
+// ════════════════════════════════════════════════════════════════
+function toggleReview() {
+  commitUndo();
+  isReviewMode = !isReviewMode;
+  if(isReviewMode){
+    fab.textContent = '← Kembali ke Input';
+    fab.classList.add('review-mode');
+    $('inputBar').style.display     = 'none';
+    globalActions.style.display     = 'none';
+    containerList.style.display     = 'none';
+    emptyState.style.display        = 'none';
+    containerReview.style.display   = 'block';
+    buildReviewRows();
+  } else {
+    fab.textContent = 'Review Selisih';
+    fab.classList.remove('review-mode');
+    $('inputBar').style.display     = '';
+    containerList.style.display     = '';
+    containerReview.style.display   = 'none';
+    updateGlobalActions();
+    updateEmptyState();
+  }
+}
+
+function buildReviewRows() {
+  const rowsEl = $('reviewRows');
+  rowsEl.innerHTML = '';
+  items.forEach(it => {
+    const s = calcSelisih(it.stok, it.fisik);
+    if(s===0) return;
+    const saved = getPrice(it.plu) || it.harga || 0;
+    const row = document.createElement('div');
+    row.className = 'review-row';
+    row.innerHTML = `
+      <div class="rc rc-plu">${esc(it.plu)}</div>
+      <div class="rc rc-item">${esc(it.nama)}</div>
+      <div class="rc rc-harga" data-plu="${esc(it.plu)}">${saved>0?'Rp '+fmt(saved):'Rp 0'}</div>
+      <div class="rc">${it.stok||'0'}</div>
+      <div class="rc">${it.fisik||'0'}</div>
+      <div class="rc ${s>0?'rc-selisih-plus':'rc-selisih-minus'}">${s>0?'+'+s:s}</div>`;
+    row.querySelector('.rc-harga').addEventListener('click', async () => {
+      const hargaEl = row.querySelector('.rc-harga');
+      const cur = getPrice(it.plu)||it.harga||0;
+      const res = await showPriceDialog(it.plu, it.nama, cur>0?String(cur):'');
+      if(!res.skipped && res.price){
+        it.harga = res.price;
+        setPrice(it.plu, res.price);
+        hargaEl.textContent = 'Rp '+fmt(res.price);
+        saveData();
+      }
+    });
+    rowsEl.appendChild(row);
+  });
+  if(!rowsEl.children.length){
+    rowsEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--g2);font-size:14px">Semua item balance ✓</div>';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  SHARE WHATSAPP
+// ════════════════════════════════════════════════════════════════
+async function onShareWa() {
+  if(!items.length){ toast('Tidak ada data untuk dibagikan'); return; }
+
+  showLoading(true,'Menyiapkan laporan...');
+
+  // Collect items needing prices
+  const needPrice = items.filter(it => calcSelisih(it.stok,it.fisik)!==0 && !getPrice(it.plu) && !it.harga);
+
+  showLoading(false,'');
+
+  // Ask price sequentially for those without price
+  for(const it of needPrice){
+    const res = await showPriceDialog(it.plu, it.nama, '');
+    if(!res.skipped && res.price){
+      it.harga = res.price;
+      setPrice(it.plu, res.price);
+      saveData();
+    }
+  }
+
+  const report = buildReport();
+
+  // Try WhatsApp
+  const waUrl = 'https://wa.me/?text='+encodeURIComponent(report);
+  try {
+    window.open(waUrl, '_blank');
+  } catch(e) {}
+
+  // Also show copy modal as fallback
+  $('reportTextArea').value = report;
+  openModal('reportModal');
+}
+
+function buildReport() {
+  const now  = new Date();
+  const locale = 'id-ID';
+  const date = now.toLocaleDateString(locale,{day:'2-digit',month:'long',year:'numeric'});
+  const time = now.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit',hour12:false});
+  const h    = now.getHours()*100+now.getMinutes();
+  const shift= (h>=630&&h<1430)?'1':(h>=1430&&h<2230)?'2':'3';
+
+  let totalPlus=0, totalMinus=0;
+  let body='';
+  items.forEach(it => {
+    const s     = calcSelisih(it.stok,it.fisik);
+    const stok  = it.stok||'0';
+    const fisik = it.fisik||'0';
+    const sTxt  = s>0?'+'+s:String(s);
+    body += it.plu+'\n';
+    body += `(${it.nama.toUpperCase()}) | ${stok} | ${fisik} | ${sTxt}\n`;
+    if(s!==0){
+      const harga = getPrice(it.plu)||it.harga||0;
+      const total = Math.abs(s)*harga;
+      if(s>0) totalPlus+=total; else totalMinus+=total;
+      body += `Rp. ${fmt(total)}\n\n`;
+    } else { body+='\n'; }
+  });
+
+  return `*LAPORAN SO RH*\n${date}, ${time}\nShift: ${shift}\n\nPLU | ITEM | STOK | FISIK | SELISIH\n\n${body}*TOTAL ESTIMASI RUPIAH*\nTotal Plus (+): Rp ${fmt(totalPlus)}\nTotal Minus (-): -Rp ${fmt(totalMinus)}`;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════
+function calcSelisih(stok, fisik) {
+  const s = stok ===''||stok ===null?0:parseInt(stok)||0;
+  const f = fisik===''||fisik===null?0:parseInt(fisik)||0;
+  return f - s;
+}
+function updateGlobalActions() {
+  if(isReviewMode){ globalActions.style.display='none'; return; }
+  if(!items.length){ globalActions.style.display='none'; return; }
+  globalActions.style.display='flex';
+  const hasVal = items.some(it=>it.stok!==''||it.fisik!=='');
+  $('btnResetStok').style.display = hasVal?'block':'none';
+}
+function updateEmptyState() {
+  if(isReviewMode){ emptyState.style.display='none'; return; }
+  if(!items.length) emptyState.classList.add('show');
+  else emptyState.classList.remove('show');
+}
+function updateAutoComplete() {
+  // refresh suggestions on next keystroke naturally
+}
+function hideAC() { $('autocomplete-list').style.display='none'; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmt(n){ return Number(n).toLocaleString('de-DE'); }
+
+// ── UNDO ──
+function showUndo(msg, data) {
+  undoPending = data;
+  $('undoMsg').textContent = msg;
+  undoBar.classList.add('show');
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(()=>{ undoBar.classList.remove('show'); undoPending=null; saveData(); }, 10000);
+}
+function doUndo() {
+  clearTimeout(undoTimer);
+  undoBar.classList.remove('show');
+  if(undoPending && undoPending.snapshot){
+    try{
+      items = JSON.parse(undoPending.snapshot);
+      items.forEach(it=>masterProducts[it.plu]=it.nama);
+      saveData(); renderAll();
+    }catch(e){}
+  }
+  undoPending = null;
+}
+function commitUndo() {
+  if(!undoPending) return;
+  clearTimeout(undoTimer);
+  undoBar.classList.remove('show');
+  undoPending = null;
+  saveData();
+}
+
+// ── MODALS ──
+function openModal(id)  { $(id).classList.add('open'); }
+function closeModal(id) { $(id).classList.remove('open'); }
+
+function showPriceDialog(plu, nama, defaultVal) {
+  return new Promise(resolve => {
+    priceCallback = resolve;
+    $('priceModalMsg').textContent = `${plu} - ${nama}`;
+    $('priceInput').value = defaultVal;
+    openModal('priceModal');
+    setTimeout(()=>{ $('priceInput').focus(); if(defaultVal) $('priceInput').select(); }, 150);
+  });
+}
+function showConfirm(title, msg, yesLabel, cb) {
+  $('confirmTitle').textContent = title;
+  $('confirmMsg').textContent   = msg;
+  $('confirmYes').textContent   = yesLabel;
+  confirmCallback = cb;
+  openModal('confirmModal');
+}
+function showLoading(show, msg) {
+  if(show){ $('loadingMsg').textContent=msg; $('loadingOv').classList.add('show'); }
+  else     $('loadingOv').classList.remove('show');
+}
+
+// ── TOAST ──
+let toastTimer=null;
+function toast(msg) {
+  const el=$('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
