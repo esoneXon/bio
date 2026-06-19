@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<title>Retail Exp</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FF4500;--green:#34C759;--red:#FF3B30;--gold:#C69200;
+  --g1:#1C1C1E;--g2:#8E8E93;--g3:#F2F2F7;--g4:#E5E5EA;--bg:#F5F6FA;--white:#FFFFFF;
+}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--g1);overscroll-behavior:none}
+body{overflow-x:hidden}
+
+/* ════════ SPLASH ════════ */
+#splash{
+  position:fixed;inset:0;background:var(--bg);z-index:9000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .5s;
+}
+#splash.fade{opacity:0;pointer-events:none}
+.splash-center{display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(80px);animation:splashIn .8s ease forwards}
+@keyframes splashIn{to{opacity:1;transform:translateY(0)}}
+.splash-logo{
+  width:100px;height:100px;border-radius:50%;
+  background:var(--orange);color:#fff;font-size:48px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;margin-bottom:32px;
+}
+.splash-title{font-size:28px;font-weight:800;color:var(--g1)}
+.splash-sub{font-size:14px;color:var(--g2);margin-top:8px}
+.splash-bottom{
+  position:absolute;bottom:60px;left:0;right:0;text-align:center;
+  font-size:12px;color:#C7C7CC;line-height:1.6;
+}
+
+/* ════════ TOP BAR ════════ */
+#topbar{display:flex;align-items:center;gap:10px;padding:24px 20px 16px;padding-top:calc(24px + env(safe-area-inset-top))}
+#topbar h1{flex:1;font-size:28px;font-weight:800;color:var(--g1)}
+.icon-btn{width:40px;height:40px;border:none;background:none;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.icon-btn:active{background:rgba(0,0,0,.06)}
+
+/* ════════ MAIN SCROLL ════════ */
+#mainScroll{padding-bottom:100px}
+
+/* ════════ CARDS ════════ */
+.card{background:var(--white);border-radius:24px;margin:0 16px 16px;box-shadow:0 1px 6px rgba(0,0,0,.05);overflow:hidden}
+.card-pad{padding:20px}
+
+/* photo card */
+.photo-box{width:100%;height:220px;background:var(--g4);margin-bottom:16px;position:relative;overflow:hidden;border-radius:12px}
+#video{width:100%;height:100%;object-fit:cover;display:block}
+#photoPreview{width:100%;height:100%;object-fit:cover;display:none;position:absolute;top:0;left:0;cursor:pointer}
+.btn-photo{width:100%;height:50px;border:none;border-radius:12px;background:var(--orange);color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:transform .1s}
+.btn-photo:active{transform:scale(.98)}
+
+/* collapsible header */
+.card-header{display:flex;align-items:center;padding:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .1s}
+.card-header:active{background:rgba(0,0,0,.03)}
+.card-header h3{flex:1;font-size:18px;font-weight:700;color:var(--g1)}
+.card-icon{font-size:16px;color:var(--g2);transition:transform .2s}
+.card-content{padding:0 20px 20px;display:none}
+.card-content.open{display:block;animation:cardOpen .2s ease}
+@keyframes cardOpen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* inputs */
+.input-row{display:flex;gap:8px;margin-bottom:12px}
+.inp{
+  height:50px;border:none;border-radius:12px;background:var(--g3);
+  padding:0 16px;font-family:inherit;font-size:14px;color:var(--g1);outline:none;
+  transition:box-shadow .15s;width:100%;
+}
+.inp:focus{box-shadow:0 0 0 2px var(--orange)}
+.inp-flex{flex:1;min-width:0}
+.inp-icon-btn{
+  width:50px;height:50px;border:none;border-radius:12px;background:var(--g4);
+  color:var(--g1);font-size:20px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:transform .1s;
+}
+.inp-icon-btn:active{transform:scale(.95)}
+textarea.inp{height:90px;padding:14px 16px;resize:none;font-family:inherit;line-height:1.5}
+
+/* date picker btn */
+.btn-date{
+  width:100%;height:50px;border:none;border-radius:12px;background:var(--g4);
+  color:var(--g1);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  margin-bottom:8px;transition:transform .1s;
+}
+.btn-date:active{transform:scale(.98)}
+.date-display{font-size:14px;color:var(--g2);text-align:center;margin-bottom:20px}
+
+/* retur duration grid */
+.retur-label{font-size:14px;color:var(--g2);margin-bottom:12px}
+.retur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.retur-btn{
+  padding:12px 4px;border-radius:10px;background:var(--g3);color:var(--g1);
+  font-family:inherit;font-size:12px;font-weight:600;border:none;cursor:pointer;
+  transition:transform .1s,background .15s,color .15s;text-align:center;
+}
+.retur-btn:active{transform:scale(.94)}
+.retur-btn.active{background:var(--orange);color:#fff}
+.tarik-display{font-size:18px;font-weight:800;color:var(--orange);text-align:center}
+
+/* save/view buttons */
+.btn-row{display:flex;gap:10px}
+.btn-half{
+  flex:1;height:55px;border:none;border-radius:12px;font-family:inherit;
+  font-size:16px;font-weight:700;cursor:pointer;transition:transform .1s;
+}
+.btn-half:active{transform:scale(.97)}
+.btn-save{background:var(--green);color:#fff}
+.btn-view{background:var(--g4);color:var(--g1)}
+
+/* FAB */
+#fabScan{
+  position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;
+  background:var(--orange);color:#fff;border:none;font-size:26px;cursor:pointer;
+  box-shadow:0 6px 20px rgba(255,69,0,.4);z-index:50;transition:transform .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+#fabScan:active{transform:scale(.92)}
+
+/* ════════ LOCK SCREEN ════════ */
+#lockScreen{
+  position:fixed;inset:0;background:var(--g1);z-index:8000;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;text-align:center;
+}
+#lockScreen.show{display:flex}
+.lock-icon{font-size:54px;margin-bottom:16px}
+.lock-title{font-size:24px;font-weight:800;color:#fff;margin-bottom:8px}
+.lock-sub{font-size:14px;color:var(--g2);line-height:1.5;margin-bottom:32px;max-width:320px}
+.lock-input{
+  width:100%;max-width:320px;height:54px;border-radius:14px;
+  background:#2C2C2E;border:2px solid #3A3A3C;color:#fff;
+  text-align:center;font-size:16px;font-family:inherit;outline:none;margin-bottom:20px;
+  transition:border-color .15s;
+}
+.lock-input:focus{border-color:var(--orange)}
+.lock-btn{
+  width:100%;max-width:320px;height:54px;border:none;border-radius:14px;
+  background:var(--orange);color:#fff;font-family:inherit;font-size:16px;font-weight:700;
+  cursor:pointer;transition:transform .1s,opacity .2s;margin-bottom:24px;
+}
+.lock-btn:active{transform:scale(.97)}
+.lock-btn:disabled{opacity:.5}
+.lock-wa{background:none;border:none;color:#25D366;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+
+/* ════════ MODALS ════════ */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:500;padding:20px}
+.modal-ov.open{display:flex}
+.modal-card{background:#fff;border-radius:18px;width:min(340px,100%);overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.3)}
+.modal-pad{padding:24px}
+.modal-pad h3{font-size:17px;font-weight:800;margin-bottom:8px;text-align:center}
+.modal-pad p{font-size:13px;color:var(--g2);text-align:center;line-height:1.5;margin-bottom:18px}
+.modal-btns{display:flex;border-top:1px solid var(--g4)}
+.modal-btns button{flex:1;height:48px;border:none;background:none;font-family:inherit;font-size:15px;cursor:pointer;color:#007AFF}
+.modal-btns button.danger{color:var(--red);font-weight:700;border-left:1px solid var(--g4)}
+
+/* info dialog */
+.info-line{font-size:14px;color:var(--g2);margin-bottom:6px;line-height:1.5}
+.info-link{font-size:14px;font-weight:700;cursor:pointer;padding:10px 0}
+
+/* full screen image viewer */
+#imgViewer{position:fixed;inset:0;background:#000;z-index:600;display:none;align-items:center;justify-content:center}
+#imgViewer.open{display:flex}
+#imgViewer img{max-width:100%;max-height:100%;object-fit:contain}
+
+/* date picker (native fallback styled) */
+.date-input-hidden{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
+
+/* ════════ REKAP DIALOG (full screen) ════════ */
+#rekapScreen{position:fixed;inset:0;background:var(--bg);z-index:700;display:none;flex-direction:column}
+#rekapScreen.open{display:flex}
+.rekap-header{display:flex;align-items:center;background:#fff;padding:20px;gap:12px;padding-top:calc(20px + env(safe-area-inset-top))}
+.rekap-header h2{flex:1;font-size:20px;font-weight:800}
+.rekap-close{background:none;border:none;color:var(--orange);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer}
+#rekapList{flex:1;overflow-y:auto;padding:16px 0 40px}
+.rekap-empty{text-align:center;color:var(--g2);padding-top:100px;font-size:14px}
+
+.rekap-card{background:#fff;border-radius:18px;margin:8px 16px;padding:14px;display:flex;align-items:center;gap:12px}
+.rekap-thumb{width:60px;height:60px;border-radius:12px;background:var(--g4);flex-shrink:0;object-fit:cover}
+.rekap-thumb-empty{width:60px;height:60px;border-radius:12px;background:var(--g4);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;color:#C7C7CC}
+.rekap-info{flex:1;min-width:0}
+.rekap-name{font-size:15px;font-weight:700;color:var(--g1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rekap-plu{font-size:12px;color:var(--g2);margin:2px 0 4px}
+.rekap-date{font-size:11px;font-weight:700;margin-bottom:2px}
+.rekap-ket{font-size:11px;color:#3A3A3C}
+.rekap-gps{font-size:10px;color:var(--g2);margin-top:4px}
+.rekap-del{background:none;border:none;color:var(--red);font-size:20px;font-weight:700;cursor:pointer;padding:8px;flex-shrink:0}
+
+/* undo bar */
+#undoBar{position:fixed;bottom:0;left:0;right:0;background:#323130;padding:14px 20px;display:none;align-items:center;gap:12px;z-index:710}
+#undoBar.show{display:flex}
+#undoBar span{flex:1;color:#fff;font-size:13px}
+#undoBtn{background:none;border:none;color:var(--orange);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+
+/* toast */
+#toast{
+  position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-10px);
+  background:rgba(28,28,30,.92);color:#fff;padding:11px 20px;border-radius:22px;
+  font-size:13px;font-weight:600;opacity:0;transition:opacity .2s,transform .2s;
+  pointer-events:none;max-width:88vw;text-align:center;z-index:9500;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+#fileIn,#galleryIn{display:none}
+
+@media(min-width:640px){
+  .card{margin-left:auto;margin-right:auto;max-width:560px}
+  #topbar{max-width:560px;margin:0 auto}
+}
+
+/* ════════ RESPONSIVE FIXES ════════ */
+#mainScroll { 
+  padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
+}
+#fabScan { 
+  bottom: calc(24px + env(safe-area-inset-bottom)); 
+}
+#undoBar { 
+  padding-bottom: calc(14px + env(safe-area-inset-bottom)); 
+}
+
+@media (max-width: 380px) {
+  .retur-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .btn-half { font-size: 14px; height: 50px; }
+}
+
+.modal-card { max-height: 90vh; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-title">Sistem Terkunci</div>
+  <div class="lock-sub">Aplikasi ini dilindungi kunci akses dari developer.<br/>Masukkan kode yang sah untuk melanjutkan.</div>
+  <input class="lock-input" id="lockInput" type="password" placeholder="Ketik / Paste Kunci Lisensi" autocomplete="off" autocapitalize="off" spellcheck="false"/>
+  <button class="lock-btn" id="lockBtn">Verifikasi Online</button>
+  <button class="lock-wa" id="lockWaBtn">💬 Hubungi Developer (Minta Sandi Baru)</button>
+</div>
+
+<div id="splash">
+  <div class="splash-center">
+    <div class="splash-logo">R</div>
+    <div class="splash-title">Retail Exp</div>
+    <div class="splash-sub">Smart Retail Sorter</div>
+  </div>
+  <div class="splash-bottom">Version 1.0<br/>Retail System<br/><br/>Developed by Sadewa Arrohim</div>
+</div>
+
+<div id="topbar">
+  <h1>Penyortiran Barang</h1>
+  <button class="icon-btn" id="btnInfo">ℹ️</button>
+</div>
+
+<div id="mainScroll">
+
+  <div class="card">
+    <div class="card-pad">
+      <div class="photo-box">
+        <video id="video" autoplay playsinline muted></video>
+        <img id="photoPreview"/>
+      </div>
+      <button class="btn-photo" id="btnTakePhoto">Jepret Foto Fisik</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" id="headerIdentitas">
+      <h3>Identitas Barang</h3>
+      <span class="card-icon" id="iconIdentitas">▼</span>
+    </div>
+    <div class="card-content" id="contentIdentitas">
+      <div class="input-row">
+        <input class="inp inp-flex" id="etBarcode" type="number" inputmode="numeric" placeholder="PLU / Barcode"/>
+        <button class="inp-icon-btn" id="btnUploadBarcode">🖼️</button>
+      </div>
+      <input class="inp" id="etProductName" placeholder="Nama Produk"/>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" id="headerJadwal">
+      <h3>Jadwal Retur</h3>
+      <span class="card-icon" id="iconJadwal">▼</span>
+    </div>
+    <div class="card-content" id="contentJadwal">
+      <button class="btn-date" id="btnPickDate">Pilih Tanggal Kedaluwarsa</button>
+      <input type="date" id="dateInput" class="date-input-hidden"/>
+      <div class="date-display" id="tvExpiredDate">Belum ada tanggal dipilih</div>
+
+      <div class="retur-label">Masa Retur (Tampil Penuh):</div>
+      <div class="retur-grid" id="returGrid"></div>
+
+      <div class="tarik-display" id="tvReturDate">Tarik Barang: -</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" id="headerKeterangan">
+      <h3>Keterangan &amp; Aksi</h3>
+      <span class="card-icon" id="iconKeterangan">▼</span>
+    </div>
+    <div class="card-content" id="contentKeterangan">
+      <textarea class="inp" id="etDescription" placeholder="Misal: Kemasan bocor..." style="margin-bottom:20px"></textarea>
+      <div class="btn-row">
+        <button class="btn-half btn-save" id="btnSave">Simpan Data</button>
+        <button class="btn-half btn-view" id="btnViewData">Lihat Rekap</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<button id="fabScan">📷</button>
+
+<input type="file" id="fileIn" accept="image/*"/>
+<input type="file" id="galleryIn" accept="image/*"/>
+
+<div id="imgViewer"><img id="imgViewerSrc"/></div>
+
+<div class="modal-ov" id="modalDurasi">
+  <div class="modal-card">
+    <div class="modal-pad">
+      <h3>Update Masa Retur?</h3>
+      <p id="modalDurasiMsg"></p>
+    </div>
+    <div class="modal-btns">
+      <button id="durasiNo">Tidak</button>
+      <button class="danger" id="durasiYes" style="color:var(--green);font-weight:700">Ya, Update</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modalDelConfirm">
+  <div class="modal-card">
+    <div class="modal-pad">
+      <h3>Hapus Data?</h3>
+      <p id="modalDelMsg">Yakin ingin menghapus rekap ini?</p>
+    </div>
+    <div class="modal-btns">
+      <button id="delCancel">Batal</button>
+      <button class="danger" id="delConfirm">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modalInfo">
+  <div class="modal-card">
+    <div class="modal-pad">
+      <h3 style="margin-bottom:14px">Informasi Aplikasi</h3>
+      <p style="font-weight:700;color:var(--g1);margin-bottom:4px">Retail Exp (Smart Sorter)<br/>Versi: 1.0</p>
+      <p class="info-line">Developer: Sadewa Arrohim<br/>Sistem pendataan retur barang universal untuk operasional retail.</p>
+      <div class="info-link" style="color:#E1306C" id="infoIg">📷 Instagram: @dewxrhm</div>
+      <div class="info-link" style="color:#25D366" id="infoWa">💬 WhatsApp: 081268204954</div>
+    </div>
+    <div class="modal-btns"><button id="infoClose" style="font-weight:700">Tutup</button></div>
+  </div>
+</div>
+
+<div id="rekapScreen">
+  <div class="rekap-header">
+    <h2>Rekap Barang Retur</h2>
+    <button class="rekap-close" id="rekapCloseBtn">Tutup</button>
+  </div>
+  <div id="rekapList"></div>
+</div>
+
+<div id="undoBar">
+  <span id="undoMsg">Data dihapus.</span>
+  <button id="undoBtn">URUNGKAN (5s)</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  RETAIL EXP — Web Version (converted from Android Java/XML)
+// ════════════════════════════════════════════════════════════════
+
+// ── STATE ──
+let db = {};              // databaseProduk: {plu: {nama, gambar(dataURL), durasi_retur, tanggal_input, lokasi, koordinat}}
+let records = [];         // CSV rows as objects
+let expDate = null;       // Date object for expired date
+let returTextSelected = '-1 Bulan';
+let returValue = 1;
+let isMonthBased = true;
+let capturedPhotoDataUrl = null;
+let videoStream = null;
+let scanningMode = true;
+let isProcessingFrame = false;
+let coords = '0.0,0.0';
+let locationName = 'Toko Retail';
+let pendingDeleteRecord = null;
+let undoTimer = null;
+let durasiConfirmCallback = null;
+
+const DB_KEY = 'retailexp_db';
+const CSV_KEY = 'retailexp_records';
+
+const returTexts  = ['-7 Hari','-14 Hari','-1 Bulan','-2 Bulan','-3 Bulan','-4 Bulan','-5 Bulan','-6 Bulan'];
+const returValues  = [7,14,1,2,3,4,5,6];
+const isMonthArr    = [false,false,true,true,true,true,true,true];
+
+const $ = id => document.getElementById(id);
+
+// ════════════════════════════════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildReturGrid();
+  bindEvents();
+  loadData();
+  selectRetur(2); // default -1 Bulan
+
+  // Splash timing
+  setTimeout(() => {
+    $('splash').classList.add('fade');
+    setTimeout(() => { $('splash').style.display='none'; checkLock(); }, 500);
+  }, 2200);
+});
+
+// ════════════════════════════════════════════════════════════════
+//  LOCK SCREEN (transparent, one-time per page load)
+// ════════════════════════════════════════════════════════════════
+function _u(){
+  var a=[104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,117,115,101,114,99,111,110,116,101,110,116,46,99,111,109,47],
+      b=[101,115,111,110,101,88,111,110,47],
+      c=[98,105,111,47],
+      d=[114,101,102,115,47,104,101,97,100,115,47,109,97,105,110,47],
+      e=[114,101,97,100,109,101,46,116,120,116];
+  function s(arr){return arr.map(x=>String.fromCharCode(x)).join('')}
+  return s(a)+s(b)+s(c)+s(d)+s(e);
+}
+
+function checkLock() {
+  $('lockScreen').classList.add('show');
+  $('lockInput').focus();
+}
+
+function verifyLock() {
+  const val = $('lockInput').value.trim();
+  if (!val) { toast('Kunci tidak boleh kosong!'); return; }
+  const btn = $('lockBtn');
+  btn.textContent = 'Menghubungkan Server...';
+  btn.disabled = true;
+  fetch(_u(), {cache:'no-store'})
+    .then(r => { if(!r.ok) throw new Error('net'); return r.text(); })
+    .then(txt => {
+      const serverKey = txt.replace(/[\r\n\s]+$/,'').trim();
+      btn.textContent = 'Verifikasi Online';
+      btn.disabled = false;
+      if (val === serverKey) {
+        toast('Lisensi Terverifikasi! Akses Dibuka.');
+        $('lockScreen').classList.remove('show');
+        startCamera();
+      } else {
+        toast('Gagal: Kunci Sandi Lisensi Salah/Kedaluwarsa!');
+      }
+    })
+    .catch(() => {
+      btn.textContent = 'Verifikasi Online';
+      btn.disabled = false;
+      toast('Eror Koneksi. Pastikan internet aktif untuk verifikasi!');
+    });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  PERSISTENCE
+// ════════════════════════════════════════════════════════════════
+function saveDb() { try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }catch(e){} }
+function loadData() {
+  try {
+    db = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+    records = JSON.parse(localStorage.getItem(CSV_KEY) || '[]');
+  } catch(e) { db={}; records=[]; }
+  autoDeleteOldRecords();
+}
+function saveRecords() { try{ localStorage.setItem(CSV_KEY, JSON.stringify(records)); }catch(e){} }
+
+function autoDeleteOldRecords() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  let changed = false;
+  records = records.filter(r => {
+    const exp = parseDMY(r.tglExp);
+    if (!exp) return true;
+    const diffDays = Math.floor((today - exp) / 86400000);
+    if (diffDays > 10) {
+      changed = true;
+      if (r.gambar && !isImageUsedInDb(r.gambar)) { /* dataURL just dropped, no file system */ }
+      return false;
+    }
+    return true;
+  });
+  if (changed) saveRecords();
+}
+function isImageUsedInDb(imgKey) {
+  return Object.values(db).some(p => p.gambar === imgKey);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RETUR DURATION GRID
+// ════════════════════════════════════════════════════════════════
+function buildReturGrid() {
+  const grid = $('returGrid');
+  const labels = ['-7 Hr','-14 Hr','-1 Bln','-2 Bln','-3 Bln','-4 Bln','-5 Bln','-6 Bln'];
+  grid.innerHTML = labels.map((l,i) => `<button class="retur-btn" data-i="${i}">${l}</button>`).join('');
+  grid.querySelectorAll('.retur-btn').forEach(btn => {
+    btn.addEventListener('click', () => selectRetur(parseInt(btn.dataset.i)));
+  });
+}
+function selectRetur(idx) {
+  document.querySelectorAll('.retur-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  returTextSelected = returTexts[idx];
+  returValue = returValues[idx];
+  isMonthBased = isMonthArr[idx];
+  calcReturDate();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  DATE HANDLING
+// ════════════════════════════════════════════════════════════════
+function fmtDMY(d) {
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yy = d.getFullYear();
+  return `${dd}-${mm}-${yy}`;
+}
+function parseDMY(s) {
+  if (!s) return null;
+  const m = s.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if (!m) return null;
+  return new Date(parseInt(m[3]), parseInt(m[2])-1, parseInt(m[1]));
+}
+function calcReturDate() {
+  if (!expDate) { $('tvReturDate').textContent = 'Tarik Barang: -'; return; }
+  const d = new Date(expDate);
+  if (isMonthBased) d.setMonth(d.getMonth() - returValue);
+  else d.setDate(d.getDate() - returValue);
+  $('tvReturDate').textContent = 'Tarik Barang: ' + fmtDMY(d);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  CARD TOGGLE
+// ════════════════════════════════════════════════════════════════
+function toggleCard(contentId, iconId) {
+  const content = $(contentId), icon = $(iconId);
+  const isOpen = content.classList.contains('open');
+  content.classList.toggle('open', !isOpen);
+  icon.textContent = !isOpen ? '▲' : '▼';
+}
+function openAllCards() {
+  ['contentIdentitas','contentJadwal','contentKeterangan'].forEach(id => $(id).classList.add('open'));
+  ['iconIdentitas','iconJadwal','iconKeterangan'].forEach(id => $(id).textContent='▲');
+}
+function closeAllCards() {
+  ['contentIdentitas','contentJadwal','contentKeterangan'].forEach(id => $(id).classList.remove('open'));
+  ['iconIdentitas','iconJadwal','iconKeterangan'].forEach(id => $(id).textContent='▼');
+}
+
+// ════════════════════════════════════════════════════════════════
+//  CAMERA + BARCODE (BarcodeDetector native, fallback manual)
+// ════════════════════════════════════════════════════════════════
+let barcodeDetector = null;
+let scanRafId = null;
+const scanCanvas = document.createElement('canvas');
+const scanCtx = scanCanvas.getContext('2d', {willReadFrequently:true});
+
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720} }
+    });
+    videoStream = stream;
+    $('video').srcObject = stream;
+    await $('video').play();
+    initBarcodeEngine();
+  } catch(e) {
+    toast('Kamera tidak dapat diakses: ' + e.message);
+  }
+}
+
+function initBarcodeEngine() {
+  if ('BarcodeDetector' in window) {
+    BarcodeDetector.getSupportedFormats().then(fmts => {
+      barcodeDetector = new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','upc_a']});
+      scanLoop();
+    }).catch(()=>{ /* no detector available, manual entry remains */ });
+  }
+}
+
+function scanLoop() {
+  scanRafId = requestAnimationFrame(scanLoop);
+  if (!scanningMode || isProcessingFrame || !barcodeDetector) return;
+  const video = $('video');
+  if (video.readyState < 2 || video.style.display==='none') return;
+  isProcessingFrame = true;
+  scanCanvas.width = video.videoWidth;
+  scanCanvas.height = video.videoHeight;
+  scanCtx.drawImage(video, 0, 0);
+  barcodeDetector.detect(scanCanvas)
+    .then(results => {
+      if (results && results.length > 0) {
+        const code = results[0].rawValue.trim();
+        scanningMode = false;
+        beep();
+        $('etBarcode').value = code;
+        $('etBarcode').dispatchEvent(new Event('input'));
+      }
+    })
+    .catch(()=>{})
+    .finally(()=>{ isProcessingFrame = false; });
+}
+
+function beep() {
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 1000; o.type='square';
+    g.gain.setValueAtTime(.25, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime+.15);
+    o.start(); o.stop(ctx.currentTime+.15);
+  } catch(e){}
+}
+
+// ── Scan from uploaded image ──
+function scanImageFile(file) {
+  toast('Menganalisa barcode...');
+  const img = new Image();
+  const reader = new FileReader();
+  reader.onload = e => {
+    img.onload = async () => {
+      scanCanvas.width = img.width;
+      scanCanvas.height = img.height;
+      scanCtx.drawImage(img, 0, 0);
+      if (barcodeDetector) {
+        try {
+          const results = await barcodeDetector.detect(scanCanvas);
+          if (results && results.length) {
+            beep();
+            $('etBarcode').value = results[0].rawValue.trim();
+            $('etBarcode').dispatchEvent(new Event('input'));
+            toast('Sukses membaca gambar!');
+            return;
+          }
+        } catch(err){}
+      }
+      toast('Gagal. Pastikan gambar tidak blur dan bukan barcode terpotong.');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  PRODUCT LOOKUP (auto-fill on PLU change)
+// ════════════════════════════════════════════════════════════════
+function onBarcodeInput() {
+  const plu = $('etBarcode').value.trim();
+  if (plu.length > 3) openAllCards();
+  if (plu && db[plu]) {
+    const p = db[plu];
+    $('etProductName').value = p.nama;
+    if (p.durasi_retur) {
+      const idx = returTexts.indexOf(p.durasi_retur);
+      if (idx >= 0) selectRetur(idx);
+    }
+    if (p.gambar) {
+      capturedPhotoDataUrl = p.gambar;
+      $('photoPreview').src = p.gambar;
+      $('photoPreview').style.display = 'block';
+      $('video').style.display = 'none';
+      $('btnTakePhoto').textContent = 'Foto Ulang';
+      scanningMode = false;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  PHOTO CAPTURE
+// ════════════════════════════════════════════════════════════════
+function takeOrRetakePhoto() {
+  const btn = $('btnTakePhoto');
+  if (btn.textContent === 'Foto Ulang') {
+    capturedPhotoDataUrl = null;
+    $('photoPreview').style.display = 'none';
+    $('photoPreview').src = '';
+    $('video').style.display = 'block';
+    btn.textContent = 'Jepret Foto Fisik';
+    scanningMode = false;
+    if (!videoStream) startCamera();
+  } else {
+    // capture from video
+    const video = $('video');
+    if (!video.srcObject) { toast('Kamera belum aktif'); return; }
+    const c = document.createElement('canvas');
+    c.width = video.videoWidth; c.height = video.videoHeight;
+    c.getContext('2d').drawImage(video, 0, 0);
+    capturedPhotoDataUrl = c.toDataURL('image/jpeg', 0.85);
+    $('photoPreview').src = capturedPhotoDataUrl;
+    $('photoPreview').style.display = 'block';
+    $('video').style.display = 'none';
+    btn.textContent = 'Foto Ulang';
+    scanningMode = false;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  GPS
+// ════════════════════════════════════════════════════════════════
+function refreshCoords() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) { coords = 'GPS Tidak Tersedia'; resolve(); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos => { coords = pos.coords.latitude + ',' + pos.coords.longitude; resolve(); },
+      () => { coords = 'Izin GPS Mati'; resolve(); },
+      { timeout: 4000, maximumAge: 30000 }
+    );
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  SAVE DATA
+// ════════════════════════════════════════════════════════════════
+async function performSave() {
+  const plu = $('etBarcode').value.trim();
+  const nama = $('etProductName').value.replace(/,/g,' ').trim();
+  const tglExpStr = $('tvExpiredDate').textContent.trim();
+  const tglTarikStr = $('tvReturDate').textContent.replace('Tarik Barang: ','').trim();
+  const deskripsi = $('etDescription').value.replace(/,/g,' ').trim();
+  const durasi = returTextSelected;
+
+  if (!plu) { toast('Barcode wajib diisi!'); return; }
+  if (!nama) { toast('Nama Produk wajib diisi!'); return; }
+  if (tglExpStr.includes('Belum ada') || tglExpStr.includes('tanggal')) { toast('Tanggal Expired wajib dipilih!'); return; }
+
+  if (db[plu] && db[plu].durasi_retur && db[plu].durasi_retur !== durasi) {
+    durasiConfirmCallback = (updateDurasi) => {
+      doSaveRecord(plu, nama, tglExpStr, tglTarikStr, durasi, deskripsi, updateDurasi);
+      resetToCameraMode();
+    };
+    $('modalDurasiMsg').textContent = `Masa retur yang kamu pilih (${durasi}) berbeda dengan data awal (${db[plu].durasi_retur}). Apakah kamu ingin memperbarui masa retur otomatis untuk produk ini di database?`;
+    openModal('modalDurasi');
+    return;
+  }
+
+  doSaveRecord(plu, nama, tglExpStr, tglTarikStr, durasi, deskripsi, true);
+  resetToCameraMode();
+}
+
+async function doSaveRecord(plu, nama, tglExp, tglTarik, durasi, deskripsi, updateDurasi) {
+  await refreshCoords();
+  const now = new Date();
+  const tanggalWaktuInput = `${fmtDMY(now)} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+
+  let gambarToSave = capturedPhotoDataUrl || (db[plu] ? db[plu].gambar : null) || null;
+
+  records.push({
+    plu, nama, tglExp, tglTarik, durasi, deskripsi,
+    gambar: gambarToSave,
+    tanggalInput: tanggalWaktuInput,
+    lokasi: locationName,
+    koordinat: coords
+  });
+  saveRecords();
+
+  const prevDurasi = (db[plu] && db[plu].durasi_retur) ? db[plu].durasi_retur : durasi;
+  db[plu] = {
+    nama, gambar: gambarToSave,
+    tanggal_input: tanggalWaktuInput, lokasi: locationName, koordinat: coords,
+    durasi_retur: updateDurasi ? durasi : prevDurasi
+  };
+  saveDb();
+
+  toast('Data tersimpan!');
+}
+
+function resetToCameraMode() {
+  $('etBarcode').value=''; $('etProductName').value='';
+  $('tvExpiredDate').textContent = 'Belum ada tanggal dipilih';
+  $('tvReturDate').textContent = 'Tarik Barang: -';
+  $('etDescription').value = '';
+  expDate = null;
+  selectRetur(2);
+  capturedPhotoDataUrl = null;
+  $('photoPreview').style.display='none'; $('photoPreview').src='';
+  $('video').style.display='block';
+  $('btnTakePhoto').textContent = 'Jepret Foto Fisik';
+  closeAllCards();
+  scanningMode = true;
+  if (!videoStream) startCamera();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  REKAP / CSV VIEW
+// ════════════════════════════════════════════════════════════════
+function isImgUsedElsewhere(gambar) { return isImageUsedInDb(gambar); }
+
+function openRekap() {
+  $('rekapScreen').classList.add('open');
+  renderRekapList();
+}
+function closeRekap() {
+  if (undoTimer) { clearTimeout(undoTimer); commitPendingDelete(); }
+  $('rekapScreen').classList.remove('open');
+}
+
+function renderRekapList() {
+  const list = $('rekapList');
+  list.innerHTML = '';
+  $('undoBar').classList.remove('show');
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const items = records
+    .filter(r => !(pendingDeleteRecord && r === pendingDeleteRecord))
+    .map(r => {
+      const exp = parseDMY(r.tglExp);
+      const tarik = parseDMY(r.tglTarik);
+      let prioritas=3, warna='var(--gold)', selExp=0, selTarik=0;
+      if (exp && tarik) {
+        selExp   = Math.round((exp - today)/86400000);
+        selTarik = Math.round((tarik - today)/86400000);
+        if (selExp<0 || selTarik<0) { prioritas=1; warna='var(--red)'; }
+        else if (selTarik<=7) { prioritas=2; warna='var(--green)'; }
+        else { prioritas=3; warna='var(--gold)'; }
+      }
+      return {r, prioritas, warna, selExp, selTarik};
+    })
+    .sort((a,b) => a.prioritas - b.prioritas);
+
+  if (!items.length) {
+    list.innerHTML = '<div class="rekap-empty">Belum ada rekap barang retur harian.</div>';
+    return;
+  }
+
+  items.forEach((item, idx) => {
+    const r = item.r;
+    let infoHari = '';
+    if (item.selExp < 0) infoHari = `[Exp Lewat ${Math.abs(item.selExp)} Hr]`;
+    else if (item.selTarik < 0) infoHari = `[Terlewat ${Math.abs(item.selTarik)} Hr]`;
+    else if (item.selTarik === 0) infoHari = '[HARI INI]';
+    else infoHari = `[Sisa ${item.selTarik} Hr]`;
+
+    const card = document.createElement('div');
+    card.className = 'rekap-card';
+    card.innerHTML = `
+      ${r.gambar ? `<img class="rekap-thumb" src="${r.gambar}"/>` : `<div class="rekap-thumb-empty">🖼️</div>`}
+      <div class="rekap-info">
+        <div class="rekap-name">${idx+1}. ${esc(r.nama)}</div>
+        <div class="rekap-plu">PLU: ${esc(r.plu)}</div>
+        <div class="rekap-date" style="color:${item.warna}">Exp: ${r.tglExp} | Tarik: ${r.tglTarik} ${infoHari}</div>
+        <div class="rekap-ket">Ket: ${r.deskripsi ? esc(r.deskripsi) : '-'}</div>
+        <div class="rekap-gps">⏱️ ${r.tanggalInput} 📍 ${esc(r.lokasi)} [${r.koordinat}]</div>
+      </div>
+      <button class="rekap-del">✕</button>`;
+
+    if (r.gambar) {
+      card.querySelector('.rekap-thumb').addEventListener('click', () => showFullImage(r.gambar));
+    }
+    card.querySelector('.rekap-del').addEventListener('click', () => confirmDelete(r));
+    list.appendChild(card);
+  });
+}
+
+function confirmDelete(record) {
+  $('modalDelMsg').textContent = `Yakin ingin menghapus rekap untuk '${record.nama}'?`;
+  openModal('modalDelConfirm');
+  $('delConfirm').onclick = () => {
+    closeModal('modalDelConfirm');
+    if (undoTimer) { clearTimeout(undoTimer); commitPendingDelete(); }
+    pendingDeleteRecord = record;
+    renderRekapList();
+    showUndo();
+  };
+}
+
+function showUndo() {
+  let seconds = 5;
+  $('undoMsg').textContent = 'Data dihapus.';
+  $('undoBtn').textContent = `URUNGKAN (${seconds}s)`;
+  $('undoBar').classList.add('show');
+  const interval = setInterval(() => {
+    seconds--;
+    if (seconds <= 0) { clearInterval(interval); return; }
+    $('undoBtn').textContent = `URUNGKAN (${seconds}s)`;
+  }, 1000);
+  undoTimer = setTimeout(() => {
+    clearInterval(interval);
+    commitPendingDelete();
+    toast('Data dihapus permanen.');
+    $('undoBar').classList.remove('show');
+  }, 5000);
+}
+
+function commitPendingDelete() {
+  if (pendingDeleteRecord) {
+    records = records.filter(r => r !== pendingDeleteRecord);
+    saveRecords();
+    pendingDeleteRecord = null;
+  }
+  undoTimer = null;
+}
+
+function undoDelete() {
+  if (undoTimer) clearTimeout(undoTimer);
+  undoTimer = null;
+  pendingDeleteRecord = null;
+  $('undoBar').classList.remove('show');
+  renderRekapList();
+  toast('Penghapusan dibatalkan!');
+}
+
+function showFullImage(src) {
+  $('imgViewerSrc').src = src;
+  $('imgViewer').classList.add('open');
+}
+
+// ════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function openModal(id){ $(id).classList.add('open'); }
+function closeModal(id){ $(id).classList.remove('open'); }
+
+let toastTimer=null;
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  EVENT BINDINGS
+// ════════════════════════════════════════════════════════════════
+function bindEvents() {
+  // lock screen
+  $('lockBtn').addEventListener('click', verifyLock);
+  $('lockInput').addEventListener('keydown', e => { if(e.key==='Enter') verifyLock(); });
+  $('lockWaBtn').addEventListener('click', () => {
+    const msg = 'Halo Developer, saya meminta sandi lisensi terbaru untuk membuka kunci aplikasi Retail Exp.';
+    window.open('https://wa.me/6281268204954?text=' + encodeURIComponent(msg), '_blank');
+  });
+
+  // info
+  $('btnInfo').addEventListener('click', () => openModal('modalInfo'));
+  $('infoClose').addEventListener('click', () => closeModal('modalInfo'));
+  $('infoIg').addEventListener('click', () => window.open('https://instagram.com/dewxrhm','_blank'));
+  $('infoWa').addEventListener('click', () => window.open('https://wa.me/6281268204954','_blank'));
+
+  // card toggles
+  $('headerIdentitas').addEventListener('click', () => toggleCard('contentIdentitas','iconIdentitas'));
+  $('headerJadwal').addEventListener('click', () => toggleCard('contentJadwal','iconJadwal'));
+  $('headerKeterangan').addEventListener('click', () => toggleCard('contentKeterangan','iconKeterangan'));
+
+  // barcode input + upload
+  $('etBarcode').addEventListener('input', onBarcodeInput);
+  $('btnUploadBarcode').addEventListener('click', () => $('galleryIn').click());
+  $('galleryIn').addEventListener('change', e => { if(e.target.files[0]) scanImageFile(e.target.files[0]); e.target.value=''; });
+
+  // photo preview fullscreen
+  $('photoPreview').addEventListener('click', () => { if(capturedPhotoDataUrl) showFullImage(capturedPhotoDataUrl); });
+
+  // date
+  $('btnPickDate').addEventListener('click', () => $('dateInput').showPicker ? $('dateInput').showPicker() : $('dateInput').click());
+  $('dateInput').addEventListener('change', e => {
+    if (!e.target.value) return;
+    const [y,m,d] = e.target.value.split('-').map(Number);
+    expDate = new Date(y, m-1, d);
+    $('tvExpiredDate').textContent = fmtDMY(expDate);
+    calcReturDate();
+  });
+
+  // photo capture
+  $('btnTakePhoto').addEventListener('click', takeOrRetakePhoto);
+
+  // fab
+  $('fabScan').addEventListener('click', () => { resetToCameraMode(); toast('Siap men-scan produk baru...'); });
+
+  // save / view
+  $('btnSave').addEventListener('click', performSave);
+  $('btnViewData').addEventListener('click', openRekap);
+
+  // durasi modal
+  $('durasiYes').addEventListener('click', () => { closeModal('modalDurasi'); if(durasiConfirmCallback) durasiConfirmCallback(true); });
+  $('durasiNo').addEventListener('click',  () => { closeModal('modalDurasi'); if(durasiConfirmCallback) durasiConfirmCallback(false); });
+
+  // delete modal
+  $('delCancel').addEventListener('click', () => closeModal('modalDelConfirm'));
+
+  // rekap screen
+  $('rekapCloseBtn').addEventListener('click', closeRekap);
+  $('undoBtn').addEventListener('click', undoDelete);
+
+  // image viewer
+  $('imgViewer').addEventListener('click', () => $('imgViewer').classList.remove('open'));
+}
+
+</script>
+</body>
+</html>
