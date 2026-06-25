@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PaXtok Web</title>
+    
+    <link rel="icon" href="56023.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    
     <style>
         :root {
             --bg-color: #F2F2F7;
@@ -22,13 +30,15 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* Menggunakan font Poppins */
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             padding-bottom: 120px; /* Space for FAB */
+            transition: zoom 0.3s ease; /* Transisi halus saat ganti ukuran */
         }
 
         /* Utility Classes */
@@ -40,15 +50,19 @@
         .justify-between { justify-content: space-between; }
         .justify-center { justify-content: center; }
         .text-center { text-align: center; }
-        .font-bold { font-weight: bold; }
+        .font-bold { font-weight: 700; }
 
         /* Header */
         header { padding: 20px; }
-        .logo-text { font-size: 24px; margin-left: 12px; flex-grow: 1; }
+        .logo-img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
+        .logo-text { font-size: 24px; margin-left: 12px; flex-grow: 1; letter-spacing: -0.5px; }
+        
         .btn-header {
             border-radius: 17px; padding: 0 14px; height: 34px;
-            font-size: 12px; font-weight: bold; line-height: 34px; cursor: pointer;
+            font-size: 12px; font-weight: 600; line-height: 34px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
+        .btn-zoom { background: #D1D1D6; color: #000; margin-right: 8px; font-size: 14px; }
         .btn-projects { background: var(--divider); color: var(--blue); margin-right: 8px; }
         .btn-csv { background: var(--text-main); color: #FFF; }
 
@@ -56,7 +70,7 @@
         #container_input_manual { margin: 0 16px; padding: 8px; border-radius: 24px; }
         .input-box {
             background: var(--bg-color); border-radius: 16px; height: 48px; border: none;
-            padding: 0 16px; font-size: 14px; width: 100%; outline: none;
+            padding: 0 16px; font-size: 14px; width: 100%; outline: none; font-weight: 600;
         }
         .add-btn {
             background: var(--blue); color: #FFF; border-radius: 24px; width: 48px; height: 48px;
@@ -64,7 +78,7 @@
         }
 
         /* Global Actions */
-        .global-actions { padding: 16px 20px 8px; justify-content: flex-end; gap: 16px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .global-actions { padding: 16px 20px 8px; justify-content: flex-end; gap: 16px; font-size: 12px; font-weight: 600; cursor: pointer; }
         .text-orange { color: var(--orange); }
         .text-red { color: var(--red); }
 
@@ -73,29 +87,29 @@
         .item-card { padding-top: 20px; overflow: hidden; }
         .item-header { padding: 0 20px; }
         .item-plu { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-        .item-name { font-size: 16px; font-weight: bold; }
-        .item-selisih { font-size: 30px; font-weight: bold; }
+        .item-name { font-size: 16px; font-weight: 700; line-height: 1.2; }
+        .item-selisih { font-size: 30px; font-weight: 700; }
         .barcode-container { margin: 16px 20px; text-align: center; }
         .barcode-container svg { width: 100%; height: 50px; }
         
         .stok-fisik-row { padding: 0 20px 20px; gap: 12px; }
         .sf-box { flex: 1; }
-        .sf-label { font-size: 10px; font-weight: bold; margin-bottom: 6px; margin-left: 8px; }
+        .sf-label { font-size: 10px; font-weight: 700; margin-bottom: 6px; margin-left: 8px; letter-spacing: 0.5px; }
         .stok-label { color: var(--text-muted); }
         .fisik-label { color: var(--blue); }
         .sf-input {
             width: 100%; height: 48px; border-radius: 16px; border: none; text-align: center;
-            font-size: 18px; font-weight: bold; outline: none;
+            font-size: 18px; font-weight: 700; outline: none;
         }
         .input-stok { background: #F2F2F7; color: var(--text-main); }
         .input-fisik { background: #E5F0FF; color: var(--blue); }
 
         .item-actions { border-top: 1px solid var(--divider); display: flex; height: 45px; }
-        .action-btn { flex: 1; background: none; border: none; font-size: 12px; cursor: pointer; border-right: 1px solid var(--divider); }
+        .action-btn { flex: 1; background: none; border: none; font-size: 12px; font-weight: 600; cursor: pointer; border-right: 1px solid var(--divider); }
         .action-btn:last-child { border-right: none; }
         .btn-reset-item { color: var(--orange); }
         .btn-updown { color: var(--text-muted); }
-        .btn-delete { color: var(--red); font-weight: bold; }
+        .btn-delete { color: var(--red); font-weight: 700; }
 
         /* FAB Bottom */
         .fab-container {
@@ -104,7 +118,7 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.15); display: flex; align-items: center; overflow: hidden; z-index: 100;
         }
         .fab-container.mode-review { background: var(--red); }
-        .fab-btn { padding: 0 24px; font-size: 15px; font-weight: bold; cursor: pointer; height: 100%; display: flex; align-items: center; }
+        .fab-btn { padding: 0 24px; font-size: 15px; font-weight: 700; cursor: pointer; height: 100%; display: flex; align-items: center; }
         .fab-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.3); }
 
         /* Undo Snackbar */
@@ -114,7 +128,7 @@
             padding: 0 8px 0 24px; z-index: 101; transform: translateY(150px); transition: transform 0.3s;
         }
         #card_undo.show { transform: translateY(0); }
-        .btn-undo-action { background: #323232; color: #3478F6; border-radius: 17px; padding: 6px 16px; font-weight: bold; font-size: 14px; cursor: pointer; }
+        .btn-undo-action { background: #323232; color: #3478F6; border-radius: 17px; padding: 6px 16px; font-weight: 700; font-size: 14px; cursor: pointer; }
 
         /* Dialogs */
         #dialog_overlay {
@@ -123,28 +137,28 @@
         }
         .dialog-card { background: #F2F2F7; border-radius: 18px; width: 80%; max-width: 340px; overflow: hidden; }
         .dialog-content { padding: 20px; text-align: center; }
-        .dialog-title { font-size: 17px; font-weight: bold; color: #000; margin-bottom: 6px; }
+        .dialog-title { font-size: 17px; font-weight: 700; color: #000; margin-bottom: 6px; }
         .dialog-message { font-size: 13px; color: #3C3C43; margin-bottom: 16px; }
         .dialog-body { margin-bottom: 16px; }
         .dialog-actions { display: flex; border-top: 1px solid rgba(60,60,67,0.29); height: 48px; }
-        .dialog-btn { flex: 1; border: none; background: transparent; font-size: 17px; color: var(--blue); cursor: pointer; }
-        .dialog-btn.bold { font-weight: bold; }
+        .dialog-btn { flex: 1; border: none; background: transparent; font-size: 17px; font-weight: 600; color: var(--blue); cursor: pointer; }
+        .dialog-btn.bold { font-weight: 700; }
         .dialog-btn.red { color: var(--red); }
         .dialog-divider { width: 1px; background: rgba(60,60,67,0.29); }
 
         /* Review Container */
         #container_review { padding: 16px; }
         .review-header, .review-row { display: flex; padding: 16px; font-size: 11px; align-items: center; }
-        .review-header { background: #F2F2F7; font-weight: bold; color: var(--text-muted); border-radius: 20px 20px 0 0;}
+        .review-header { background: #F2F2F7; font-weight: 700; color: var(--text-muted); border-radius: 20px 20px 0 0;}
         .review-row { border-bottom: 1px solid var(--divider); }
         .review-row:last-child { border-bottom: none; }
         .r-plu { flex: 1.1; color: var(--text-muted); }
-        .r-item { flex: 1.6; font-size: 12px; font-weight: bold; }
-        .r-hrg { flex: 1.3; color: var(--blue); font-weight: bold; text-align: center; cursor: pointer; }
+        .r-item { flex: 1.6; font-size: 12px; font-weight: 700; }
+        .r-hrg { flex: 1.3; color: var(--blue); font-weight: 700; text-align: center; cursor: pointer; }
         .r-stk { flex: 0.8; text-align: center; }
         .r-fsk { flex: 0.8; text-align: center; }
-        .r-sls { flex: 1.0; font-size: 14px; font-weight: bold; text-align: right; }
-        .btn-wa { background: var(--green); color: #FFF; border-radius: 16px; height: 55px; width: 100%; border: none; font-size: 15px; font-weight: bold; margin-top: 24px; cursor: pointer; }
+        .r-sls { flex: 1.0; font-size: 14px; font-weight: 700; text-align: right; }
+        .btn-wa { background: var(--green); color: #FFF; border-radius: 16px; height: 55px; width: 100%; border: none; font-size: 15px; font-weight: 700; margin-top: 24px; cursor: pointer; }
 
         /* Loading */
         #loading_overlay {
@@ -153,13 +167,25 @@
         }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--blue); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Level Ukuran Info */
+        #zoom_indicator {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 6px 16px; border-radius: 20px;
+            font-size: 12px; font-weight: 600; z-index: 400; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
+    <div id="zoom_indicator">Ukuran: Normal</div>
+
     <header class="flex items-center">
-        <div style="width:32px; height:32px; background:var(--blue); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#FFF; font-weight:bold;">Px</div>
+        <img src="56023.png" alt="Logo" class="logo-img">
         <div class="logo-text font-bold">PaXtok</div>
+        
+        <div class="btn-header btn-zoom" onclick="toggleZoom()" title="Ubah Ukuran Tampilan">Aa</div>
+        
         <div class="btn-header btn-projects" onclick="showProjectManager()">PROYEK</div>
         <div class="btn-header btn-csv" onclick="document.getElementById('csv-file').click()">CSV</div>
         <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
@@ -171,7 +197,7 @@
             <datalist id="plu_list"></datalist>
             <input type="text" id="et_input_item" class="input-box" placeholder="Nama Item" style="flex:1.5; text-transform: uppercase;">
         </div>
-        <button class="add-btn" onclick="performManualAdd()">+</button>
+        <button class="add-btn font-bold" onclick="performManualAdd()">+</button>
     </div>
 
     <div id="container_global_actions" class="flex global-actions">
@@ -233,8 +259,36 @@
         let masterProducts = {};
         let isReviewMode = false;
 
+        // Zooming System (5 Levels)
+        const zoomLevels = [0.8, 0.9, 1.0, 1.1, 1.2];
+        const zoomLabels = ["Sangat Kecil", "Kecil", "Normal", "Besar", "Sangat Besar"];
+        let currentZoomIdx = 2; // Default level 1.0 (Normal)
+        let zoomTimeout;
+
+        function initZoom() {
+            const savedZoom = localStorage.getItem("app_zoom_idx");
+            if (savedZoom !== null) {
+                currentZoomIdx = parseInt(savedZoom);
+            }
+            document.body.style.zoom = zoomLevels[currentZoomIdx];
+        }
+
+        function toggleZoom() {
+            currentZoomIdx = (currentZoomIdx + 1) % 5;
+            document.body.style.zoom = zoomLevels[currentZoomIdx];
+            localStorage.setItem("app_zoom_idx", currentZoomIdx);
+            
+            // Tampilkan info indikator
+            const indicator = document.getElementById("zoom_indicator");
+            indicator.textContent = "Ukuran: " + zoomLabels[currentZoomIdx];
+            indicator.style.opacity = "1";
+            
+            clearTimeout(zoomTimeout);
+            zoomTimeout = setTimeout(() => { indicator.style.opacity = "0"; }, 1500);
+        }
+
         // Undo Variables
-        let pendingUndoType = -1; // 0: delete item, 1: delete all, 2: reset stok, 3: delete project
+        let pendingUndoType = -1; 
         let backupDataForUndo = [];
         let pendingDeletedItem = null;
         let pendingDeletedIndex = -1;
@@ -243,11 +297,11 @@
         let undoTimeout;
 
         // --- CORE FUNCTIONS ---
-
         function init() {
+            initZoom(); // Muat pengaturan zoom
             loadSavedData();
             
-            // Auto-fill Item Name when PLU is selected from datalist
+            // Auto-fill Item Name
             document.getElementById('et_input_plu').addEventListener('input', function(e) {
                 const val = this.value;
                 if(val.includes(" - ")) {
@@ -284,7 +338,6 @@
         }
 
         // --- DOM RENDERERS ---
-
         function renderList() {
             const container = document.getElementById('container_list');
             container.innerHTML = '';
@@ -336,7 +389,6 @@
                 </div>
             `;
 
-            // Generate Barcode async
             setTimeout(() => {
                 try { JsBarcode(`#barcode-${item.plu}`, item.plu, { format: "CODE128", width: 2, height: 40, displayValue: false }); } catch(e){}
             }, 10);
@@ -345,12 +397,10 @@
         }
 
         // --- ACTIONS ---
-
         function updateItemValue(index, field, value) {
             items[index][field] = value;
             saveData();
             
-            // Re-render specifically for this card to update selisih & reset button without losing focus
             const intStok = parseInt(items[index].stok) || 0;
             const intFisik = parseInt(items[index].fisik) || 0;
             const selisih = (items[index].stok === "" && items[index].fisik === "") ? 0 : (intFisik - intStok);
@@ -455,7 +505,6 @@
         }
 
         // --- CSV HANDLING ---
-        
         function handleCSVUpload(event) {
             const file = event.target.files[0];
             if(!file) return;
@@ -499,7 +548,6 @@
         }
 
         // --- UNDO SYSTEM ---
-
         function showUndoSnackbar(msg, type) {
             pendingUndoType = type;
             document.getElementById('tv_undo_msg').textContent = msg;
@@ -538,7 +586,6 @@
         }
 
         // --- REVIEW & WHATSAPP ---
-
         function toggleReviewMode() {
             commitPendingDeletion();
             isReviewMode = !isReviewMode;
@@ -634,7 +681,6 @@
                 if(prices[item.plu]) {
                     item.harga = prices[item.plu];
                 } else {
-                    // Fetch from KlikIndomaret via Proxy
                     try {
                         const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.klikindomaret.com/xpress/' + item.plu)}`);
                         if(res.ok) {
@@ -705,7 +751,6 @@
         }
 
         // --- PROJECT MANAGEMENT ---
-
         function showProjectManager() {
             let list = JSON.parse(localStorage.getItem("project_list") || "[]");
             let html = "";
@@ -714,7 +759,7 @@
                     html += `
                     <div style="display:flex; padding:14px 16px; border-bottom:1px solid var(--divider); align-items:center; cursor:pointer;" onclick="actionProject('${p}')">
                         <span style="font-size:18px; margin-right:12px;">📁</span>
-                        <span style="flex:1;">${p}</span>
+                        <span style="flex:1; font-weight: 600;">${p}</span>
                         <span style="color:#C7C7CC; font-size:22px;">›</span>
                     </div>`;
                 });
@@ -729,9 +774,9 @@
 
         function actionProject(name) {
             let html = `
-                <div style="padding:16px; color:var(--blue); font-size:16px; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="openProject('${name}')">📂 Buka Sesi</div>
-                <div style="padding:16px; color:var(--green); font-size:16px; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="exportProject('${name}')">⬇️ Ekspor ke File</div>
-                <div style="padding:16px; color:var(--red); font-size:16px; cursor:pointer;" onclick="deleteProject('${name}')">🗑 Hapus Project</div>
+                <div style="padding:16px; color:var(--blue); font-size:16px; font-weight:600; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="openProject('${name}')">📂 Buka Sesi</div>
+                <div style="padding:16px; color:var(--green); font-size:16px; font-weight:600; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="exportProject('${name}')">⬇️ Ekspor ke File</div>
+                <div style="padding:16px; color:var(--red); font-size:16px; font-weight:600; cursor:pointer;" onclick="deleteProject('${name}')">🗑 Hapus Project</div>
             `;
             showDialog(name, "", html, [{ text: "Tutup", class: "", onclick: closeDialog }]);
         }
@@ -791,7 +836,6 @@
         }
 
         // --- UI UTILS (MODALS) ---
-
         function showDialog(title, msg, customHtml, buttons) {
             document.getElementById('dialog_title').textContent = title;
             const msgEl = document.getElementById('dialog_message');
