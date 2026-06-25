@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Generator Sadewa</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <style>
+        /* CSS meniru desain dari XML Android */
+        :root {
+            --bg-main: #162E4E;
+            --accent-green: #798A61;
+            --text-muted: #A0B0C8;
+            --card-bg: #1C355E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: #FFFFFF;
+            padding: 20px;
+            padding-bottom: 90px; /* Space for FAB */
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .dev-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .main-title {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .header-buttons button {
+            background-color: var(--card-bg);
+            color: #FFF;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .switch-container input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+
+        .input-container {
+            background-color: #FFFFFF;
+            border-radius: 24px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        textarea, input[type="text"] {
+            flex: 1;
+            border: none;
+            outline: none;
+            color: #162E4E;
+            font-size: 16px;
+            resize: none;
+            background: transparent;
+        }
+
+        textarea {
+            height: 120px;
+        }
+
+        input[type="text"].single-line {
+            height: 56px;
+        }
+
+        .btn-generate {
+            background-color: var(--accent-green);
+            color: #FFFFFF;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ListView Container */
+        #listview_barcode {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: transform 0.3s ease;
+            transform-origin: top left;
+        }
+
+        /* Card Style meniru BaseAdapter Android */
+        .barcode-card {
+            background-color: var(--accent-green);
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .product-thumb {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 14px;
+            background-color: #E1E6EB;
+        }
+
+        .card-text {
+            flex: 1;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: #D0DBC4;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .btn-web {
+            background-color: #FFFFFF;
+            color: var(--accent-green);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .barcode-img-container {
+            background-color: #FFFFFF;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .barcode-img-container svg {
+            width: 100%;
+            height: 80px;
+        }
+
+        /* Floating Action Button */
+        .fab-save {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: var(--accent-green);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Modal / Dialog Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #112540;
+            border-radius: 24px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            color: #162E4E;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn-cancel { background: transparent; color: var(--text-muted); border: none; padding: 10px 16px; cursor: pointer; }
+        .btn-confirm { background: var(--accent-green); color: white; border: none; padding: 10px 16px; border-radius: 14px; cursor: pointer; }
+        
+        .list-item {
+            background: #1C355E;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .list-item:hover { background: #25436C; }
+        .list-item.active { background: var(--accent-green); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <div class="dev-title">Developed by Sadewa</div>
+            <div class="main-title">Barcode</div>
+        </div>
+        <div class="header-buttons">
+            <button id="btn-scale">Ukuran</button>
+            <button id="btn-project">Project</button>
+        </div>
+    </header>
+
+    <div class="switch-container">
+        <input type="checkbox" id="switch_mode">
+        <label for="switch_mode">Mode Cepat (Enter = Langsung Jadi)</label>
+    </div>
+
+    <div class="input-container">
+        <textarea id="edittext_input" placeholder="Masukkan kode barang...&#10;(Satu baris satu kode)"></textarea>
+        <button id="symbol_generate" class="btn-generate">+</button>
+    </div>
+
+    <div id="listview_barcode"></div>
+
+    <button id="fab_save" class="fab-save">💾</button>
+
+    <div id="modal-save" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Simpan Project</div>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Masukkan nama untuk menyimpan list project barcode ini:</p>
+            <input type="text" id="project-name-input" placeholder="Contoh: Hasil Scan Rak A">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('modal-save')">Batal</button>
+                <button class="btn-confirm" onclick="saveProject()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-list" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-list-title">Judul</div>
+            <div id="modal-list-items" style="max-height: 240px; overflow-y: auto;"></div>
+            <button class="btn-cancel" style="width: 100%; margin-top: 8px;" onclick="closeModal('modal-list')">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        // State Aplikasi
+        let barcodeList = [];
+        let currentScaleIndex = parseInt(localStorage.getItem('settings_ui_scale_index')) || 2;
+        const scaleMultipliers = [0.70, 0.85, 1.00, 1.20, 1.45];
+        const scaleNames = ["Sangat Kecil", "Kecil", "Normal", "Besar", "Sangat Besar"];
+
+        // Element UI
+        const switchMode = document.getElementById('switch_mode');
+        const inputField = document.getElementById('edittext_input');
+        const btnGenerate = document.getElementById('symbol_generate');
+        const listView = document.getElementById('listview_barcode');
+
+        // Mode Cepat Logic
+        switchMode.addEventListener('change', (e) => {
+            inputField.value = "";
+            if (e.target.checked) {
+                // Ubah menjadi single line
+                inputField.outerHTML = `<input type="text" id="edittext_input" class="single-line" placeholder="Ketik/Scan kode lalu tekan Enter...">`;
+            } else {
+                // Ubah menjadi multi line
+                inputField.outerHTML = `<textarea id="edittext_input" placeholder="Masukkan kode barang...&#10;(Satu baris satu kode)"></textarea>`;
+            }
+            // Re-bind event listener setelah elemen diganti
+            bindInputEvents();
+        });
+
+        function bindInputEvents() {
+            const newInput = document.getElementById('edittext_input');
+            newInput.addEventListener('keydown', (e) => {
+                if (switchMode.checked && e.key === 'Enter') {
+                    e.preventDefault();
+                    prosesSingleLineBarcode(newInput.value);
+                }
+            });
+        }
+        bindInputEvents();
+
+        btnGenerate.addEventListener('click', () => {
+            const inputVal = document.getElementById('edittext_input').value;
+            if (switchMode.checked) {
+                prosesSingleLineBarcode(inputVal);
+            } else {
+                prosesMultiLineBarcode(inputVal);
+            }
+        });
+
+        function prosesSingleLineBarcode(text) {
+            const cleanText = text.trim();
+            if (!cleanText) return;
+            barcodeList.unshift(cleanText); // Tambah di atas
+            renderList();
+            document.getElementById('edittext_input').value = "";
+        }
+
+        function prosesMultiLineBarcode(text) {
+            if (!text.trim()) return;
+            barcodeList = []; // Clear list
+            const lines = text.split('\n');
+            lines.forEach(line => {
+                const cleanLine = line.trim();
+                if (cleanLine) barcodeList.push(cleanLine);
+            });
+            renderList();
+        }
+
+        // Render Data ke Layar
+        function renderList() {
+            listView.innerHTML = "";
+            const scale = scaleMultipliers[currentScaleIndex];
+            listView.style.transform = `scale(${scale})`;
+            listView.style.width = `${100 / scale}%`; // Kompensasi lebar saat di-scale
+
+            barcodeList.forEach((code, index) => {
+                const imgUrl = `https://www.klikindomaret.com/assets-klikidmcore/_next/image?url=https://cdn-klik.klikindomaret.com/klik-catalog/product/${code}_thumb.jpg&w=3840&q=75`;
+                
+                const card = document.createElement('div');
+                card.className = 'barcode-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <img src="${imgUrl}" class="product-thumb" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MiIgaGVpZ2h0PSI1MiIgZmlsbD0iI0UxRTZFQiI+PHJlY3Qgd2lkdGg9IjUyIiBoZWlnaHQ9IjUyIi8+PC9zdmc+'">
+                        <div class="card-text">
+                            <div class="card-subtitle">Barcode Item</div>
+                            <div class="card-title">${code}</div>
+                        </div>
+                        <button class="btn-web" onclick="window.open('https://www.klikindomaret.com/xpress/${code}', '_blank')">🌐</button>
+                    </div>
+                    <div class="barcode-img-container">
+                        <svg id="barcode-${index}"></svg>
+                    </div>
+                `;
+                listView.appendChild(card);
+                
+                // Eksekusi JsBarcode
+                try {
+                    JsBarcode(`#barcode-${index}`, code, {
+                        format: "CODE128",
+                        width: 2,
+                        height: 60,
+                        displayValue: false,
+                        margin: 0
+                    });
+                } catch (e) {
+                    console.error("Format barcode tidak valid untuk", code);
+                }
+            });
+        }
+
+        // Modal Logic
+        function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Fitur Simpan Project
+        document.getElementById('fab_save').addEventListener('click', () => {
+            if(barcodeList.length === 0) {
+                alert("List kosong! Data tidak valid.");
+                return;
+            }
+            showModal('modal-save');
+            document.getElementById('project-name-input').value = "";
+        });
+
+        function saveProject() {
+            const name = document.getElementById('project-name-input').value.trim();
+            if (!name) return;
+            
+            let masterList = JSON.parse(localStorage.getItem('master_project_names') || '[]');
+            if (!masterList.includes(name)) {
+                masterList.push(name);
+                localStorage.setItem('master_project_names', JSON.stringify(masterList));
+            }
+            
+            localStorage.setItem('project_data_' + name.toLowerCase(), JSON.stringify(barcodeList));
+            alert(`Project '${name}' Tersimpan! ✔️`);
+            closeModal('modal-save');
+        }
+
+        // Fitur Muat Project
+        document.getElementById('btn-project').addEventListener('click', () => {
+            let masterList = JSON.parse(localStorage.getItem('master_project_names') || '[]');
+            if (masterList.length === 0) {
+                alert("Belum ada project terkumpul.");
+                return;
+            }
+            
+            document.getElementById('modal-list-title').innerText = "Pilih Project Barcode";
+            const container = document.getElementById('modal-list-items');
+            container.innerHTML = "";
+            
+            masterList.forEach(proj => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerText = proj;
+                item.onclick = () => {
+                    const data = JSON.parse(localStorage.getItem('project_data_' + proj.toLowerCase()) || '[]');
+                    barcodeList = data;
+                    renderList();
+                    closeModal('modal-list');
+                };
+                container.appendChild(item);
+            });
+            showModal('modal-list');
+        });
+
+        // Fitur Ukuran UI (Scaling)
+        document.getElementById('btn-scale').addEventListener('click', () => {
+            document.getElementById('modal-list-title').innerText = "Pilih Ukuran Tampilan";
+            const container = document.getElementById('modal-list-items');
+            container.innerHTML = "";
+            
+            scaleNames.forEach((name, index) => {
+                const item = document.createElement('div');
+                item.className = `list-item ${index === currentScaleIndex ? 'active' : ''}`;
+                item.innerText = name;
+                item.onclick = () => {
+                    currentScaleIndex = index;
+                    localStorage.setItem('settings_ui_scale_index', index);
+                    renderList();
+                    closeModal('modal-list');
+                };
+                container.appendChild(item);
+            });
+            showModal('modal-list');
+        });
+
+        // Initial Render
+        renderList();
+    </script>
+</body>
+</html>
