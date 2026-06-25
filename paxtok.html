@@ -1,781 +1,857 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PaXtok - Stock Opname</title>
-  <style>
-    :root{
-      --bg:#F2F2F7;
-      --card:#FFFFFF;
-      --muted:#8E8E93;
-      --primary:#007AFF;
-      --danger:#FF3B30;
-      --warning:#FF9500;
-      --plus:#34C759;
-      --divider:#E5E5EA;
-      --shadow:0 8px 22px rgba(0,0,0,.06);
-    }
-    *{box-sizing:border-box;}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
-      background:var(--bg);
-      color:#000;
-    }
-    #app{min-height:100vh; padding-bottom:120px;}
-    .header{display:flex; align-items:center; justify-content:space-between; padding:18px 18px;}
-    .header-left{display:flex; align-items:center; gap:12px;}
-    .logo{font-weight:800; font-size:24px;}
-    .header-actions{display:flex; gap:10px;}
-    .chip{border:0; padding:8px 14px; border-radius:17px; background:#E5E5EA; color:var(--primary); font-weight:800; font-size:12px;}
-    .chip.dark{background:#000; color:#fff;}
-    .card{background:var(--card); border-radius:24px; box-shadow:0 2px 10px rgba(0,0,0,.06); margin:0 16px; padding:12px;}
-    .input-row{display:flex; gap:10px; align-items:center;}
-    .pill{background:#F2F2F7; border-radius:16px; padding:0 10px; flex:1; height:48px; display:flex; align-items:center;}
-    .pill.wide{flex:1.5;}
-    .pill input{width:100%; border:0; outline:none; background:transparent; font-size:14px;}
-    .fabAdd{width:48px; height:48px; border:0; border-radius:24px; background:var(--primary); color:#fff; font-size:26px; font-weight:800;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PaXtok Web</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #F2F2F7;
+            --card-bg: #FFFFFF;
+            --text-main: #000000;
+            --text-muted: #8E8E93;
+            --blue: #007AFF;
+            --red: #FF3B30;
+            --green: #34C759;
+            --orange: #FF9500;
+            --divider: #E5E5EA;
+        }
 
-    .global-actions{display:flex; justify-content:flex-end; gap:16px; padding:16px 20px 8px; margin-top:0;}
-    .global-actions button{border:0; background:transparent; padding:6px 10px; border-radius:8px; font-weight:800; font-size:12px;}
-    .global-actions #btnResetStok{color:var(--warning);} 
-    .global-actions #btnResetAll{color:var(--danger);} 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    .list-wrap{padding:0 0;}
-    .list{padding:4px 16px 0;}
+        body {
+            background-color: var(--bg-color);
+            padding-bottom: 120px; /* Space for FAB */
+        }
 
-    .item-card{background:#fff; border-radius:20px; padding:0; box-shadow:0 1px 3px rgba(0,0,0,.04); margin:16px 0;}
-    .item-head{display:flex; align-items:flex-start; justify-content:space-between; padding:18px 18px 0; gap:12px;}
-    .item-head .left{flex:1;}
-    .item-title{font-weight:800; font-size:16px;}
-    .item-plu{font-size:12px; color:var(--muted); margin-top:2px;}
-    .item-selisih{font-size:30px; font-weight:900; text-align:right; min-width:90px;}
-    .item-body{padding:0 20px 12px;}
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .card { background: var(--card-bg); border-radius: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .flex { display: flex; }
+        .flex-col { display: flex; flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: bold; }
 
-    .barcode{width:100%; height:50px; background:#fff; display:flex; align-items:center; justify-content:center; margin:14px 0; border-radius:10px; overflow:hidden;}
+        /* Header */
+        header { padding: 20px; }
+        .logo-text { font-size: 24px; margin-left: 12px; flex-grow: 1; }
+        .btn-header {
+            border-radius: 17px; padding: 0 14px; height: 34px;
+            font-size: 12px; font-weight: bold; line-height: 34px; cursor: pointer;
+        }
+        .btn-projects { background: var(--divider); color: var(--blue); margin-right: 8px; }
+        .btn-csv { background: var(--text-main); color: #FFF; }
 
-    .inputs{display:flex; gap:12px; padding-bottom:12px;}
-    .col{flex:1;}
-    .label{font-size:10px; font-weight:900; color:var(--muted); margin:10px 0 6px;}
-    .label.blue{color:var(--primary);}
+        /* Input Manual Container */
+        #container_input_manual { margin: 0 16px; padding: 8px; border-radius: 24px; }
+        .input-box {
+            background: var(--bg-color); border-radius: 16px; height: 48px; border: none;
+            padding: 0 16px; font-size: 14px; width: 100%; outline: none;
+        }
+        .add-btn {
+            background: var(--blue); color: #FFF; border-radius: 24px; width: 48px; height: 48px;
+            font-size: 26px; border: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        }
 
-    .input-card{background:#F2F2F7; border-radius:16px; height:48px; display:flex; align-items:center; justify-content:center;}
-    .input-card.blue{background:#E5F0FF;}
-    .input-card input{border:0; outline:none; width:100%; background:transparent; height:100%; text-align:center; font-size:18px; font-weight:800; color:#000;}
-    .input-card.blue input{color:var(--primary)}
+        /* Global Actions */
+        .global-actions { padding: 16px 20px 8px; justify-content: flex-end; gap: 16px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .text-orange { color: var(--orange); }
+        .text-red { color: var(--red); }
 
-    .sep{height:1px; background:#F2F2F7; margin:0 -20px 0;}
+        /* List Items */
+        #container_list { display: flex; flex-direction: column; gap: 12px; padding: 4px 16px 0; }
+        .item-card { padding-top: 20px; overflow: hidden; }
+        .item-header { padding: 0 20px; }
+        .item-plu { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .item-name { font-size: 16px; font-weight: bold; }
+        .item-selisih { font-size: 30px; font-weight: bold; }
+        .barcode-container { margin: 16px 20px; text-align: center; }
+        .barcode-container svg { width: 100%; height: 50px; }
+        
+        .stok-fisik-row { padding: 0 20px 20px; gap: 12px; }
+        .sf-box { flex: 1; }
+        .sf-label { font-size: 10px; font-weight: bold; margin-bottom: 6px; margin-left: 8px; }
+        .stok-label { color: var(--text-muted); }
+        .fisik-label { color: var(--blue); }
+        .sf-input {
+            width: 100%; height: 48px; border-radius: 16px; border: none; text-align: center;
+            font-size: 18px; font-weight: bold; outline: none;
+        }
+        .input-stok { background: #F2F2F7; color: var(--text-main); }
+        .input-fisik { background: #E5F0FF; color: var(--blue); }
 
-    .item-actions{display:flex; height:45px; width:100%;}
-    .item-actions button{flex:1; border:0; background:transparent; border-left:1px solid #F2F2F7; font-size:12px; color:var(--muted); font-weight:700;}
-    .item-actions button:first-child{border-left:0;}
-    .item-actions .reset{color:var(--warning); display:none;}
-    .item-actions .delete{color:var(--danger); font-weight:900;}
+        .item-actions { border-top: 1px solid var(--divider); display: flex; height: 45px; }
+        .action-btn { flex: 1; background: none; border: none; font-size: 12px; cursor: pointer; border-right: 1px solid var(--divider); }
+        .action-btn:last-child { border-right: none; }
+        .btn-reset-item { color: var(--orange); }
+        .btn-updown { color: var(--text-muted); }
+        .btn-delete { color: var(--red); font-weight: bold; }
 
-    .review-card{background:#fff; border-radius:20px; box-shadow:0 2px 10px rgba(0,0,0,.05); margin:12px 16px; padding:0;}
-    .review-head{display:flex; background:#F2F2F7; padding:16px; gap:0;}
-    .review-head .th{font-size:11px; font-weight:900; color:var(--muted);}
-    .review-head .th:nth-child(1){flex:1.1;}
-    .review-head .th:nth-child(2){flex:1.6;}
-    .review-head .th:nth-child(3){flex:1.3;}
-    .review-head .th:nth-child(4){flex:.8; text-align:center;}
-    .review-head .th:nth-child(5){flex:.8; text-align:center;}
-    .review-head .th:nth-child(6){flex:1; text-align:right;}
-    .review-rows{padding:12px 16px; display:flex; flex-direction:column; gap:10px;}
-    .review-row{display:flex; align-items:center; gap:10px;}
-    .review-row div{font-size:14px;}
+        /* FAB Bottom */
+        .fab-container {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: var(--blue); border-radius: 27px; height: 55px; color: #FFF;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15); display: flex; align-items: center; overflow: hidden; z-index: 100;
+        }
+        .fab-container.mode-review { background: var(--red); }
+        .fab-btn { padding: 0 24px; font-size: 15px; font-weight: bold; cursor: pointer; height: 100%; display: flex; align-items: center; }
+        .fab-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.3); }
 
-    .share-area{padding:16px; display:flex; justify-content:center;}
-    .share{width:100%; max-width:520px; border:0; border-radius:16px; background:#34C759; color:#fff; font-weight:900; padding:14px 16px;}
+        /* Undo Snackbar */
+        #card_undo {
+            position: fixed; bottom: 100px; left: 20px; right: 20px; background: #1C1C1E; color: #FFF;
+            border-radius: 25px; height: 50px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 8px 0 24px; z-index: 101; transform: translateY(150px); transition: transform 0.3s;
+        }
+        #card_undo.show { transform: translateY(0); }
+        .btn-undo-action { background: #323232; color: #3478F6; border-radius: 17px; padding: 6px 16px; font-weight: bold; font-size: 14px; cursor: pointer; }
 
-    .fab-container{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--primary); color:#fff; border-radius:27px; box-shadow:var(--shadow); width:max-content; padding:0 14px; display:flex; align-items:center; height:55px;}
-    .fab-container button{border:0; background:transparent; color:#fff; padding:0 14px; font-size:15px; font-weight:900;}
-    .fab-divider{width:1px; height:24px; background:rgba(255,255,255,.35);}
+        /* Dialogs */
+        #dialog_overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4);
+            z-index: 200; display: flex; align-items: center; justify-content: center;
+        }
+        .dialog-card { background: #F2F2F7; border-radius: 18px; width: 80%; max-width: 340px; overflow: hidden; }
+        .dialog-content { padding: 20px; text-align: center; }
+        .dialog-title { font-size: 17px; font-weight: bold; color: #000; margin-bottom: 6px; }
+        .dialog-message { font-size: 13px; color: #3C3C43; margin-bottom: 16px; }
+        .dialog-body { margin-bottom: 16px; }
+        .dialog-actions { display: flex; border-top: 1px solid rgba(60,60,67,0.29); height: 48px; }
+        .dialog-btn { flex: 1; border: none; background: transparent; font-size: 17px; color: var(--blue); cursor: pointer; }
+        .dialog-btn.bold { font-weight: bold; }
+        .dialog-btn.red { color: var(--red); }
+        .dialog-divider { width: 1px; background: rgba(60,60,67,0.29); }
 
-    .loading-overlay{position:fixed; inset:0; background:rgba(255,255,255,.85); display:flex; align-items:center; justify-content:center;}
-    .spinner{width:42px; height:42px; border:4px solid rgba(0,0,0,.08); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite;}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .loading-text{margin-top:16px; font-weight:900;}
+        /* Review Container */
+        #container_review { padding: 16px; }
+        .review-header, .review-row { display: flex; padding: 16px; font-size: 11px; align-items: center; }
+        .review-header { background: #F2F2F7; font-weight: bold; color: var(--text-muted); border-radius: 20px 20px 0 0;}
+        .review-row { border-bottom: 1px solid var(--divider); }
+        .review-row:last-child { border-bottom: none; }
+        .r-plu { flex: 1.1; color: var(--text-muted); }
+        .r-item { flex: 1.6; font-size: 12px; font-weight: bold; }
+        .r-hrg { flex: 1.3; color: var(--blue); font-weight: bold; text-align: center; cursor: pointer; }
+        .r-stk { flex: 0.8; text-align: center; }
+        .r-fsk { flex: 0.8; text-align: center; }
+        .r-sls { flex: 1.0; font-size: 14px; font-weight: bold; text-align: right; }
+        .btn-wa { background: var(--green); color: #FFF; border-radius: 16px; height: 55px; width: 100%; border: none; font-size: 15px; font-weight: bold; margin-top: 24px; cursor: pointer; }
 
-    .toast{position:fixed; bottom:110px; left:50%; transform:translateX(-50%); background:#1C1C1E; color:#fff; border-radius:25px; padding:14px 18px; display:flex; gap:16px; align-items:center; box-shadow:var(--shadow);}
-    .toast.hidden{display:none;}
-    .toast-btn{border:0; background:#323232; color:#3478F6; font-weight:900; border-radius:17px; padding:8px 14px;}
-
-    .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35);}
-    .modal{position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; width:min(520px, calc(100vw - 24px)); border-radius:18px; box-shadow:var(--shadow); padding:16px;}
-    .modal-title{font-weight:900; font-size:17px; text-align:center;}
-    .modal-message{color:#3C3C43; font-size:13px; text-align:center; margin-top:6px; margin-bottom:12px;}
-    .modal-dynamic{margin-top:10px;}
-    .modal-actions{display:flex; gap:12px; margin-top:16px; align-items:center;}
-    .modal-actions .divider{flex:0 0 1px; height:34px; background:#3D3C3C43;}
-    .modal-actions .btn{flex:1; border:0; padding:10px 12px; border-radius:10px; font-weight:900; font-size:15px;}
-    .modal-actions .btn.cancel{background:transparent; color:var(--primary)}
-    .modal-actions .btn.primary{background:transparent; color:var(--primary)}
-
-    #containerReview[hidden]{display:none;}
-    #fileInputCsv{display:none;}
-  </style>
-
-  <!-- Barcode: JsBarcode (CODE128) -->
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/jsbarcode.all.min.js"></script>
+        /* Loading */
+        #loading_overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8);
+            z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--blue); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
-  <div id="app">
-    <div class="header">
-      <div class="header-left">
-        <div class="logo">PaXtok</div>
-      </div>
-      <div class="header-actions">
-        <button class="chip" id="btnProjects" type="button">PROYEK</button>
-        <button class="chip dark" id="btnUploadCsv" type="button">CSV</button>
-      </div>
-    </div>
 
-    <section class="card" id="containerInputManual">
-      <div class="input-row">
-        <div class="pill">
-          <input id="etInputPlu" list="datalistPlu" inputmode="numeric" autocomplete="off" placeholder="PLU" />
-          <datalist id="datalistPlu"></datalist>
+    <header class="flex items-center">
+        <div style="width:32px; height:32px; background:var(--blue); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#FFF; font-weight:bold;">Px</div>
+        <div class="logo-text font-bold">PaXtok</div>
+        <div class="btn-header btn-projects" onclick="showProjectManager()">PROYEK</div>
+        <div class="btn-header btn-csv" onclick="document.getElementById('csv-file').click()">CSV</div>
+        <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
+    </header>
+
+    <div id="container_input_manual" class="card flex items-center">
+        <div style="flex:1; margin-right:8px; display:flex; gap:8px;">
+            <input type="number" id="et_input_plu" class="input-box" placeholder="PLU" list="plu_list" style="flex:1;">
+            <datalist id="plu_list"></datalist>
+            <input type="text" id="et_input_item" class="input-box" placeholder="Nama Item" style="flex:1.5; text-transform: uppercase;">
         </div>
+        <button class="add-btn" onclick="performManualAdd()">+</button>
+    </div>
 
-        <div class="pill wide">
-          <input id="etInputItem" placeholder="Nama Item" maxlength="80" />
+    <div id="container_global_actions" class="flex global-actions">
+        <span id="btn_reset_stok" class="text-orange hidden" onclick="resetAllStokFisik()">Kosongkan Stok</span>
+        <span id="btn_reset_all" class="text-red hidden" onclick="deleteAllItems()">Hapus Semua</span>
+    </div>
+
+    <div id="container_list"></div>
+
+    <div id="container_review" class="hidden">
+        <div class="card flex-col">
+            <div class="review-header">
+                <div class="r-plu">PLU</div>
+                <div class="r-item">ITEM</div>
+                <div class="r-hrg">HRG</div>
+                <div class="r-stk">STK</div>
+                <div class="r-fsk">FSK</div>
+                <div class="r-sls">SLS</div>
+            </div>
+            <div id="container_review_rows" class="flex-col"></div>
         </div>
-
-        <button class="fabAdd" id="btnAddManual" type="button" title="Tambah">+</button>
-      </div>
-    </section>
-
-    <div class="global-actions" id="containerGlobalActions">
-      <button class="action" id="btnResetStok" type="button">Kosongkan Stok</button>
-      <button class="action danger" id="btnResetAll" type="button">Hapus Semua</button>
+        <button class="btn-wa" onclick="prepareWhatsAppReport()">BAGIKAN KE WHATSAPP</button>
     </div>
 
-    <div class="mode-review" id="containerReview" hidden>
-      <div class="review-card">
-        <div class="review-head">
-          <div class="th">PLU</div>
-          <div class="th">ITEM</div>
-          <div class="th">HRG</div>
-          <div class="th center">STK</div>
-          <div class="th center">FSK</div>
-          <div class="th right">SLS</div>
+    <div id="fab_container" class="fab-container">
+        <div id="btn_quick_save" class="fab-btn" onclick="saveNewProjectDialog()">💾 Simpan</div>
+        <div id="fab_divider" class="fab-divider"></div>
+        <div id="tv_fab" class="fab-btn" onclick="toggleReviewMode()">Review Selisih</div>
+    </div>
+
+    <div id="card_undo">
+        <span id="tv_undo_msg">Item dihapus</span>
+        <div class="btn-undo-action" onclick="performUndo()">Batal</div>
+    </div>
+
+    <div id="dialog_overlay" class="hidden">
+        <div class="dialog-card flex-col">
+            <div class="dialog-content">
+                <div id="dialog_title" class="dialog-title">Title</div>
+                <div id="dialog_message" class="dialog-message">Message</div>
+                <div id="dialog_body" class="dialog-body"></div>
+            </div>
+            <div class="dialog-actions">
+                <button id="dialog_btn_cancel" class="dialog-btn" onclick="closeDialog()">Batal</button>
+                <div id="dialog_btn_divider" class="dialog-divider"></div>
+                <button id="dialog_btn_save" class="dialog-btn bold">Simpan</button>
+            </div>
         </div>
-        <div id="containerReviewRows" class="review-rows"></div>
-      </div>
     </div>
 
-    <main class="list-wrap" id="containerListWrap">
-      <div class="list" id="containerList"></div>
-      <div class="share-area">
-        <button class="share" id="btnShare" type="button">BAGIKAN KE WHATSAPP</button>
-      </div>
-    </main>
-
-    <div class="toast" id="toastUndo" hidden>
-      <div class="toast-msg" id="tvUndoMsg">Item dihapus</div>
-      <button class="toast-btn" id="btnUndo" type="button">Batal</button>
-    </div>
-
-    <div class="loading-overlay" id="loadingOverlay" hidden style="display:none;">
-      <div class="loading-box">
+    <div id="loading_overlay" class="hidden">
         <div class="spinner"></div>
-        <div class="loading-text" id="tvLoadingMsg">Memproses...</div>
-      </div>
+        <div id="tv_loading_msg" style="margin-top:16px; font-weight:bold;">Memproses...</div>
     </div>
 
-    <div class="fab-container" id="fabContainer">
-      <button class="fab-left" id="btnQuickSave" type="button">💾 Simpan</button>
-      <div class="fab-divider"></div>
-      <button class="fab-right" id="btnToggleReview" type="button">Review Selisih</button>
-    </div>
+    <script>
+        // State Variables
+        let items = [];
+        let masterProducts = {};
+        let isReviewMode = false;
 
-    <input type="file" id="fileInputCsv" accept=".csv,text/csv" hidden />
-  </div>
+        // Undo Variables
+        let pendingUndoType = -1; // 0: delete item, 1: delete all, 2: reset stok, 3: delete project
+        let backupDataForUndo = [];
+        let pendingDeletedItem = null;
+        let pendingDeletedIndex = -1;
+        let pendingDeletedProjectName = "";
+        let pendingDeletedProjectData = "";
+        let undoTimeout;
 
-  <!-- Modals (placeholder; tidak dipakai di versi ini) -->
-  <div class="modal-backdrop" id="modalBackdrop" hidden></div>
-  <div class="modal" id="modal" hidden>
-    <div class="modal-title" id="modalTitle">Judul</div>
-    <div class="modal-message" id="modalMessage"></div>
-    <div class="modal-dynamic" id="modalDynamic"></div>
-    <div class="modal-actions">
-      <button class="btn cancel" id="modalBtnCancel" type="button">Batal</button>
-      <div class="divider"></div>
-      <button class="btn primary" id="modalBtnSave" type="button">Simpan</button>
-    </div>
-  </div>
+        // --- CORE FUNCTIONS ---
 
-  <script>
-    const STORAGE = {
-      items: 'saved_items',
-      manualPrices: 'ManualPrices'
-    };
+        function init() {
+            loadSavedData();
+            
+            // Auto-fill Item Name when PLU is selected from datalist
+            document.getElementById('et_input_plu').addEventListener('input', function(e) {
+                const val = this.value;
+                if(val.includes(" - ")) {
+                    const plu = val.split(" - ")[0];
+                    this.value = plu;
+                    if(masterProducts[plu]) {
+                        document.getElementById('et_input_item').value = masterProducts[plu];
+                        document.getElementById('et_input_item').focus();
+                    }
+                }
+            });
 
-    const $ = (id) => document.getElementById(id);
-    const show = (el) => { if(el) el.hidden = false; };
-    const hide = (el) => { if(el) el.hidden = true; };
-
-    function nowShift() {
-      const d = new Date();
-      const timeVal = d.getHours()*100 + d.getMinutes();
-      if (timeVal >= 630 && timeVal < 1430) return '1';
-      if (timeVal >= 1430 && timeVal < 2230) return '2';
-      return '3';
-    }
-
-    function parseIntSafe(s){
-      const t = String(s ?? '').trim();
-      if (!t || t === '-') return 0;
-      const x = parseInt(t, 10);
-      return Number.isFinite(x) ? x : 0;
-    }
-
-    function calcSelisih(stok, fisik){
-      const s = parseIntSafe(stok);
-      const f = parseIntSafe(fisik);
-      const diff = f - s;
-      let text = String(diff);
-      if (diff > 0) text = '+' + diff;
-      return { diff, text, color: diff<0 ? '#FF3B30' : (diff>0 ? '#34C759' : '#000000') };
-    }
-
-    function escapeHtml(s){
-      return String(s ?? '')
-        .replaceAll('&','&amp;')
-        .replaceAll('<','<')
-        .replaceAll('>','>')
-        .replaceAll('"','"')
-        .replaceAll("'",'&#039;');
-    }
-
-    function formatIDR(n){
-      const x = Number(n||0);
-      return 'Rp ' + x.toLocaleString('de-DE');
-    }
-
-    function renderBarcodeCode128(barcodeEl, code){
-      try{
-        barcodeEl.innerHTML = '';
-        const v = String(code ?? '').trim();
-        if(!v){
-          barcodeEl.style.display = 'none';
-          return;
+            // Enter key mapping
+            document.getElementById('et_input_item').addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') performManualAdd();
+            });
         }
-        barcodeEl.style.display = 'flex';
-        JsBarcode(barcodeEl, v, {
-          format: 'CODE128',
-          displayValue: false,
-          margin: 0,
-          height: 48,
-          width: 2,
-          fontSize: 10,
-          background: '#FFFFFF',
-          lineColor: '#000000'
-        });
-      } catch(e) {
-        // ignore
-      }
-    }
 
-    const state = {
-      isFiltered: false,
-      items: [],
-      pluToItem: new Map(),
-      undo: null,
-      undoTimer: null
-    };
-
-    function saveSession(){
-      const arr = state.items.map(it => ({
-        plu: it.plu,
-        item: it.item,
-        stok: it.stok ?? '',
-        fisik: it.fisik ?? ''
-      }));
-      localStorage.setItem(STORAGE.items, JSON.stringify(arr));
-    }
-
-    function loadSession(){
-      const raw = localStorage.getItem(STORAGE.items);
-      if (raw) {
-        try{
-          const arr = JSON.parse(raw);
-          state.items = [];
-          state.pluToItem = new Map();
-          for(const obj of arr){
-            const plu = String(obj.plu ?? '').trim();
-            const item = String(obj.item ?? '').trim();
-            if(!plu) continue;
-            state.pluToItem.set(plu, item);
-            state.items.push({ plu, item, stok: obj.stok ?? '', fisik: obj.fisik ?? '' });
-          }
-        }catch(e){}
-      } else {
-        const sample = [
-          ['20024079','TELUR AYAM'],
-          ['20020184','ASIN MATANG'],
-          ['10004977','AYAM KAMPUNG'],
-          ['20134344','SOSIS ORI'],
-          ['20134345','SOSIS KEJU']
-        ];
-        state.items = [];
-        state.pluToItem = new Map();
-        for(const [plu,item] of sample){
-          state.pluToItem.set(plu, item);
-          state.items.push({ plu, item, stok:'', fisik:'' });
+        function loadSavedData() {
+            const saved = localStorage.getItem("saved_items");
+            if (saved) {
+                try {
+                    items = JSON.parse(saved);
+                    items.forEach(i => { masterProducts[i.plu] = i.item; });
+                } catch(e) { items = []; }
+            }
+            renderList();
+            updateDatalist();
         }
-      }
-    }
 
-    function updateDatalist(){
-      const list = $('datalistPlu');
-      list.innerHTML = '';
-      for(const plu of state.pluToItem.keys()){
-        const item = state.pluToItem.get(plu);
-        const opt = document.createElement('option');
-        opt.value = `${plu} - ${String(item).toUpperCase()}`;
-        list.appendChild(opt);
-      }
-    }
-
-    function getMasterFromInputPlu(){
-      const input = $('etInputPlu');
-      const v = (input.value||'').trim();
-      if(v.includes(' - ')) return v.split(' - ')[0].trim();
-      return v;
-    }
-
-    function updateGlobalActions(){
-      if(state.isFiltered){
-        $('containerGlobalActions').hidden = true;
-        return;
-      }
-      const hasItems = state.items.length>0;
-      $('containerGlobalActions').hidden = !hasItems;
-      if(!hasItems){
-        $('btnResetStok').hidden = true;
-        $('btnResetAll').hidden = true;
-        return;
-      }
-      $('btnResetAll').hidden = false;
-      const hasAny = state.items.some(it => String(it.stok||'').trim()!=='' || String(it.fisik||'').trim()!=='' );
-      $('btnResetStok').hidden = !hasAny;
-    }
-
-    function showUndo(msg){
-      $('toastUndo').hidden = false;
-      $('tvUndoMsg').textContent = msg;
-      if(state.undoTimer) clearTimeout(state.undoTimer);
-      state.undoTimer = setTimeout(()=>{
-        $('toastUndo').hidden = true;
-        state.undo = null;
-        state.undoTimer = null;
-      }, 10000);
-    }
-
-    function commitUndoSnapshot(){
-      state.undo = { items: JSON.parse(JSON.stringify(state.items)) };
-    }
-
-    function hideUndo(){
-      $('toastUndo').hidden = true;
-      state.undo = null;
-    }
-
-    function buildItemCard(item, index){
-      const wrap = document.createElement('div');
-      wrap.className = 'item-card';
-
-      const r = calcSelisih(item.stok, item.fisik);
-
-      wrap.innerHTML = `
-        <div class="item-head">
-          <div class="left">
-            <div class="item-title">${escapeHtml(String(item.item||'').toUpperCase())}</div>
-            <div class="item-plu">PLU: ${escapeHtml(String(item.plu||''))}</div>
-          </div>
-          <div class="item-selisih" style="color:${r.color}">${escapeHtml(r.text)}</div>
-        </div>
-
-        <div class="item-body">
-          <div class="barcode" title="Barcode (CODE128)"></div>
-
-          <div class="inputs">
-            <div class="col">
-              <div class="label">STOK SISTEM</div>
-              <div class="input-card">
-                <input class="inp-stok" inputmode="numeric" value="${escapeHtml(String(item.stok||''))}" />
-              </div>
-            </div>
-
-            <div class="col">
-              <div class="label blue">CEK FISIK</div>
-              <div class="input-card blue">
-                <input class="inp-fisik" inputmode="numeric" value="${escapeHtml(String(item.fisik||''))}" />
-              </div>
-            </div>
-          </div>
-
-          <div class="sep"></div>
-
-          <div class="item-actions">
-            <button class="reset">↺ Reset</button>
-            <button class="btn-up">▲ Naik</button>
-            <button class="btn-down">▼ Turun</button>
-            <button class="delete">Hapus</button>
-          </div>
-        </div>
-      `;
-
-      const inpStok = wrap.querySelector('.inp-stok');
-      const inpFisik = wrap.querySelector('.inp-fisik');
-      const barcodeEl = wrap.querySelector('.barcode');
-      const selisihEl = wrap.querySelector('.item-selisih');
-      const resetBtn = wrap.querySelector('.reset');
-
-      renderBarcodeCode128(barcodeEl, item.plu);
-
-      function afterChange(){
-        item.stok = inpStok.value;
-        item.fisik = inpFisik.value;
-        const rr = calcSelisih(item.stok, item.fisik);
-        selisihEl.textContent = rr.text;
-        selisihEl.style.color = rr.color;
-        const showReset = String(item.stok||'').trim()!=='' || String(item.fisik||'').trim()!=='';
-        resetBtn.style.display = showReset ? 'flex' : 'none';
-        saveSession();
-        updateGlobalActions();
-      }
-
-      inpStok.addEventListener('input', afterChange);
-      inpFisik.addEventListener('input', afterChange);
-
-      // initial
-      const showReset0 = String(item.stok||'').trim()!=='' || String(item.fisik||'').trim()!=='';
-      resetBtn.style.display = showReset0 ? 'flex' : 'none';
-
-      resetBtn.addEventListener('click', ()=>{
-        inpStok.value='';
-        inpFisik.value='';
-        item.stok='';
-        item.fisik='';
-        afterChange();
-        inpStok.focus();
-      });
-
-      wrap.querySelector('.btn-up').addEventListener('click', ()=>{
-        if(index<=0) return;
-        commitUndoSnapshot();
-        const t = state.items[index-1];
-        state.items[index-1] = state.items[index];
-        state.items[index] = t;
-        render();
-        saveSession();
-      });
-
-      wrap.querySelector('.btn-down').addEventListener('click', ()=>{
-        if(index>=state.items.length-1) return;
-        commitUndoSnapshot();
-        const t = state.items[index+1];
-        state.items[index+1] = state.items[index];
-        state.items[index] = t;
-        render();
-        saveSession();
-      });
-
-      wrap.querySelector('.delete').addEventListener('click', ()=>{
-        commitUndoSnapshot();
-        state.items.splice(index,1);
-        render();
-        saveSession();
-        showUndo('Item berhasil dihapus');
-      });
-
-      return wrap;
-    }
-
-    function render(){
-      updateDatalist();
-      updateGlobalActions();
-
-      const list = $('containerList');
-      const review = $('containerReview');
-      list.innerHTML = '';
-
-      if(state.isFiltered){
-        hide($('containerInputManual'));
-        hide($('containerGlobalActions'));
-        hide($('fabContainer'));
-        show(review);
-        $('containerListWrap').scrollTop = 0;
-        renderReview();
-        return;
-      }
-
-      hide(review);
-      show($('containerInputManual'));
-      show($('containerGlobalActions'));
-      show($('fabContainer'));
-
-      for(let i=0;i<state.items.length;i++){
-        list.appendChild(buildItemCard(state.items[i], i));
-      }
-    }
-
-    function renderReview(){
-      const rows = $('containerReviewRows');
-      rows.innerHTML = '';
-      const pricePrefsRaw = localStorage.getItem(STORAGE.manualPrices);
-      const pricePrefs = pricePrefsRaw ? JSON.parse(pricePrefsRaw) : {};
-
-      for(const item of state.items){
-        const rr = calcSelisih(item.stok, item.fisik);
-        if(rr.diff === 0) continue;
-
-        const row = document.createElement('div');
-        row.className = 'review-row';
-        const rawPlu = String(item.plu);
-        const itemName = String(item.item||'').toUpperCase();
-        const savedPrice = Number(pricePrefs[rawPlu] || 0);
-
-        row.innerHTML = `
-          <div style="flex:1.1">${escapeHtml(rawPlu)}</div>
-          <div style="flex:1.6">${escapeHtml(itemName)}</div>
-          <div style="flex:1.3;cursor:pointer" class="rev-price">${savedPrice>0?escapeHtml(formatIDR(savedPrice)): 'Rp 0'}</div>
-          <div style="flex:.8;text-align:center">${escapeHtml(parseIntSafe(item.stok))}</div>
-          <div style="flex:.8;text-align:center; color:${rr.diff<0?'#FF3B30':'#34C759'}">${escapeHtml(parseIntSafe(item.fisik))}</div>
-          <div style="flex:1; text-align:right; font-weight:900; color:${rr.diff<0?'#FF3B30':'#34C759'}">${escapeHtml(rr.text)}</div>
-        `;
-
-        row.querySelector('.rev-price').addEventListener('click', ()=>{
-          const current = Number(pricePrefs[rawPlu] || 0);
-          const input = prompt('Ubah Harga (angka) untuk PLU '+rawPlu+'\nContoh: 12500', current?String(current):'0');
-          if(input===null) return;
-          const v = parseIntSafe(input);
-          pricePrefs[rawPlu] = v;
-          localStorage.setItem(STORAGE.manualPrices, JSON.stringify(pricePrefs));
-          renderReview();
-          saveSession();
-        });
-
-        rows.appendChild(row);
-      }
-    }
-
-    function toggleReview(){
-      state.isFiltered = !state.isFiltered;
-      $('btnToggleReview').textContent = state.isFiltered ? 'Kembali ke Input' : 'Review Selisih';
-      $('fabContainer').style.background = state.isFiltered ? '#FF3B30' : '#007AFF';
-      render();
-    }
-
-    function addManual(){
-      const plu = getMasterFromInputPlu();
-      const item = $('etInputItem').value.trim();
-
-      if(!plu || !item){ alert('PLU dan Nama Item harus diisi'); return; }
-      if(!/^\d+$/.test(plu)){ alert('Gagal: PLU harus berupa angka bulat'); return; }
-
-      state.pluToItem.set(plu, item);
-      state.items.push({ plu, item, stok:'', fisik:'' });
-      saveSession();
-      render();
-
-      $('etInputPlu').value='';
-      $('etInputItem').value='';
-      $('etInputPlu').focus();
-    }
-
-    function validateCsv(raw){
-      const lines = String(raw||'').split(/\r?\n/);
-      if(lines.length===0) return 'File CSV kosong';
-      for(let i=0;i<lines.length;i++){
-        const line = lines[i].trim();
-        if(!line) continue;
-        const parts = line.split(',');
-        if(i===0 && parts[0].trim().toLowerCase()==='plu') continue;
-        if(parts.length!==2) return 'Format salah pada baris ke-'+(i+1)+' (Gunakan format: PLU, ITEM).';
-        const p = parts[0].trim();
-        if(!/^\d+$/.test(p)) return 'PLU tidak valid pada baris ke-'+(i+1)+' (Harus berupa angka integer): '+p;
-      }
-      return null;
-    }
-
-    function processCsv(raw){
-      commitUndoSnapshot();
-      state.items = [];
-      state.pluToItem = new Map();
-
-      const lines = String(raw||'').split(/\r?\n/);
-      for(const line0 of lines){
-        const line = line0.trim();
-        if(!line) continue;
-        const parts = line.split(',');
-        if(parts.length>=2){
-          if(parts[0].trim().toLowerCase()==='plu') continue;
-          const plu = parts[0].trim();
-          const itemName = parts[1].trim();
-          state.pluToItem.set(plu, itemName);
-          state.items.push({ plu, item: itemName, stok:'', fisik:'' });
+        function saveData() {
+            localStorage.setItem("saved_items", JSON.stringify(items));
+            updateGlobalActionsVisibility();
         }
-      }
-    }
 
-    function generateWhatsAppText(){
-      const pricePrefsRaw = localStorage.getItem(STORAGE.manualPrices);
-      const pricePrefs = pricePrefsRaw ? JSON.parse(pricePrefsRaw) : {};
+        // --- DOM RENDERERS ---
 
-      let grandPlus=0, grandMinus=0;
-      let sbDetail='';
-
-      for(const item of state.items){
-        const rr = calcSelisih(item.stok, item.fisik);
-        if(rr.diff === 0) continue;
-
-        const plu = String(item.plu);
-        const harga = Number(pricePrefs[plu] || 0);
-        const total = rr.diff * harga;
-
-        sbDetail += `${plu}\n(${String(item.item||'').toUpperCase()}) | ${item.stok||'0'} | ${item.fisik||'0'} | ${rr.text}\n`;
-
-        if(rr.diff !== 0 && harga > 0){
-          if(rr.diff > 0) grandPlus += total;
-          else grandMinus += Math.abs(total);
-          sbDetail += `Rp. ${Math.abs(total).toLocaleString('de-DE')}\n\n`;
-        } else {
-          sbDetail += `\n`;
+        function renderList() {
+            const container = document.getElementById('container_list');
+            container.innerHTML = '';
+            items.forEach((item, index) => {
+                container.appendChild(createItemCard(item, index));
+            });
+            updateGlobalActionsVisibility();
         }
-      }
 
-      const d = new Date();
-      const waktuCek = d.toLocaleString('id-ID', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
-      const shiftNumber = nowShift();
+        function createItemCard(item, index) {
+            const intStok = parseInt(item.stok) || 0;
+            const intFisik = parseInt(item.fisik) || 0;
+            const selisih = (item.stok === "" && item.fisik === "") ? 0 : (intFisik - intStok);
+            const selisihStr = selisih > 0 ? "+" + selisih : selisih;
+            const selisihColor = selisih < 0 ? "var(--red)" : (selisih > 0 ? "var(--green)" : "#000");
+            const hasInput = item.stok !== "" || item.fisik !== "";
 
-      let final='*LAPORAN SO RH*\n';
-      final += `${waktuCek}\n`;
-      final += `Shift: ${shiftNumber}\n\n`;
-      final += 'PLU | ITEM | STOK | FISIK | SELISIH\n\n';
+            const div = document.createElement('div');
+            div.className = 'card item-card';
+            div.innerHTML = `
+                <div class="item-header flex justify-between items-center">
+                    <div class="flex-col">
+                        <div class="item-name">${item.item.toUpperCase()}</div>
+                        <div class="item-plu">PLU: ${item.plu}</div>
+                    </div>
+                    <div class="item-selisih" style="color: ${selisihColor}">${selisihStr}</div>
+                </div>
+                
+                <div class="barcode-container">
+                    <svg id="barcode-${item.plu}"></svg>
+                </div>
 
-      if(sbDetail.trim()) final += sbDetail;
-      else final += 'Semua item balance (tidak ada selisih).\n\n';
+                <div class="stok-fisik-row flex">
+                    <div class="sf-box flex-col">
+                        <div class="sf-label stok-label">STOK SISTEM</div>
+                        <input type="number" class="sf-input input-stok" value="${item.stok}" oninput="updateItemValue(${index}, 'stok', this.value)">
+                    </div>
+                    <div class="sf-box flex-col">
+                        <div class="sf-label fisik-label">CEK FISIK</div>
+                        <input type="number" class="sf-input input-fisik" value="${item.fisik}" oninput="updateItemValue(${index}, 'fisik', this.value)">
+                    </div>
+                </div>
 
-      final += '*TOTAL ESTIMASI RUPIAH*\n';
-      final += `Total Plus (+): Rp ${grandPlus.toLocaleString('de-DE')}\n`;
-      final += `Total Minus (-): -Rp ${grandMinus.toLocaleString('de-DE')}\n`;
-      return final;
-    }
+                <div class="item-actions">
+                    <button class="action-btn btn-reset-item ${hasInput ? '' : 'hidden'}" onclick="resetItem(${index})">↺ Reset</button>
+                    <button class="action-btn btn-updown" onclick="moveItem(${index}, -1)">▲ Naik</button>
+                    <button class="action-btn btn-updown" onclick="moveItem(${index}, 1)">▼ Turun</button>
+                    <button class="action-btn btn-delete" onclick="deleteItem(${index})">Hapus</button>
+                </div>
+            `;
 
-    function downloadCsv(){
-      const projectName = prompt('Nama Project untuk file CSV?', 'PaXtok');
-      if(projectName===null) return;
+            // Generate Barcode async
+            setTimeout(() => {
+                try { JsBarcode(`#barcode-${item.plu}`, item.plu, { format: "CODE128", width: 2, height: 40, displayValue: false }); } catch(e){}
+            }, 10);
 
-      const header = ['PLU','ITEM','STOK','FISIK','SELISIH'].join(',');
-      const rows = state.items.map(it => {
-        const stokStr = String(it.stok||'');
-        const fisikStr = String(it.fisik||'');
-        const s = parseIntSafe(stokStr);
-        const f = parseIntSafe(fisikStr);
-        const selisih = f - s;
-        return [it.plu, String(it.item||'').toUpperCase(), stokStr, fisikStr, selisih].join(',');
-      });
+            return div;
+        }
 
-      const csv = [header, ...rows].join('\n');
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `PaXtok_${String(projectName)}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
+        // --- ACTIONS ---
 
-    // Wire events
-    $('btnAddManual').addEventListener('click', addManual);
-    $('etInputItem').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); addManual(); }});
+        function updateItemValue(index, field, value) {
+            items[index][field] = value;
+            saveData();
+            
+            // Re-render specifically for this card to update selisih & reset button without losing focus
+            const intStok = parseInt(items[index].stok) || 0;
+            const intFisik = parseInt(items[index].fisik) || 0;
+            const selisih = (items[index].stok === "" && items[index].fisik === "") ? 0 : (intFisik - intStok);
+            const selisihStr = selisih > 0 ? "+" + selisih : selisih;
+            const selisihColor = selisih < 0 ? "var(--red)" : (selisih > 0 ? "var(--green)" : "#000");
+            
+            const card = document.getElementById('container_list').children[index];
+            card.querySelector('.item-selisih').textContent = selisihStr;
+            card.querySelector('.item-selisih').style.color = selisihColor;
+            
+            const btnReset = card.querySelector('.btn-reset-item');
+            if(items[index].stok !== "" || items[index].fisik !== "") {
+                btnReset.classList.remove('hidden');
+            } else {
+                btnReset.classList.add('hidden');
+            }
+            updateGlobalActionsVisibility();
+        }
 
-    $('etInputPlu').addEventListener('change', ()=>{
-      const plu = getMasterFromInputPlu();
-      const itemName = state.pluToItem.get(plu);
-      if(itemName) $('etInputItem').value = String(itemName).toUpperCase();
-    });
+        function performManualAdd() {
+            commitPendingDeletion();
+            const plu = document.getElementById('et_input_plu').value.trim();
+            const itemName = document.getElementById('et_input_item').value.trim().toUpperCase();
 
-    $('btnToggleReview').addEventListener('click', toggleReview);
+            if(plu && itemName) {
+                if(!/^\d+$/.test(plu)) { alert("PLU harus berupa angka"); return; }
+                items.push({ plu: plu, item: itemName, stok: "", fisik: "" });
+                masterProducts[plu] = itemName;
+                saveData();
+                renderList();
+                updateDatalist();
+                document.getElementById('et_input_plu').value = "";
+                document.getElementById('et_input_item').value = "";
+                document.getElementById('et_input_plu').focus();
+            }
+        }
 
-    $('btnResetStok').addEventListener('click', ()=>{
-      if(state.items.length===0) return;
-      if(!confirm('Kosongkan Stok & Fisik?\nNama barang tetap ada.')) return;
-      commitUndoSnapshot();
-      for(const it of state.items){ it.stok=''; it.fisik=''; }
-      render();
-      saveSession();
-      showUndo('Stok & Fisik dikosongkan');
-    });
+        function moveItem(index, dir) {
+            commitPendingDeletion();
+            if(index + dir < 0 || index + dir >= items.length) return;
+            const temp = items[index];
+            items[index] = items[index + dir];
+            items[index + dir] = temp;
+            saveData();
+            renderList();
+        }
 
-    $('btnResetAll').addEventListener('click', ()=>{
-      if(state.items.length===0) return;
-      if(!confirm('Hapus Semua Data?')) return;
-      commitUndoSnapshot();
-      state.items = [];
-      state.pluToItem = new Map();
-      render();
-      saveSession();
-      showUndo('Semua item dihapus');
-    });
+        function resetItem(index) {
+            items[index].stok = "";
+            items[index].fisik = "";
+            saveData();
+            renderList();
+        }
 
-    $('btnUndo').addEventListener('click', ()=>{
-      if(state.undo && state.undo.items){
-        state.items = JSON.parse(JSON.stringify(state.undo.items));
-        state.pluToItem = new Map();
-        for(const it of state.items){ state.pluToItem.set(String(it.plu), String(it.item)); }
-        hideUndo();
-        render();
-        saveSession();
-      } else {
-        hideUndo();
-      }
-    });
+        function deleteItem(index) {
+            commitPendingDeletion();
+            pendingDeletedItem = items[index];
+            pendingDeletedIndex = index;
+            items.splice(index, 1);
+            saveData();
+            renderList();
+            showUndoSnackbar("Item berhasil dihapus", 0);
+        }
 
-    $('btnShare').addEventListener('click', ()=>{
-      const text = generateWhatsAppText();
-      navigator.clipboard.writeText(text).then(()=>{
-        alert('Teks laporan sudah disalin ke clipboard.');
-      }).catch(()=>{
-        prompt('Salin teks ini:', text);
-      });
-    });
+        function deleteAllItems() {
+            if(items.length === 0) return;
+            showConfirmDialog("Hapus Semua Data?", "Seluruh barang di layar akan dihapus.", "HAPUS", "Batal", () => {
+                commitPendingDeletion();
+                backupDataForUndo = JSON.parse(JSON.stringify(items));
+                items = [];
+                saveData();
+                renderList();
+                showUndoSnackbar("Semua item dihapus", 1);
+            });
+        }
 
-    $('btnProjects').addEventListener('click', ()=>{
-      alert('Fitur Project (simpan/buka/hapus) belum diimplementasi penuh di versi website ini.');
-    });
+        function resetAllStokFisik() {
+            if(items.length === 0) return;
+            showConfirmDialog("Kosongkan Stok & Fisik?", "Semua angka akan dihapus, nama barang tetap ada.", "KOSONGKAN", "Batal", () => {
+                commitPendingDeletion();
+                backupDataForUndo = JSON.parse(JSON.stringify(items));
+                items.forEach(i => { i.stok = ""; i.fisik = ""; });
+                saveData();
+                renderList();
+                showUndoSnackbar("Stok & Fisik dikosongkan", 2);
+            });
+        }
 
-    $('btnUploadCsv').addEventListener('click', ()=>{ $('fileInputCsv').click(); });
-    $('fileInputCsv').addEventListener('change', async ()=>{
-      const file = $('fileInputCsv').files?.[0];
-      if(!file) return;
-      const raw = await file.text();
-      const csvText = raw.replace(/\uFEFF/g,'');
-      const err = validateCsv(csvText);
-      if(err){ alert('GAGAL UPLOAD: '+err); return; }
-      processCsv(csvText);
-      saveSession();
-      render();
-      alert('Berhasil memuat file CSV');
-      $('fileInputCsv').value='';
-    });
+        function updateGlobalActionsVisibility() {
+            if (isReviewMode) {
+                document.getElementById('container_global_actions').classList.add('hidden');
+                return;
+            }
+            if (items.length === 0) {
+                document.getElementById('container_global_actions').classList.add('hidden');
+            } else {
+                document.getElementById('container_global_actions').classList.remove('hidden');
+                document.getElementById('btn_reset_all').classList.remove('hidden');
+                const hasData = items.some(i => i.stok !== "" || i.fisik !== "");
+                document.getElementById('btn_reset_stok').classList.toggle('hidden', !hasData);
+            }
+        }
 
-    $('btnQuickSave').addEventListener('click', ()=>{ downloadCsv(); });
+        // --- CSV HANDLING ---
+        
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result.replace(/\r/g, "");
+                const lines = text.split("\n");
+                commitPendingDeletion();
+                items = [];
+                masterProducts = {};
+                
+                lines.forEach((line, index) => {
+                    if(!line.trim()) return;
+                    const parts = line.split(",");
+                    if(parts.length >= 2) {
+                        if(index === 0 && parts[0].toLowerCase().includes("plu")) return;
+                        const plu = parts[0].trim();
+                        const item = parts[1].trim();
+                        if(/^\d+$/.test(plu)) {
+                            items.push({plu: plu, item: item, stok: "", fisik: ""});
+                            masterProducts[plu] = item;
+                        }
+                    }
+                });
+                saveData();
+                renderList();
+                updateDatalist();
+                event.target.value = ""; 
+            };
+            reader.readAsText(file);
+        }
 
-    // Init
-    hide($('toastUndo'));
-    hide($('loadingOverlay'));
-    hide($('containerReview'));
+        function updateDatalist() {
+            const dl = document.getElementById('plu_list');
+            dl.innerHTML = '';
+            for(let plu in masterProducts) {
+                let opt = document.createElement('option');
+                opt.value = plu + " - " + masterProducts[plu];
+                dl.appendChild(opt);
+            }
+        }
 
-    loadSession();
-    updateDatalist();
-    render();
-  </script>
+        // --- UNDO SYSTEM ---
+
+        function showUndoSnackbar(msg, type) {
+            pendingUndoType = type;
+            document.getElementById('tv_undo_msg').textContent = msg;
+            const bar = document.getElementById('card_undo');
+            bar.classList.add('show');
+            clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => { commitPendingDeletion(); }, 10000);
+        }
+
+        function commitPendingDeletion() {
+            if(pendingUndoType !== -1) {
+                document.getElementById('card_undo').classList.remove('show');
+                pendingUndoType = -1;
+                pendingDeletedItem = null;
+                pendingDeletedIndex = -1;
+                backupDataForUndo = [];
+            }
+        }
+
+        function performUndo() {
+            clearTimeout(undoTimeout);
+            if(pendingUndoType === 0 && pendingDeletedItem) {
+                items.splice(pendingDeletedIndex, 0, pendingDeletedItem);
+            } else if ((pendingUndoType === 1 || pendingUndoType === 2) && backupDataForUndo.length > 0) {
+                items = JSON.parse(JSON.stringify(backupDataForUndo));
+            } else if (pendingUndoType === 3 && pendingDeletedProjectName) {
+                let list = JSON.parse(localStorage.getItem("project_list") || "[]");
+                if(!list.includes(pendingDeletedProjectName)) list.push(pendingDeletedProjectName);
+                localStorage.setItem("project_list", JSON.stringify(list));
+                localStorage.setItem("project_data_" + pendingDeletedProjectName, pendingDeletedProjectData);
+            }
+            saveData();
+            renderList();
+            document.getElementById('card_undo').classList.remove('show');
+            pendingUndoType = -1;
+        }
+
+        // --- REVIEW & WHATSAPP ---
+
+        function toggleReviewMode() {
+            commitPendingDeletion();
+            isReviewMode = !isReviewMode;
+            const fab = document.getElementById('fab_container');
+            const tvFab = document.getElementById('tv_fab');
+            
+            if (isReviewMode) {
+                tvFab.textContent = "Kembali ke Input";
+                fab.classList.add('mode-review');
+                document.getElementById('btn_quick_save').classList.add('hidden');
+                document.getElementById('fab_divider').classList.add('hidden');
+                
+                document.getElementById('container_input_manual').classList.add('hidden');
+                document.getElementById('container_list').classList.add('hidden');
+                document.getElementById('container_review').classList.remove('hidden');
+                
+                renderReviewTable();
+            } else {
+                tvFab.textContent = "Review Selisih";
+                fab.classList.remove('mode-review');
+                document.getElementById('btn_quick_save').classList.remove('hidden');
+                document.getElementById('fab_divider').classList.remove('hidden');
+                
+                document.getElementById('container_input_manual').classList.remove('hidden');
+                document.getElementById('container_list').classList.remove('hidden');
+                document.getElementById('container_review').classList.add('hidden');
+            }
+            updateGlobalActionsVisibility();
+        }
+
+        function renderReviewTable() {
+            const container = document.getElementById('container_review_rows');
+            container.innerHTML = '';
+            
+            let prices = JSON.parse(localStorage.getItem("ManualPrices") || "{}");
+
+            items.forEach((item) => {
+                const s = parseInt(item.stok) || 0;
+                const f = parseInt(item.fisik) || 0;
+                const selisih = f - s;
+                
+                if (selisih !== 0 && (item.stok !== "" || item.fisik !== "")) {
+                    const price = prices[item.plu] || 0;
+                    const priceStr = price > 0 ? "Rp " + price.toLocaleString('id-ID') : "Rp 0";
+                    const selisihColor = selisih < 0 ? "var(--red)" : "var(--green)";
+                    const selisihStr = selisih > 0 ? "+" + selisih : selisih;
+
+                    const row = document.createElement('div');
+                    row.className = 'review-row';
+                    row.innerHTML = `
+                        <div class="r-plu">${item.plu}</div>
+                        <div class="r-item">${item.item}</div>
+                        <div class="r-hrg" onclick="askPrice('${item.plu}', '${item.item.replace(/'/g, "\\'")}', ${price})">${priceStr}</div>
+                        <div class="r-stk">${s}</div>
+                        <div class="r-fsk">${f}</div>
+                        <div class="r-sls" style="color:${selisihColor}">${selisihStr}</div>
+                    `;
+                    container.appendChild(row);
+                }
+            });
+        }
+
+        function askPrice(plu, item, currentPrice) {
+            showInputDialog("Ubah Harga", `${plu} - ${item}`, "Rp 0", currentPrice ? currentPrice : "", "Simpan", "Batal", true, (val) => {
+                let prices = JSON.parse(localStorage.getItem("ManualPrices") || "{}");
+                prices[plu] = parseInt(val);
+                localStorage.setItem("ManualPrices", JSON.stringify(prices));
+                renderReviewTable();
+            });
+        }
+
+        async function prepareWhatsAppReport() {
+            const selisihItems = [];
+            items.forEach(i => {
+                const s = parseInt(i.stok) || 0;
+                const f = parseInt(i.fisik) || 0;
+                const sls = f - s;
+                if(sls !== 0 && (i.stok !== "" || i.fisik !== "")) {
+                    selisihItems.push({ plu: i.plu, item: i.item, stok: s, fisik: f, selisih: sls, harga: 0 });
+                }
+            });
+
+            if(selisihItems.length === 0) {
+                alert("Tidak ada data selisih untuk dibagikan.");
+                return;
+            }
+
+            setLoading(true, "Menarik harga dari HTML KlikIndomaret...");
+            let prices = JSON.parse(localStorage.getItem("ManualPrices") || "{}");
+
+            for (let i = 0; i < selisihItems.length; i++) {
+                let item = selisihItems[i];
+                if(prices[item.plu]) {
+                    item.harga = prices[item.plu];
+                } else {
+                    // Fetch from KlikIndomaret via Proxy
+                    try {
+                        const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.klikindomaret.com/xpress/' + item.plu)}`);
+                        if(res.ok) {
+                            const data = await res.json();
+                            const html = data.contents;
+                            const match = html.match(/Rp\s*([0-9]{1,3}(?:\.[0-9]{3})*)/) || html.match(/"price"\s*:\s*"?(\d+)"?/);
+                            if(match) {
+                                item.harga = parseInt(match[1].replace(/\./g, ''));
+                            }
+                        }
+                    } catch(e) { console.log("Fetch failed for", item.plu); }
+                }
+            }
+            setLoading(false);
+            promptMissingPrices(selisihItems, 0);
+        }
+
+        function promptMissingPrices(reportList, index) {
+            if (index >= reportList.length) {
+                sendWA(reportList);
+                return;
+            }
+            const item = reportList[index];
+            if (item.harga === 0) {
+                showInputDialog("Input Harga Baru", `${item.plu} - ${item.item}`, "Rp 0", "", "SIMPAN", "Lewati", true, (val) => {
+                    if(val) {
+                        item.harga = parseInt(val);
+                        let prices = JSON.parse(localStorage.getItem("ManualPrices") || "{}");
+                        prices[item.plu] = item.harga;
+                        localStorage.setItem("ManualPrices", JSON.stringify(prices));
+                    }
+                    promptMissingPrices(reportList, index + 1);
+                });
+            } else {
+                promptMissingPrices(reportList, index + 1);
+            }
+        }
+
+        function sendWA(reportList) {
+            let totalPlus = 0;
+            let totalMinus = 0;
+            let sbDetail = "";
+
+            reportList.forEach(item => {
+                const sStr = item.selisih > 0 ? "+" + item.selisih : item.selisih;
+                sbDetail += `${item.plu}\n(${item.item}) | ${item.stok} | ${item.fisik} | ${sStr}\n`;
+                
+                const rupiah = Math.abs(item.selisih * item.harga);
+                if(item.selisih > 0) totalPlus += rupiah;
+                else totalMinus += rupiah;
+                
+                sbDetail += `Rp. ${rupiah.toLocaleString('id-ID')}\n\n`;
+            });
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) + ", " + 
+                            now.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
+            
+            const hours = now.getHours();
+            const mins = now.getMinutes();
+            const timeVal = hours * 100 + mins;
+            const shift = (timeVal >= 630 && timeVal < 1430) ? "1" : (timeVal >= 1430 && timeVal < 2230) ? "2" : "3";
+
+            let finalMsg = `*LAPORAN SO RH*\n${dateStr}\nShift: ${shift}\n\nPLU | ITEM | STOK | FISIK | SELISIH\n\n${sbDetail}`;
+            finalMsg += `*TOTAL ESTIMASI RUPIAH*\nTotal Plus (+): Rp ${totalPlus.toLocaleString('id-ID')}\nTotal Minus (-): -Rp ${totalMinus.toLocaleString('id-ID')}\n`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(finalMsg)}`);
+        }
+
+        // --- PROJECT MANAGEMENT ---
+
+        function showProjectManager() {
+            let list = JSON.parse(localStorage.getItem("project_list") || "[]");
+            let html = "";
+            if(list.length > 0) {
+                list.forEach(p => {
+                    html += `
+                    <div style="display:flex; padding:14px 16px; border-bottom:1px solid var(--divider); align-items:center; cursor:pointer;" onclick="actionProject('${p}')">
+                        <span style="font-size:18px; margin-right:12px;">📁</span>
+                        <span style="flex:1;">${p}</span>
+                        <span style="color:#C7C7CC; font-size:22px;">›</span>
+                    </div>`;
+                });
+            } else {
+                html = `<div style="padding:16px; text-align:center;">Belum ada project tersimpan.</div>`;
+            }
+            showDialog("Kelola Sesi Project", "", html, [
+                { text: "Tutup", class: "", onclick: closeDialog },
+                { text: "+ Baru", class: "bold", onclick: saveNewProjectDialog }
+            ]);
+        }
+
+        function actionProject(name) {
+            let html = `
+                <div style="padding:16px; color:var(--blue); font-size:16px; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="openProject('${name}')">📂 Buka Sesi</div>
+                <div style="padding:16px; color:var(--green); font-size:16px; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="exportProject('${name}')">⬇️ Ekspor ke File</div>
+                <div style="padding:16px; color:var(--red); font-size:16px; cursor:pointer;" onclick="deleteProject('${name}')">🗑 Hapus Project</div>
+            `;
+            showDialog(name, "", html, [{ text: "Tutup", class: "", onclick: closeDialog }]);
+        }
+
+        function saveNewProjectDialog() {
+            closeDialog();
+            if(items.length === 0) { alert("Belum ada item untuk disimpan."); return; }
+            showInputDialog("Simpan Project", "", "Cth: Shift Pagi", "", "SIMPAN", "Batal", false, (val) => {
+                if(!val) return;
+                let list = JSON.parse(localStorage.getItem("project_list") || "[]");
+                if(!list.includes(val)) list.push(val);
+                localStorage.setItem("project_list", JSON.stringify(list));
+                localStorage.setItem("project_data_" + val, JSON.stringify(items));
+                alert("Project tersimpan!");
+            });
+        }
+
+        function openProject(name) {
+            showConfirmDialog("Buka Project?", "Data di layar saat ini akan diganti.", "YA BUKA", "Batal", () => {
+                if(isReviewMode) toggleReviewMode();
+                let data = localStorage.getItem("project_data_" + name);
+                if(data) {
+                    items = JSON.parse(data);
+                    saveData();
+                    renderList();
+                }
+            });
+        }
+
+        function exportProject(name) {
+            let data = JSON.parse(localStorage.getItem("project_data_" + name) || "[]");
+            let csv = "PLU,ITEM,STOK,FISIK,SELISIH\n";
+            data.forEach(i => {
+                const s = parseInt(i.stok) || 0;
+                const f = parseInt(i.fisik) || 0;
+                csv += `${i.plu},${i.item},${i.stok},${i.fisik},${f-s}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PaXtok_${name}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function deleteProject(name) {
+            showConfirmDialog("Hapus Project?", "Project " + name + " akan dihapus.", "HAPUS", "Batal", () => {
+                pendingDeletedProjectName = name;
+                pendingDeletedProjectData = localStorage.getItem("project_data_" + name);
+                let list = JSON.parse(localStorage.getItem("project_list") || "[]");
+                list = list.filter(p => p !== name);
+                localStorage.setItem("project_list", JSON.stringify(list));
+                localStorage.removeItem("project_data_" + name);
+                showUndoSnackbar("Project dihapus", 3);
+            });
+        }
+
+        // --- UI UTILS (MODALS) ---
+
+        function showDialog(title, msg, customHtml, buttons) {
+            document.getElementById('dialog_title').textContent = title;
+            const msgEl = document.getElementById('dialog_message');
+            if(msg) { msgEl.textContent = msg; msgEl.classList.remove('hidden'); } else { msgEl.classList.add('hidden'); }
+            
+            document.getElementById('dialog_body').innerHTML = customHtml;
+            
+            const actions = document.querySelector('.dialog-actions');
+            actions.innerHTML = '';
+            buttons.forEach((b, i) => {
+                const btn = document.createElement('button');
+                btn.className = `dialog-btn ${b.class}`;
+                btn.textContent = b.text;
+                btn.onclick = () => { if(b.onclick) b.onclick(); };
+                actions.appendChild(btn);
+                if(i < buttons.length - 1) {
+                    const div = document.createElement('div'); div.className = 'dialog-divider'; actions.appendChild(div);
+                }
+            });
+            document.getElementById('dialog_overlay').classList.remove('hidden');
+        }
+
+        function closeDialog() {
+            document.getElementById('dialog_overlay').classList.add('hidden');
+        }
+
+        function showConfirmDialog(title, msg, posBtn, negBtn, onPos) {
+            const isRed = posBtn === "HAPUS" ? "red bold" : "bold";
+            showDialog(title, msg, "", [
+                { text: negBtn, class: "", onclick: closeDialog },
+                { text: posBtn, class: isRed, onclick: () => { closeDialog(); onPos(); } }
+            ]);
+        }
+
+        function showInputDialog(title, msg, hint, defVal, posBtn, negBtn, isNumber, onSave) {
+            const inputHtml = `<input type="${isNumber ? 'number' : 'text'}" id="dialog_input_val" class="input-box" style="text-align:center; background:#FFF;" placeholder="${hint}" value="${defVal}">`;
+            showDialog(title, msg, inputHtml, [
+                { text: negBtn, class: "", onclick: () => { closeDialog(); onSave(""); } },
+                { text: posBtn, class: "bold", onclick: () => { 
+                    const val = document.getElementById('dialog_input_val').value.trim();
+                    if(!val && posBtn !== "Lewati") { alert("Input tidak boleh kosong"); return; }
+                    closeDialog(); onSave(val);
+                }}
+            ]);
+            setTimeout(() => { document.getElementById('dialog_input_val').focus(); }, 100);
+        }
+
+        function setLoading(show, msg) {
+            const el = document.getElementById('loading_overlay');
+            if(show) {
+                document.getElementById('tv_loading_msg').textContent = msg;
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // Initialize on load
+        window.onload = init;
+
+    </script>
 </body>
 </html>
-
