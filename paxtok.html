@@ -36,12 +36,15 @@
     .pill.wide{flex:1.5;}
     .pill input{width:100%; border:0; outline:none; background:transparent; font-size:14px;}
     .fabAdd{width:48px; height:48px; border:0; border-radius:24px; background:var(--primary); color:#fff; font-size:26px; font-weight:800;}
+
     .global-actions{display:flex; justify-content:flex-end; gap:16px; padding:16px 20px 8px; margin-top:0;}
     .global-actions button{border:0; background:transparent; padding:6px 10px; border-radius:8px; font-weight:800; font-size:12px;}
     .global-actions #btnResetStok{color:var(--warning);} 
     .global-actions #btnResetAll{color:var(--danger);} 
+
     .list-wrap{padding:0 0;}
     .list{padding:4px 16px 0;}
+
     .item-card{background:#fff; border-radius:20px; padding:0; box-shadow:0 1px 3px rgba(0,0,0,.04); margin:16px 0;}
     .item-head{display:flex; align-items:flex-start; justify-content:space-between; padding:18px 18px 0; gap:12px;}
     .item-head .left{flex:1;}
@@ -49,22 +52,27 @@
     .item-plu{font-size:12px; color:var(--muted); margin-top:2px;}
     .item-selisih{font-size:30px; font-weight:900; text-align:right; min-width:90px;}
     .item-body{padding:0 20px 12px;}
+
     .barcode{width:100%; height:50px; background:#fff; display:flex; align-items:center; justify-content:center; margin:14px 0; border-radius:10px; overflow:hidden;}
+
     .inputs{display:flex; gap:12px; padding-bottom:12px;}
     .col{flex:1;}
     .label{font-size:10px; font-weight:900; color:var(--muted); margin:10px 0 6px;}
     .label.blue{color:var(--primary);}
+
     .input-card{background:#F2F2F7; border-radius:16px; height:48px; display:flex; align-items:center; justify-content:center;}
     .input-card.blue{background:#E5F0FF;}
     .input-card input{border:0; outline:none; width:100%; background:transparent; height:100%; text-align:center; font-size:18px; font-weight:800; color:#000;}
     .input-card.blue input{color:var(--primary)}
+
     .sep{height:1px; background:#F2F2F7; margin:0 -20px 0;}
+
     .item-actions{display:flex; height:45px; width:100%;}
     .item-actions button{flex:1; border:0; background:transparent; border-left:1px solid #F2F2F7; font-size:12px; color:var(--muted); font-weight:700;}
     .item-actions button:first-child{border-left:0;}
     .item-actions .reset{color:var(--warning); display:none;}
     .item-actions .delete{color:var(--danger); font-weight:900;}
-    .item-actions .reset.visible{display:block;}
+
     .review-card{background:#fff; border-radius:20px; box-shadow:0 2px 10px rgba(0,0,0,.05); margin:12px 16px; padding:0;}
     .review-head{display:flex; background:#F2F2F7; padding:16px; gap:0;}
     .review-head .th{font-size:11px; font-weight:900; color:var(--muted);}
@@ -77,18 +85,23 @@
     .review-rows{padding:12px 16px; display:flex; flex-direction:column; gap:10px;}
     .review-row{display:flex; align-items:center; gap:10px;}
     .review-row div{font-size:14px;}
+
     .share-area{padding:16px; display:flex; justify-content:center;}
     .share{width:100%; max-width:520px; border:0; border-radius:16px; background:#34C759; color:#fff; font-weight:900; padding:14px 16px;}
+
     .fab-container{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--primary); color:#fff; border-radius:27px; box-shadow:var(--shadow); width:max-content; padding:0 14px; display:flex; align-items:center; height:55px;}
     .fab-container button{border:0; background:transparent; color:#fff; padding:0 14px; font-size:15px; font-weight:900;}
     .fab-divider{width:1px; height:24px; background:rgba(255,255,255,.35);}
+
     .loading-overlay{position:fixed; inset:0; background:rgba(255,255,255,.85); display:flex; align-items:center; justify-content:center;}
     .spinner{width:42px; height:42px; border:4px solid rgba(0,0,0,.08); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg)}}
     .loading-text{margin-top:16px; font-weight:900;}
+
     .toast{position:fixed; bottom:110px; left:50%; transform:translateX(-50%); background:#1C1C1E; color:#fff; border-radius:25px; padding:14px 18px; display:flex; gap:16px; align-items:center; box-shadow:var(--shadow);}
     .toast.hidden{display:none;}
     .toast-btn{border:0; background:#323232; color:#3478F6; font-weight:900; border-radius:17px; padding:8px 14px;}
+
     .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35);}
     .modal{position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; width:min(520px, calc(100vw - 24px)); border-radius:18px; box-shadow:var(--shadow); padding:16px;}
     .modal-title{font-weight:900; font-size:17px; text-align:center;}
@@ -99,11 +112,13 @@
     .modal-actions .btn{flex:1; border:0; padding:10px 12px; border-radius:10px; font-weight:900; font-size:15px;}
     .modal-actions .btn.cancel{background:transparent; color:var(--primary)}
     .modal-actions .btn.primary{background:transparent; color:var(--primary)}
+
     #containerReview[hidden]{display:none;}
     #fileInputCsv{display:none;}
-    .modal-actions .btn.primary{background:transparent; color:var(--primary)}
   </style>
 
+  <!-- Barcode: JsBarcode (CODE128) -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/jsbarcode.all.min.js"></script>
 </head>
 <body>
   <div id="app">
@@ -111,7 +126,6 @@
       <div class="header-left">
         <div class="logo">PaXtok</div>
       </div>
-
       <div class="header-actions">
         <button class="chip" id="btnProjects" type="button">PROYEK</button>
         <button class="chip dark" id="btnUploadCsv" type="button">CSV</button>
@@ -154,7 +168,6 @@
 
     <main class="list-wrap" id="containerListWrap">
       <div class="list" id="containerList"></div>
-
       <div class="share-area">
         <button class="share" id="btnShare" type="button">BAGIKAN KE WHATSAPP</button>
       </div>
@@ -165,8 +178,7 @@
       <button class="toast-btn" id="btnUndo" type="button">Batal</button>
     </div>
 
-  <div class="loading-overlay" id="loadingOverlay" hidden style="display:none;">
-
+    <div class="loading-overlay" id="loadingOverlay" hidden style="display:none;">
       <div class="loading-box">
         <div class="spinner"></div>
         <div class="loading-text" id="tvLoadingMsg">Memproses...</div>
@@ -179,11 +191,10 @@
       <button class="fab-right" id="btnToggleReview" type="button">Review Selisih</button>
     </div>
 
-
     <input type="file" id="fileInputCsv" accept=".csv,text/csv" hidden />
   </div>
 
-  <!-- Modals -->
+  <!-- Modals (placeholder; tidak dipakai di versi ini) -->
   <div class="modal-backdrop" id="modalBackdrop" hidden></div>
   <div class="modal" id="modal" hidden>
     <div class="modal-title" id="modalTitle">Judul</div>
@@ -197,457 +208,490 @@
   </div>
 
   <script>
-  /* JS inlined (from app.js) */
-  const STORAGE = {
-    items: 'saved_items',
-    projectList: 'project_list',
-    projectPrefix: 'project_data_',
-    manualPrices: 'ManualPrices',
-    undo: 'undo_snapshot'
-  };
+    const STORAGE = {
+      items: 'saved_items',
+      manualPrices: 'ManualPrices'
+    };
 
-  function $(id){return document.getElementById(id)}
-  function show(el){el.hidden=false;}
-  function hide(el){el.hidden=true;}
+    const $ = (id) => document.getElementById(id);
+    const show = (el) => { if(el) el.hidden = false; };
+    const hide = (el) => { if(el) el.hidden = true; };
 
-  function nowShift() {
-    const d = new Date();
-    const timeVal = d.getHours()*100 + d.getMinutes();
-    if (timeVal >= 630 && timeVal < 1430) return '1';
-    if (timeVal >= 1430 && timeVal < 2230) return '2';
-    return '3';
-  }
+    function nowShift() {
+      const d = new Date();
+      const timeVal = d.getHours()*100 + d.getMinutes();
+      if (timeVal >= 630 && timeVal < 1430) return '1';
+      if (timeVal >= 1430 && timeVal < 2230) return '2';
+      return '3';
+    }
 
-  function formatIDR(n){
-    const x = Number(n||0);
-    return 'Rp ' + x.toLocaleString('de-DE');
-  }
+    function parseIntSafe(s){
+      const t = String(s ?? '').trim();
+      if (!t || t === '-') return 0;
+      const x = parseInt(t, 10);
+      return Number.isFinite(x) ? x : 0;
+    }
 
-  function parseIntSafe(s){
-    const t = String(s??'').trim();
-    if (!t) return 0;
-    if (t === '-') return 0;
-    const x = parseInt(t,10);
-    return Number.isFinite(x) ? x : 0;
-  }
+    function calcSelisih(stok, fisik){
+      const s = parseIntSafe(stok);
+      const f = parseIntSafe(fisik);
+      const diff = f - s;
+      let text = String(diff);
+      if (diff > 0) text = '+' + diff;
+      return { diff, text, color: diff<0 ? '#FF3B30' : (diff>0 ? '#34C759' : '#000000') };
+    }
 
-  function calcSelisih(stok, fisik){
-    const s = parseIntSafe(stok);
-    const f = parseIntSafe(fisik);
-    const diff = f - s;
-    let text = String(diff);
-    if (diff > 0) text = '+' + diff;
-    return { diff, text, color: diff<0 ? '#FF3B30' : (diff>0 ? '#34C759' : '#000000') };
-  }
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','<')
+        .replaceAll('>','>')
+        .replaceAll('"','"')
+        .replaceAll("'",'&#039;');
+    }
 
-  let state = {
-    isFiltered: false,
-    items: [],
-    pluToItem: new Map(),
-    undo: null,
-    pendingDeleted: null
-  };
+    function formatIDR(n){
+      const x = Number(n||0);
+      return 'Rp ' + x.toLocaleString('de-DE');
+    }
 
-  function saveSession(){
-    const arr = state.items.map(it => ({
-      plu: it.plu,
-      item: it.item,
-      stok: it.stok ?? '',
-      fisik: it.fisik ?? ''
-    }));
-    localStorage.setItem(STORAGE.items, JSON.stringify(arr));
-  }
-
-  function loadSession(){
-    const raw = localStorage.getItem(STORAGE.items);
-    if (raw) {
+    function renderBarcodeCode128(barcodeEl, code){
       try{
-        const arr = JSON.parse(raw);
-        state.items = [];
-        state.pluToItem = new Map();
-        for(const obj of arr){
-          const plu = String(obj.plu ?? '').trim();
-          const item = String(obj.item ?? '').trim();
-          if(!plu) continue;
-          state.pluToItem.set(plu, item);
-          state.items.push({
-            plu,
-            item,
-            stok: obj.stok ?? '',
-            fisik: obj.fisik ?? ''
-          });
+        barcodeEl.innerHTML = '';
+        const v = String(code ?? '').trim();
+        if(!v){
+          barcodeEl.style.display = 'none';
+          return;
         }
-      }catch(e){}
-    } else {
-      const sample = [
-        ['20024079','TELUR AYAM'],
-        ['20020184','ASIN MATANG'],
-        ['10004977','AYAM KAMPUNG'],
-        ['20134344','SOSIS ORI'],
-        ['20134345','SOSIS KEJU']
-      ];
-      state.items = [];
-      state.pluToItem = new Map();
-      for(const [plu,item] of sample){
-        state.pluToItem.set(plu,item);
-        state.items.push({plu,item,stok:'',fisik:''});
+        barcodeEl.style.display = 'flex';
+        JsBarcode(barcodeEl, v, {
+          format: 'CODE128',
+          displayValue: false,
+          margin: 0,
+          height: 48,
+          width: 2,
+          fontSize: 10,
+          background: '#FFFFFF',
+          lineColor: '#000000'
+        });
+      } catch(e) {
+        // ignore
       }
     }
-  }
 
-  function updateDatalist(){
-    const list = $('datalistPlu');
-    list.innerHTML='';
-    for(const plu of state.pluToItem.keys()){
-      const item = state.pluToItem.get(plu);
-      const opt = document.createElement('option');
-      opt.value = `${plu} - ${String(item).toUpperCase()}`;
-      list.appendChild(opt);
+    const state = {
+      isFiltered: false,
+      items: [],
+      pluToItem: new Map(),
+      undo: null,
+      undoTimer: null
+    };
+
+    function saveSession(){
+      const arr = state.items.map(it => ({
+        plu: it.plu,
+        item: it.item,
+        stok: it.stok ?? '',
+        fisik: it.fisik ?? ''
+      }));
+      localStorage.setItem(STORAGE.items, JSON.stringify(arr));
     }
-  }
 
-  function getMasterFromInputPlu(){
-    const input = $('etInputPlu');
-    const v = (input.value||'').trim();
-    if(v.includes(' - ')) return v.split(' - ')[0].trim();
-    return v;
-  }
-
-  function updateGlobalActions(){
-    if(state.isFiltered){
-      $('containerGlobalActions').hidden=true;
-      return;
+    function loadSession(){
+      const raw = localStorage.getItem(STORAGE.items);
+      if (raw) {
+        try{
+          const arr = JSON.parse(raw);
+          state.items = [];
+          state.pluToItem = new Map();
+          for(const obj of arr){
+            const plu = String(obj.plu ?? '').trim();
+            const item = String(obj.item ?? '').trim();
+            if(!plu) continue;
+            state.pluToItem.set(plu, item);
+            state.items.push({ plu, item, stok: obj.stok ?? '', fisik: obj.fisik ?? '' });
+          }
+        }catch(e){}
+      } else {
+        const sample = [
+          ['20024079','TELUR AYAM'],
+          ['20020184','ASIN MATANG'],
+          ['10004977','AYAM KAMPUNG'],
+          ['20134344','SOSIS ORI'],
+          ['20134345','SOSIS KEJU']
+        ];
+        state.items = [];
+        state.pluToItem = new Map();
+        for(const [plu,item] of sample){
+          state.pluToItem.set(plu, item);
+          state.items.push({ plu, item, stok:'', fisik:'' });
+        }
+      }
     }
-    const hasItems = state.items.length>0;
-    $('containerGlobalActions').hidden=!hasItems;
-    if(!hasItems){
-      $('btnResetStok').hidden=true;
-      $('btnResetAll').hidden=true;
-      return;
+
+    function updateDatalist(){
+      const list = $('datalistPlu');
+      list.innerHTML = '';
+      for(const plu of state.pluToItem.keys()){
+        const item = state.pluToItem.get(plu);
+        const opt = document.createElement('option');
+        opt.value = `${plu} - ${String(item).toUpperCase()}`;
+        list.appendChild(opt);
+      }
     }
-    $('btnResetAll').hidden=false;
-    const hasAny = state.items.some(it => String(it.stok||'').trim()!=='' || String(it.fisik||'').trim()!=='' );
-    $('btnResetStok').hidden=!hasAny;
-  }
 
-  function buildItemCard(item, index){
-    const wrap = document.createElement('div');
-    wrap.className = 'item-card';
+    function getMasterFromInputPlu(){
+      const input = $('etInputPlu');
+      const v = (input.value||'').trim();
+      if(v.includes(' - ')) return v.split(' - ')[0].trim();
+      return v;
+    }
 
-    const {text, color} = calcSelisih(item.stok, item.fisik);
+    function updateGlobalActions(){
+      if(state.isFiltered){
+        $('containerGlobalActions').hidden = true;
+        return;
+      }
+      const hasItems = state.items.length>0;
+      $('containerGlobalActions').hidden = !hasItems;
+      if(!hasItems){
+        $('btnResetStok').hidden = true;
+        $('btnResetAll').hidden = true;
+        return;
+      }
+      $('btnResetAll').hidden = false;
+      const hasAny = state.items.some(it => String(it.stok||'').trim()!=='' || String(it.fisik||'').trim()!=='' );
+      $('btnResetStok').hidden = !hasAny;
+    }
 
-    wrap.innerHTML = `
-      <div class="item-head">
-        <div class="left">
-          <div class="item-title">${escapeHtml(String(item.item||'').toUpperCase())}</div>
-          <div class="item-plu">PLU: ${escapeHtml(String(item.plu||''))}</div>
-        </div>
-        <div class="item-selisih" style="color:${color}">${escapeHtml(text)}</div>
-      </div>
-      <div class="item-body">
-        <div class="barcode" title="Barcode (opsional)">${escapeHtml(String(item.plu||''))}</div>
-        <div class="inputs">
-          <div class="col">
-            <div class="label">STOK SISTEM</div>
-            <div class="input-card">
-              <input class="inp-stok" inputmode="numeric" value="${escapeHtml(String(item.stok||''))}" />
-            </div>
-          </div>
-          <div class="col">
-            <div class="label blue">CEK FISIK</div>
-            <div class="input-card blue">
-              <input class="inp-fisik" inputmode="numeric" value="${escapeHtml(String(item.fisik||''))}" />
-            </div>
-          </div>
-        </div>
-        <div class="sep"></div>
-        <div class="item-actions">
-          <button class="reset">↺ Reset</button>
-          <button class="btn-up">▲ Naik</button>
-          <button class="btn-down">▼ Turun</button>
-          <button class="delete">Hapus</button>
-        </div>
-      </div>
-    `;
+    function showUndo(msg){
+      $('toastUndo').hidden = false;
+      $('tvUndoMsg').textContent = msg;
+      if(state.undoTimer) clearTimeout(state.undoTimer);
+      state.undoTimer = setTimeout(()=>{
+        $('toastUndo').hidden = true;
+        state.undo = null;
+        state.undoTimer = null;
+      }, 10000);
+    }
 
-    const inpStok = wrap.querySelector('.inp-stok');
-    const inpFisik = wrap.querySelector('.inp-fisik');
-    const selisihEl = wrap.querySelector('.item-selisih');
-    const resetBtn = wrap.querySelector('.reset');
+    function commitUndoSnapshot(){
+      state.undo = { items: JSON.parse(JSON.stringify(state.items)) };
+    }
 
-    function afterChange(){
-      item.stok = inpStok.value;
-      item.fisik = inpFisik.value;
+    function hideUndo(){
+      $('toastUndo').hidden = true;
+      state.undo = null;
+    }
+
+    function buildItemCard(item, index){
+      const wrap = document.createElement('div');
+      wrap.className = 'item-card';
+
       const r = calcSelisih(item.stok, item.fisik);
-      selisihEl.textContent = r.text;
-      selisihEl.style.color = r.color;
 
-      const showReset = String(item.stok||'').trim()!=='' || String(item.fisik||'').trim()!=='';
-      resetBtn.hidden = !showReset;
-      saveSession();
-      updateGlobalActions();
+      wrap.innerHTML = `
+        <div class="item-head">
+          <div class="left">
+            <div class="item-title">${escapeHtml(String(item.item||'').toUpperCase())}</div>
+            <div class="item-plu">PLU: ${escapeHtml(String(item.plu||''))}</div>
+          </div>
+          <div class="item-selisih" style="color:${r.color}">${escapeHtml(r.text)}</div>
+        </div>
+
+        <div class="item-body">
+          <div class="barcode" title="Barcode (CODE128)"></div>
+
+          <div class="inputs">
+            <div class="col">
+              <div class="label">STOK SISTEM</div>
+              <div class="input-card">
+                <input class="inp-stok" inputmode="numeric" value="${escapeHtml(String(item.stok||''))}" />
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="label blue">CEK FISIK</div>
+              <div class="input-card blue">
+                <input class="inp-fisik" inputmode="numeric" value="${escapeHtml(String(item.fisik||''))}" />
+              </div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="item-actions">
+            <button class="reset">↺ Reset</button>
+            <button class="btn-up">▲ Naik</button>
+            <button class="btn-down">▼ Turun</button>
+            <button class="delete">Hapus</button>
+          </div>
+        </div>
+      `;
+
+      const inpStok = wrap.querySelector('.inp-stok');
+      const inpFisik = wrap.querySelector('.inp-fisik');
+      const barcodeEl = wrap.querySelector('.barcode');
+      const selisihEl = wrap.querySelector('.item-selisih');
+      const resetBtn = wrap.querySelector('.reset');
+
+      renderBarcodeCode128(barcodeEl, item.plu);
+
+      function afterChange(){
+        item.stok = inpStok.value;
+        item.fisik = inpFisik.value;
+        const rr = calcSelisih(item.stok, item.fisik);
+        selisihEl.textContent = rr.text;
+        selisihEl.style.color = rr.color;
+        const showReset = String(item.stok||'').trim()!=='' || String(item.fisik||'').trim()!=='';
+        resetBtn.style.display = showReset ? 'flex' : 'none';
+        saveSession();
+        updateGlobalActions();
+      }
+
+      inpStok.addEventListener('input', afterChange);
+      inpFisik.addEventListener('input', afterChange);
+
+      // initial
+      const showReset0 = String(item.stok||'').trim()!=='' || String(item.fisik||'').trim()!=='';
+      resetBtn.style.display = showReset0 ? 'flex' : 'none';
+
+      resetBtn.addEventListener('click', ()=>{
+        inpStok.value='';
+        inpFisik.value='';
+        item.stok='';
+        item.fisik='';
+        afterChange();
+        inpStok.focus();
+      });
+
+      wrap.querySelector('.btn-up').addEventListener('click', ()=>{
+        if(index<=0) return;
+        commitUndoSnapshot();
+        const t = state.items[index-1];
+        state.items[index-1] = state.items[index];
+        state.items[index] = t;
+        render();
+        saveSession();
+      });
+
+      wrap.querySelector('.btn-down').addEventListener('click', ()=>{
+        if(index>=state.items.length-1) return;
+        commitUndoSnapshot();
+        const t = state.items[index+1];
+        state.items[index+1] = state.items[index];
+        state.items[index] = t;
+        render();
+        saveSession();
+      });
+
+      wrap.querySelector('.delete').addEventListener('click', ()=>{
+        commitUndoSnapshot();
+        state.items.splice(index,1);
+        render();
+        saveSession();
+        showUndo('Item berhasil dihapus');
+      });
+
+      return wrap;
     }
 
-    inpStok.addEventListener('input', afterChange);
-    inpFisik.addEventListener('input', afterChange);
+    function render(){
+      updateDatalist();
+      updateGlobalActions();
 
-    const showReset0 = String(item.stok||'').trim()!=='' || String(item.fisik||'').trim()!=='';
-    resetBtn.hidden = !showReset0;
+      const list = $('containerList');
+      const review = $('containerReview');
+      list.innerHTML = '';
 
-    resetBtn.addEventListener('click', ()=>{
-      inpStok.value='';
-      inpFisik.value='';
-      item.stok='';
-      item.fisik='';
-      afterChange();
-      inpStok.focus();
-    });
+      if(state.isFiltered){
+        hide($('containerInputManual'));
+        hide($('containerGlobalActions'));
+        hide($('fabContainer'));
+        show(review);
+        $('containerListWrap').scrollTop = 0;
+        renderReview();
+        return;
+      }
 
-    wrap.querySelector('.btn-up').addEventListener('click', ()=>{
-      if(index<=0) return;
-      commitUndoSnapshot();
-      const t = state.items[index-1];
-      state.items[index-1] = state.items[index];
-      state.items[index] = t;
-      render();
-      saveSession();
-    });
-
-    wrap.querySelector('.btn-down').addEventListener('click', ()=>{
-      if(index>=state.items.length-1) return;
-      commitUndoSnapshot();
-      const t = state.items[index+1];
-      state.items[index+1] = state.items[index];
-      state.items[index] = t;
-      render();
-      saveSession();
-    });
-
-    wrap.querySelector('.delete').addEventListener('click', ()=>{
-      commitPendingDeletion(index);
-      state.items.splice(index,1);
-      render();
-      saveSession();
-      showUndo('Item berhasil dihapus', 0);
-    });
-
-    return wrap;
-  }
-
-  function render(){
-    updateDatalist();
-    updateGlobalActions();
-
-    const list = $('containerList');
-    const review = $('containerReview');
-    list.innerHTML='';
-
-    if(state.isFiltered){
-      hide($('containerInputManual'));
-      hide($('containerGlobalActions'));
-      hide($('fabContainer'));
-      review.hidden=false;
-      $('containerListWrap').scrollTop=0;
-      renderReview();
-    } else {
       hide(review);
       show($('containerInputManual'));
       show($('containerGlobalActions'));
       show($('fabContainer'));
+
       for(let i=0;i<state.items.length;i++){
         list.appendChild(buildItemCard(state.items[i], i));
       }
     }
-  }
 
-  function renderReview(){
-    const rows = $('containerReviewRows');
-    rows.innerHTML='';
-    const pricePrefsRaw = localStorage.getItem(STORAGE.manualPrices);
-    const pricePrefs = pricePrefsRaw ? JSON.parse(pricePrefsRaw) : {};
+    function renderReview(){
+      const rows = $('containerReviewRows');
+      rows.innerHTML = '';
+      const pricePrefsRaw = localStorage.getItem(STORAGE.manualPrices);
+      const pricePrefs = pricePrefsRaw ? JSON.parse(pricePrefsRaw) : {};
 
-    for(const item of state.items){
-      const r = calcSelisih(item.stok, item.fisik);
-      if(r.diff===0) continue;
+      for(const item of state.items){
+        const rr = calcSelisih(item.stok, item.fisik);
+        if(rr.diff === 0) continue;
 
-      const row = document.createElement('div');
-      row.className='review-row';
+        const row = document.createElement('div');
+        row.className = 'review-row';
+        const rawPlu = String(item.plu);
+        const itemName = String(item.item||'').toUpperCase();
+        const savedPrice = Number(pricePrefs[rawPlu] || 0);
 
-      const rawPlu = String(item.plu);
-      const itemName = String(item.item||'').toUpperCase();
-      const savedPrice = Number(pricePrefs[rawPlu] || 0);
+        row.innerHTML = `
+          <div style="flex:1.1">${escapeHtml(rawPlu)}</div>
+          <div style="flex:1.6">${escapeHtml(itemName)}</div>
+          <div style="flex:1.3;cursor:pointer" class="rev-price">${savedPrice>0?escapeHtml(formatIDR(savedPrice)): 'Rp 0'}</div>
+          <div style="flex:.8;text-align:center">${escapeHtml(parseIntSafe(item.stok))}</div>
+          <div style="flex:.8;text-align:center; color:${rr.diff<0?'#FF3B30':'#34C759'}">${escapeHtml(parseIntSafe(item.fisik))}</div>
+          <div style="flex:1; text-align:right; font-weight:900; color:${rr.diff<0?'#FF3B30':'#34C759'}">${escapeHtml(rr.text)}</div>
+        `;
 
-      row.innerHTML = `
-        <div style="flex:1.1">${escapeHtml(rawPlu)}</div>
-        <div style="flex:1.6">${escapeHtml(itemName)}</div>
-        <div style="flex:1.3;cursor:pointer" class="rev-price">${savedPrice>0?escapeHtml(formatIDR(savedPrice)): 'Rp 0'}</div>
-        <div style="flex:.8;text-align:center">${escapeHtml(parseIntSafe(item.stok))}</div>
-        <div style="flex:.8;text-align:center; color:${r.diff<0?'#FF3B30':'#34C759'}">${escapeHtml(parseIntSafe(item.fisik))}</div>
-        <div style="flex:1; text-align:right; font-weight:900; color:${r.diff<0?'#FF3B30':'#34C759'}">${escapeHtml(r.text)}</div>
-      `;
+        row.querySelector('.rev-price').addEventListener('click', ()=>{
+          const current = Number(pricePrefs[rawPlu] || 0);
+          const input = prompt('Ubah Harga (angka) untuk PLU '+rawPlu+'\nContoh: 12500', current?String(current):'0');
+          if(input===null) return;
+          const v = parseIntSafe(input);
+          pricePrefs[rawPlu] = v;
+          localStorage.setItem(STORAGE.manualPrices, JSON.stringify(pricePrefs));
+          renderReview();
+          saveSession();
+        });
 
-      const priceEl = row.querySelector('.rev-price');
-      priceEl.addEventListener('click', ()=>{
-        const current = Number(pricePrefs[rawPlu] || 0);
-        const input = prompt('Ubah Harga (angka) untuk PLU '+rawPlu+'\nContoh: 12500', current?String(current):'0');
-        if(input===null) return;
-        const v = parseIntSafe(input);
-        pricePrefs[rawPlu]=v;
-        localStorage.setItem(STORAGE.manualPrices, JSON.stringify(pricePrefs));
-        renderReview();
-        saveSession();
+        rows.appendChild(row);
+      }
+    }
+
+    function toggleReview(){
+      state.isFiltered = !state.isFiltered;
+      $('btnToggleReview').textContent = state.isFiltered ? 'Kembali ke Input' : 'Review Selisih';
+      $('fabContainer').style.background = state.isFiltered ? '#FF3B30' : '#007AFF';
+      render();
+    }
+
+    function addManual(){
+      const plu = getMasterFromInputPlu();
+      const item = $('etInputItem').value.trim();
+
+      if(!plu || !item){ alert('PLU dan Nama Item harus diisi'); return; }
+      if(!/^\d+$/.test(plu)){ alert('Gagal: PLU harus berupa angka bulat'); return; }
+
+      state.pluToItem.set(plu, item);
+      state.items.push({ plu, item, stok:'', fisik:'' });
+      saveSession();
+      render();
+
+      $('etInputPlu').value='';
+      $('etInputItem').value='';
+      $('etInputPlu').focus();
+    }
+
+    function validateCsv(raw){
+      const lines = String(raw||'').split(/\r?\n/);
+      if(lines.length===0) return 'File CSV kosong';
+      for(let i=0;i<lines.length;i++){
+        const line = lines[i].trim();
+        if(!line) continue;
+        const parts = line.split(',');
+        if(i===0 && parts[0].trim().toLowerCase()==='plu') continue;
+        if(parts.length!==2) return 'Format salah pada baris ke-'+(i+1)+' (Gunakan format: PLU, ITEM).';
+        const p = parts[0].trim();
+        if(!/^\d+$/.test(p)) return 'PLU tidak valid pada baris ke-'+(i+1)+' (Harus berupa angka integer): '+p;
+      }
+      return null;
+    }
+
+    function processCsv(raw){
+      commitUndoSnapshot();
+      state.items = [];
+      state.pluToItem = new Map();
+
+      const lines = String(raw||'').split(/\r?\n/);
+      for(const line0 of lines){
+        const line = line0.trim();
+        if(!line) continue;
+        const parts = line.split(',');
+        if(parts.length>=2){
+          if(parts[0].trim().toLowerCase()==='plu') continue;
+          const plu = parts[0].trim();
+          const itemName = parts[1].trim();
+          state.pluToItem.set(plu, itemName);
+          state.items.push({ plu, item: itemName, stok:'', fisik:'' });
+        }
+      }
+    }
+
+    function generateWhatsAppText(){
+      const pricePrefsRaw = localStorage.getItem(STORAGE.manualPrices);
+      const pricePrefs = pricePrefsRaw ? JSON.parse(pricePrefsRaw) : {};
+
+      let grandPlus=0, grandMinus=0;
+      let sbDetail='';
+
+      for(const item of state.items){
+        const rr = calcSelisih(item.stok, item.fisik);
+        if(rr.diff === 0) continue;
+
+        const plu = String(item.plu);
+        const harga = Number(pricePrefs[plu] || 0);
+        const total = rr.diff * harga;
+
+        sbDetail += `${plu}\n(${String(item.item||'').toUpperCase()}) | ${item.stok||'0'} | ${item.fisik||'0'} | ${rr.text}\n`;
+
+        if(rr.diff !== 0 && harga > 0){
+          if(rr.diff > 0) grandPlus += total;
+          else grandMinus += Math.abs(total);
+          sbDetail += `Rp. ${Math.abs(total).toLocaleString('de-DE')}\n\n`;
+        } else {
+          sbDetail += `\n`;
+        }
+      }
+
+      const d = new Date();
+      const waktuCek = d.toLocaleString('id-ID', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      const shiftNumber = nowShift();
+
+      let final='*LAPORAN SO RH*\n';
+      final += `${waktuCek}\n`;
+      final += `Shift: ${shiftNumber}\n\n`;
+      final += 'PLU | ITEM | STOK | FISIK | SELISIH\n\n';
+
+      if(sbDetail.trim()) final += sbDetail;
+      else final += 'Semua item balance (tidak ada selisih).\n\n';
+
+      final += '*TOTAL ESTIMASI RUPIAH*\n';
+      final += `Total Plus (+): Rp ${grandPlus.toLocaleString('de-DE')}\n`;
+      final += `Total Minus (-): -Rp ${grandMinus.toLocaleString('de-DE')}\n`;
+      return final;
+    }
+
+    function downloadCsv(){
+      const projectName = prompt('Nama Project untuk file CSV?', 'PaXtok');
+      if(projectName===null) return;
+
+      const header = ['PLU','ITEM','STOK','FISIK','SELISIH'].join(',');
+      const rows = state.items.map(it => {
+        const stokStr = String(it.stok||'');
+        const fisikStr = String(it.fisik||'');
+        const s = parseIntSafe(stokStr);
+        const f = parseIntSafe(fisikStr);
+        const selisih = f - s;
+        return [it.plu, String(it.item||'').toUpperCase(), stokStr, fisikStr, selisih].join(',');
       });
 
-      rows.appendChild(row);
-    }
-  }
-
-  function commitUndoSnapshot(){
-    state.undo = { items: JSON.parse(JSON.stringify(state.items)) };
-  }
-
-  let undoTimer = null;
-  function showUndo(msg){
-    $('toastUndo').hidden=false;
-    $('tvUndoMsg').textContent = msg;
-    clearTimeout(undoTimer);
-    undoTimer = setTimeout(()=>{
-      $('toastUndo').hidden=true;
-      state.undo=null;
-    }, 10000);
-  }
-
-  function commitPendingDeletion(){
-    commitUndoSnapshot();
-  }
-
-  function hideUndo(){
-    $('toastUndo').hidden=true;
-    state.undo=null;
-  }
-
-  function escapeHtml(s){
-    return String(s??'')
-      .replaceAll('&','&amp;')
-      .replaceAll('<','<')
-      .replaceAll('>','>')
-      .replaceAll('"','"')
-      .replaceAll("'",'&#039;');
-  }
-
-  function validateCsv(raw){
-    const lines = String(raw||'').split(/\r?\n/);
-    if(lines.length===0) return 'File CSV kosong';
-    for(let i=0;i<lines.length;i++){
-      const line = lines[i].trim();
-      if(!line) continue;
-      const parts = line.split(',');
-      if(i===0 && parts[0].trim().toLowerCase()==='plu') continue;
-      if(parts.length!==2) return 'Format salah pada baris ke-'+(i+1)+' (Gunakan format: PLU, ITEM).';
-      const plu = parts[0].trim();
-      if(!/^\d+$/.test(plu)) return 'PLU tidak valid pada baris ke-'+(i+1)+' (Harus berupa angka integer): '+plu;
-    }
-    return null;
-  }
-
-  function processCsv(raw){
-    commitUndoSnapshot();
-    state.items=[];
-    state.pluToItem=new Map();
-
-    const lines = String(raw||'').split(/\r?\n/);
-    for(const line0 of lines){
-      const line = line0.trim();
-      if(!line) continue;
-      const parts = line.split(',');
-      if(parts.length>=2){
-        if(parts[0].trim().toLowerCase()==='plu') continue;
-        const plu = parts[0].trim();
-        const itemName = parts[1].trim();
-        state.pluToItem.set(plu, itemName);
-        state.items.push({plu,item:itemName,stok:'',fisik:''});
-      }
-    }
-  }
-
-  function generateWhatsAppText(){
-    const pricePrefsRaw = localStorage.getItem(STORAGE.manualPrices);
-    const pricePrefs = pricePrefsRaw ? JSON.parse(pricePrefsRaw) : {};
-
-    const listReport = [];
-    for(const item of state.items){
-      const r = calcSelisih(item.stok, item.fisik);
-      if(r.diff===0) continue;
-      const plu = String(item.plu);
-      const harga = Number(pricePrefs[plu] || 0);
-      const total = r.diff * harga;
-      listReport.push({ ...item, selisihText: r.text, selisih: r.diff, harga, total });
+      const csv = [header, ...rows].join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `PaXtok_${String(projectName)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     }
 
-    let grandPlus=0, grandMinus=0;
-    let sbDetail='';
-    for(const it of listReport){
-      sbDetail += `${it.plu}\n(${String(it.item).toUpperCase()}) | ${it.stok||'0'} | ${it.fisik||'0'} | ${it.selisihText}\n`;
-      if(it.selisih!==0 && it.harga>0){
-        const totalRupiah = it.total;
-        if(it.selisih>0) grandPlus += totalRupiah;
-        else grandMinus += Math.abs(totalRupiah);
-        sbDetail += `Rp. ${Math.abs(totalRupiah).toLocaleString('de-DE')}\n\n`;
-      } else {
-        sbDetail += `\n`;
-      }
-    }
-
-    const d = new Date();
-    const waktuCek = d.toLocaleString('id-ID', {
-      day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
-    });
-
-    const shiftNumber = nowShift();
-
-    let final='*LAPORAN SO RH*\n';
-    final += `${waktuCek}\n`;
-    final += `Shift: ${shiftNumber}\n\n`;
-    final += 'PLU | ITEM | STOK | FISIK | SELISIH\n\n';
-    if(sbDetail.trim()) final += sbDetail;
-    else final += 'Semua item balance (tidak ada selisih).\n\n';
-    final += '*TOTAL ESTIMASI RUPIAH*\n';
-    final += `Total Plus (+): Rp ${grandPlus.toLocaleString('de-DE')}\n`;
-    final += `Total Minus (-): -Rp ${grandMinus.toLocaleString('de-DE')}\n`;
-    return final;
-  }
-
-  function downloadCsv(){
-    const projectName = prompt('Nama Project untuk file CSV?', 'PaXtok');
-    if(projectName===null) return;
-    const header = ['PLU','ITEM','STOK','FISIK','SELISIH'].join(',');
-    const rows = state.items.map(it=>{
-      const stokStr = String(it.stok||'');
-      const fisikStr = String(it.fisik||'');
-      const s = parseIntSafe(stokStr);
-      const f = parseIntSafe(fisikStr);
-      const selisih = f - s;
-      return [it.plu, String(it.item||'').toUpperCase(), stokStr, fisikStr, selisih].join(',');
-    });
-    const csv = [header, ...rows].join('\n');
-
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `PaXtok_${String(projectName)}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }
-
-  function toggleReview(){
-    state.isFiltered = !state.isFiltered;
-    $('btnToggleReview').textContent = state.isFiltered ? 'Kembali ke Input' : 'Review Selisih';
-    $('fabContainer').style.background = state.isFiltered ? '#FF3B30' : '#007AFF';
-    render();
-  }
-
-  function wireEvents(){
+    // Wire events
     $('btnAddManual').addEventListener('click', addManual);
     $('etInputItem').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); addManual(); }});
 
@@ -656,6 +700,8 @@
       const itemName = state.pluToItem.get(plu);
       if(itemName) $('etInputItem').value = String(itemName).toUpperCase();
     });
+
+    $('btnToggleReview').addEventListener('click', toggleReview);
 
     $('btnResetStok').addEventListener('click', ()=>{
       if(state.items.length===0) return;
@@ -671,8 +717,8 @@
       if(state.items.length===0) return;
       if(!confirm('Hapus Semua Data?')) return;
       commitUndoSnapshot();
-      state.items=[];
-      state.pluToItem=new Map();
+      state.items = [];
+      state.pluToItem = new Map();
       render();
       saveSession();
       showUndo('Semua item dihapus');
@@ -686,17 +732,18 @@
         hideUndo();
         render();
         saveSession();
-      } else hideUndo();
+      } else {
+        hideUndo();
+      }
     });
-
-    $('btnUndo').addEventListener('keydown', (e)=>{ if(e.key==='Enter') $('btnUndo').click(); });
-    $('btnToggleReview').addEventListener('click', toggleReview);
 
     $('btnShare').addEventListener('click', ()=>{
       const text = generateWhatsAppText();
       navigator.clipboard.writeText(text).then(()=>{
         alert('Teks laporan sudah disalin ke clipboard.');
-      }).catch(()=>{ prompt('Salin teks ini:', text); });
+      }).catch(()=>{
+        prompt('Salin teks ini:', text);
+      });
     });
 
     $('btnProjects').addEventListener('click', ()=>{
@@ -704,7 +751,6 @@
     });
 
     $('btnUploadCsv').addEventListener('click', ()=>{ $('fileInputCsv').click(); });
-
     $('fileInputCsv').addEventListener('change', async ()=>{
       const file = $('fileInputCsv').files?.[0];
       if(!file) return;
@@ -720,28 +766,8 @@
     });
 
     $('btnQuickSave').addEventListener('click', ()=>{ downloadCsv(); });
-  }
 
-  function addManual(){
-    const plu = getMasterFromInputPlu();
-    const item = $('etInputItem').value.trim();
-
-    if(!plu || !item){ alert('PLU dan Nama Item harus diisi'); return; }
-    if(!/^\d+$/.test(plu)){ alert('Gagal: PLU harus berupa angka bulat'); return; }
-
-    const upperItem = item;
-    state.pluToItem.set(plu, upperItem);
-    state.items.push({plu, item: upperItem, stok:'', fisik:''});
-    saveSession();
-    updateDatalist();
-    render();
-
-    $('etInputPlu').value='';
-    $('etInputItem').value='';
-    $('etInputPlu').focus();
-  }
-
-  function init(){
+    // Init
     hide($('toastUndo'));
     hide($('loadingOverlay'));
     hide($('containerReview'));
@@ -749,12 +775,7 @@
     loadSession();
     updateDatalist();
     render();
-    wireEvents();
-
-    $('btnToggleReview').textContent = 'Review Selisih';
-  }
-
-  init();
   </script>
 </body>
 </html>
+
