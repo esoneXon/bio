@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PaXtok Web</title>
     
-    <!-- Favicon -->
     <link rel="icon" href="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" type="image/png">
 
-    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Library untuk Generate Barcode -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     
     <style>
@@ -128,10 +125,9 @@
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
             background: var(--blue); border-radius: 27px; height: 55px; color: #FFF;
             box-shadow: 0 6px 12px rgba(0,0,0,0.15); display: flex; align-items: center; overflow: hidden; z-index: 100;
-            width: max-content; /* Pastikan ukurannya pas dengan konten */
+            width: max-content; 
         }
         .fab-container.mode-review { background: var(--red); }
-        /* Padding dan font-size disesuaikan agar 3 tombol muat di layar */
         .fab-btn { padding: 0 14px; font-size: 13px; font-weight: 700; cursor: pointer; height: 100%; display: flex; align-items: center; white-space: nowrap; }
         .fab-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.3); }
 
@@ -192,16 +188,12 @@
 </head>
 <body>
 
-    <!-- Indikator Zoom -->
     <div id="zoom_indicator">Ukuran: Normal</div>
 
-    <!-- Header -->
     <header class="flex items-center">
-        <!-- Logo Aplikasi -->
         <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" alt="Logo" class="logo-img">
         <div class="logo-text">PaXtok</div>
         
-        <!-- Tombol Pengatur Ukuran -->
         <div class="btn-header btn-zoom" onclick="toggleZoom()" title="Ubah Ukuran Tampilan">Aa</div>
         
         <div class="btn-header btn-projects" onclick="showProjectManager()">PROYEK</div>
@@ -209,7 +201,6 @@
         <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
     </header>
 
-    <!-- Input Manual -->
     <div id="container_input_manual" class="card flex items-center">
         <div style="flex:1; margin-right:8px; display:flex; gap:8px;">
             <input type="number" id="et_input_plu" class="input-box" placeholder="PLU" list="plu_list" style="flex:1;">
@@ -219,16 +210,13 @@
         <button class="add-btn font-bold" onclick="performManualAdd()">+</button>
     </div>
 
-    <!-- Global Actions -->
     <div id="container_global_actions" class="flex global-actions">
         <span id="btn_reset_stok" class="text-orange hidden" onclick="resetAllStokFisik()">Kosongkan Stok</span>
         <span id="btn_reset_all" class="text-red hidden" onclick="deleteAllItems()">Hapus Semua</span>
     </div>
 
-    <!-- Main List -->
     <div id="container_list"></div>
 
-    <!-- Review Section -->
     <div id="container_review" class="hidden">
         <div class="card flex-col">
             <div class="review-header">
@@ -244,24 +232,20 @@
         <button class="btn-wa" onclick="prepareWhatsAppReport()">BAGIKAN KE WHATSAPP</button>
     </div>
 
-    <!-- FAB -->
     <div id="fab_container" class="fab-container">
         <div id="btn_quick_save" class="fab-btn" onclick="saveNewProjectDialog()">💾 Simpan</div>
         <div id="fab_divider" class="fab-divider"></div>
         <div id="tv_fab" class="fab-btn" onclick="toggleReviewMode()">Review Selisih</div>
         
-        <!-- Pembaruan: Tombol Try More Project -->
         <div id="fab_divider_2" class="fab-divider"></div>
         <div id="btn_try_more" class="fab-btn" onclick="showTryMoreDialog()">✨ Try More</div>
     </div>
 
-    <!-- Undo Snackbar -->
     <div id="card_undo">
         <span id="tv_undo_msg">Item dihapus</span>
         <div class="btn-undo-action" onclick="performUndo()">Batal</div>
     </div>
 
-    <!-- Dialog Overlay -->
     <div id="dialog_overlay" class="hidden">
         <div class="dialog-card flex-col">
             <div class="dialog-content">
@@ -277,7 +261,6 @@
         </div>
     </div>
 
-    <!-- Loading -->
     <div id="loading_overlay" class="hidden">
         <div class="spinner"></div>
         <div id="tv_loading_msg" style="margin-top:16px; font-weight:bold;">Memproses...</div>
@@ -328,6 +311,7 @@
         // --- CORE FUNCTIONS ---
         function init() {
             initZoom(); 
+            initSampleProject(); // Panggil inisialisasi project sample SO RH
             loadSavedData();
             
             document.getElementById('et_input_plu').addEventListener('input', function(e) {
@@ -345,6 +329,36 @@
             document.getElementById('et_input_item').addEventListener('keypress', function(e) {
                 if(e.key === 'Enter') performManualAdd();
             });
+        }
+        
+        // --- FITUR BARU: INISIALISASI PROJECT SO RH SECARA OTOMATIS ---
+        function initSampleProject() {
+            let list = JSON.parse(localStorage.getItem("project_list") || "[]");
+            if(!list.includes("SO RH")) {
+                list.push("SO RH");
+                localStorage.setItem("project_list", JSON.stringify(list));
+                
+                const sampleData = `20024079,TELUR AYAM\n20020184,ASIN MATANG\n10004977,AYAM KAMPUNG\n20080025,TLR MEGA 10's\n20062506,SANFORD\n20062507,GALON SANFORD\n10036631,AQUA\n20121514,LE MINERAL\n20063700,GAS KCL\n20000458,GAS BSR\n20110320,MATERAI\n20134344,SOSIS ORI\n20134345,SOSIS KEJU`;
+                
+                let sampleItems = [];
+                const lines = sampleData.split("\n");
+                lines.forEach(line => {
+                    let parts = line.split(",");
+                    if(parts.length >= 2) {
+                        let plu = parts[0].trim();
+                        let item = parts[1].trim();
+                        sampleItems.push({plu: plu, item: item, stok: "", fisik: ""});
+                    }
+                });
+                
+                localStorage.setItem("project_data_SO RH", JSON.stringify(sampleItems));
+                
+                // Jika user belum punya data aktif (baru pertama kali buka)
+                let activeData = localStorage.getItem("saved_items");
+                if (!activeData || activeData === "[]") {
+                    localStorage.setItem("saved_items", JSON.stringify(sampleItems));
+                }
+            }
         }
 
         function loadSavedData() {
@@ -625,7 +639,6 @@
                 document.getElementById('btn_quick_save').classList.add('hidden');
                 document.getElementById('fab_divider').classList.add('hidden');
                 
-                // Sembunyikan tombol "Try More" saat mode review
                 document.getElementById('fab_divider_2').classList.add('hidden');
                 document.getElementById('btn_try_more').classList.add('hidden');
                 
@@ -640,7 +653,6 @@
                 document.getElementById('btn_quick_save').classList.remove('hidden');
                 document.getElementById('fab_divider').classList.remove('hidden');
                 
-                // Tampilkan kembali tombol "Try More"
                 document.getElementById('fab_divider_2').classList.remove('hidden');
                 document.getElementById('btn_try_more').classList.remove('hidden');
                 
@@ -807,15 +819,15 @@
             ]);
         }
 
-        // Fitur Baru: Try More Project Dialog
+        // FITUR BARU: Try More Action (Membuka Link)
         function showTryMoreDialog() {
             let html = `
-                <div style="display:flex; padding:14px 16px; border-bottom:1px solid var(--divider); align-items:center; cursor:pointer;" onclick="alert('BepEx akan segera tersedia!')">
+                <div style="display:flex; padding:14px 16px; border-bottom:1px solid var(--divider); align-items:center; cursor:pointer;" onclick="window.open('https://esonexon.github.io/bio/bepex.html', '_blank')">
                     <span style="font-size:20px; margin-right:12px;">📦</span>
                     <span style="flex:1; font-weight: 600; text-align: left; color: var(--text-main);">1. BepEx</span>
                     <span style="color:#C7C7CC; font-size:22px;">›</span>
                 </div>
-                <div style="display:flex; padding:14px 16px; align-items:center; cursor:pointer;" onclick="alert('BarGen akan segera tersedia!')">
+                <div style="display:flex; padding:14px 16px; align-items:center; cursor:pointer;" onclick="window.open('https://esonexon.github.io/bio/bargen.html', '_blank')">
                     <span style="font-size:20px; margin-right:12px;">🔣</span>
                     <span style="flex:1; font-weight: 600; text-align: left; color: var(--text-main);">2. BarGen</span>
                     <span style="color:#C7C7CC; font-size:22px;">›</span>
