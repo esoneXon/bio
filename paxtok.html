@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PaXtok Web</title>
     
+    <!-- Favicon -->
     <link rel="icon" href="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" type="image/png">
 
+    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Library untuk Generate Barcode -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     
     <style>
@@ -54,15 +57,13 @@
         /* Header */
         header { padding: 20px; }
         .logo-img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
-        
-        /* PEMBARUAN TEKS LOGO PAXTOK */
         .logo-text { 
             font-size: 26px; 
             margin-left: 12px; 
             flex-grow: 1; 
             letter-spacing: -1px; 
-            font-weight: 800; /* Ekstra Tebal */
-            background: linear-gradient(90deg, #007AFF 0%, #34C759 100%); /* Gradasi Biru ke Hijau */
+            font-weight: 800;
+            background: linear-gradient(90deg, #007AFF 0%, #34C759 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0px 2px 4px rgba(0,0,0,0.05);
@@ -127,9 +128,11 @@
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
             background: var(--blue); border-radius: 27px; height: 55px; color: #FFF;
             box-shadow: 0 6px 12px rgba(0,0,0,0.15); display: flex; align-items: center; overflow: hidden; z-index: 100;
+            width: max-content; /* Pastikan ukurannya pas dengan konten */
         }
         .fab-container.mode-review { background: var(--red); }
-        .fab-btn { padding: 0 24px; font-size: 15px; font-weight: 700; cursor: pointer; height: 100%; display: flex; align-items: center; }
+        /* Padding dan font-size disesuaikan agar 3 tombol muat di layar */
+        .fab-btn { padding: 0 14px; font-size: 13px; font-weight: 700; cursor: pointer; height: 100%; display: flex; align-items: center; white-space: nowrap; }
         .fab-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.3); }
 
         /* Undo Snackbar */
@@ -189,12 +192,16 @@
 </head>
 <body>
 
+    <!-- Indikator Zoom -->
     <div id="zoom_indicator">Ukuran: Normal</div>
 
+    <!-- Header -->
     <header class="flex items-center">
+        <!-- Logo Aplikasi -->
         <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" alt="Logo" class="logo-img">
         <div class="logo-text">PaXtok</div>
         
+        <!-- Tombol Pengatur Ukuran -->
         <div class="btn-header btn-zoom" onclick="toggleZoom()" title="Ubah Ukuran Tampilan">Aa</div>
         
         <div class="btn-header btn-projects" onclick="showProjectManager()">PROYEK</div>
@@ -202,6 +209,7 @@
         <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
     </header>
 
+    <!-- Input Manual -->
     <div id="container_input_manual" class="card flex items-center">
         <div style="flex:1; margin-right:8px; display:flex; gap:8px;">
             <input type="number" id="et_input_plu" class="input-box" placeholder="PLU" list="plu_list" style="flex:1;">
@@ -211,13 +219,16 @@
         <button class="add-btn font-bold" onclick="performManualAdd()">+</button>
     </div>
 
+    <!-- Global Actions -->
     <div id="container_global_actions" class="flex global-actions">
         <span id="btn_reset_stok" class="text-orange hidden" onclick="resetAllStokFisik()">Kosongkan Stok</span>
         <span id="btn_reset_all" class="text-red hidden" onclick="deleteAllItems()">Hapus Semua</span>
     </div>
 
+    <!-- Main List -->
     <div id="container_list"></div>
 
+    <!-- Review Section -->
     <div id="container_review" class="hidden">
         <div class="card flex-col">
             <div class="review-header">
@@ -233,17 +244,24 @@
         <button class="btn-wa" onclick="prepareWhatsAppReport()">BAGIKAN KE WHATSAPP</button>
     </div>
 
+    <!-- FAB -->
     <div id="fab_container" class="fab-container">
         <div id="btn_quick_save" class="fab-btn" onclick="saveNewProjectDialog()">💾 Simpan</div>
         <div id="fab_divider" class="fab-divider"></div>
         <div id="tv_fab" class="fab-btn" onclick="toggleReviewMode()">Review Selisih</div>
+        
+        <!-- Pembaruan: Tombol Try More Project -->
+        <div id="fab_divider_2" class="fab-divider"></div>
+        <div id="btn_try_more" class="fab-btn" onclick="showTryMoreDialog()">✨ Try More</div>
     </div>
 
+    <!-- Undo Snackbar -->
     <div id="card_undo">
         <span id="tv_undo_msg">Item dihapus</span>
         <div class="btn-undo-action" onclick="performUndo()">Batal</div>
     </div>
 
+    <!-- Dialog Overlay -->
     <div id="dialog_overlay" class="hidden">
         <div class="dialog-card flex-col">
             <div class="dialog-content">
@@ -259,6 +277,7 @@
         </div>
     </div>
 
+    <!-- Loading -->
     <div id="loading_overlay" class="hidden">
         <div class="spinner"></div>
         <div id="tv_loading_msg" style="margin-top:16px; font-weight:bold;">Memproses...</div>
@@ -273,7 +292,7 @@
         // Zooming System (5 Levels)
         const zoomLevels = [0.8, 0.9, 1.0, 1.1, 1.2];
         const zoomLabels = ["Sangat Kecil", "Kecil", "Normal", "Besar", "Sangat Besar"];
-        let currentZoomIdx = 2; // Default level 1.0 (Normal)
+        let currentZoomIdx = 2; 
         let zoomTimeout;
 
         function initZoom() {
@@ -289,7 +308,6 @@
             document.body.style.zoom = zoomLevels[currentZoomIdx];
             localStorage.setItem("app_zoom_idx", currentZoomIdx);
             
-            // Tampilkan info indikator
             const indicator = document.getElementById("zoom_indicator");
             indicator.textContent = "Ukuran: " + zoomLabels[currentZoomIdx];
             indicator.style.opacity = "1";
@@ -309,10 +327,9 @@
 
         // --- CORE FUNCTIONS ---
         function init() {
-            initZoom(); // Muat pengaturan zoom
+            initZoom(); 
             loadSavedData();
             
-            // Auto-fill Item Name
             document.getElementById('et_input_plu').addEventListener('input', function(e) {
                 const val = this.value;
                 if(val.includes(" - ")) {
@@ -325,7 +342,6 @@
                 }
             });
 
-            // Enter key mapping
             document.getElementById('et_input_item').addEventListener('keypress', function(e) {
                 if(e.key === 'Enter') performManualAdd();
             });
@@ -609,6 +625,10 @@
                 document.getElementById('btn_quick_save').classList.add('hidden');
                 document.getElementById('fab_divider').classList.add('hidden');
                 
+                // Sembunyikan tombol "Try More" saat mode review
+                document.getElementById('fab_divider_2').classList.add('hidden');
+                document.getElementById('btn_try_more').classList.add('hidden');
+                
                 document.getElementById('container_input_manual').classList.add('hidden');
                 document.getElementById('container_list').classList.add('hidden');
                 document.getElementById('container_review').classList.remove('hidden');
@@ -619,6 +639,10 @@
                 fab.classList.remove('mode-review');
                 document.getElementById('btn_quick_save').classList.remove('hidden');
                 document.getElementById('fab_divider').classList.remove('hidden');
+                
+                // Tampilkan kembali tombol "Try More"
+                document.getElementById('fab_divider_2').classList.remove('hidden');
+                document.getElementById('btn_try_more').classList.remove('hidden');
                 
                 document.getElementById('container_input_manual').classList.remove('hidden');
                 document.getElementById('container_list').classList.remove('hidden');
@@ -761,7 +785,7 @@
             window.open(`https://wa.me/?text=${encodeURIComponent(finalMsg)}`);
         }
 
-        // --- PROJECT MANAGEMENT ---
+        // --- PROJECT MANAGEMENT & TRY MORE ---
         function showProjectManager() {
             let list = JSON.parse(localStorage.getItem("project_list") || "[]");
             let html = "";
@@ -780,6 +804,25 @@
             showDialog("Kelola Sesi Project", "", html, [
                 { text: "Tutup", class: "", onclick: closeDialog },
                 { text: "+ Baru", class: "bold", onclick: saveNewProjectDialog }
+            ]);
+        }
+
+        // Fitur Baru: Try More Project Dialog
+        function showTryMoreDialog() {
+            let html = `
+                <div style="display:flex; padding:14px 16px; border-bottom:1px solid var(--divider); align-items:center; cursor:pointer;" onclick="alert('BepEx akan segera tersedia!')">
+                    <span style="font-size:20px; margin-right:12px;">📦</span>
+                    <span style="flex:1; font-weight: 600; text-align: left; color: var(--text-main);">1. BepEx</span>
+                    <span style="color:#C7C7CC; font-size:22px;">›</span>
+                </div>
+                <div style="display:flex; padding:14px 16px; align-items:center; cursor:pointer;" onclick="alert('BarGen akan segera tersedia!')">
+                    <span style="font-size:20px; margin-right:12px;">🔣</span>
+                    <span style="flex:1; font-weight: 600; text-align: left; color: var(--text-main);">2. BarGen</span>
+                    <span style="color:#C7C7CC; font-size:22px;">›</span>
+                </div>
+            `;
+            showDialog("Coba Aplikasi Lainnya", "Jelajahi project portofolio lainnya:", html, [
+                { text: "Tutup", class: "bold", onclick: closeDialog }
             ]);
         }
 
