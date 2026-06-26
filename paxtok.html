@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PaXtok Web</title>
     
+    <!-- Favicon -->
     <link rel="icon" href="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" type="image/png">
 
+    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Library untuk Generate Barcode -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     
     <style>
@@ -188,12 +191,16 @@
 </head>
 <body>
 
+    <!-- Indikator Zoom -->
     <div id="zoom_indicator">Ukuran: Normal</div>
 
+    <!-- Header -->
     <header class="flex items-center">
+        <!-- Logo Aplikasi -->
         <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" alt="Logo" class="logo-img">
         <div class="logo-text">PaXtok</div>
         
+        <!-- Tombol Pengatur Ukuran -->
         <div class="btn-header btn-zoom" onclick="toggleZoom()" title="Ubah Ukuran Tampilan">Aa</div>
         
         <div class="btn-header btn-projects" onclick="showProjectManager()">PROYEK</div>
@@ -201,6 +208,7 @@
         <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
     </header>
 
+    <!-- Input Manual -->
     <div id="container_input_manual" class="card flex items-center">
         <div style="flex:1; margin-right:8px; display:flex; gap:8px;">
             <input type="number" id="et_input_plu" class="input-box" placeholder="PLU" list="plu_list" style="flex:1;">
@@ -210,13 +218,16 @@
         <button class="add-btn font-bold" onclick="performManualAdd()">+</button>
     </div>
 
+    <!-- Global Actions -->
     <div id="container_global_actions" class="flex global-actions">
         <span id="btn_reset_stok" class="text-orange hidden" onclick="resetAllStokFisik()">Kosongkan Stok</span>
         <span id="btn_reset_all" class="text-red hidden" onclick="deleteAllItems()">Hapus Semua</span>
     </div>
 
+    <!-- Main List -->
     <div id="container_list"></div>
 
+    <!-- Review Section -->
     <div id="container_review" class="hidden">
         <div class="card flex-col">
             <div class="review-header">
@@ -232,6 +243,7 @@
         <button class="btn-wa" onclick="prepareWhatsAppReport()">BAGIKAN KE WHATSAPP</button>
     </div>
 
+    <!-- FAB -->
     <div id="fab_container" class="fab-container">
         <div id="btn_quick_save" class="fab-btn" onclick="saveNewProjectDialog()">💾 Simpan</div>
         <div id="fab_divider" class="fab-divider"></div>
@@ -241,11 +253,13 @@
         <div id="btn_try_more" class="fab-btn" onclick="showTryMoreDialog()">✨ Try More</div>
     </div>
 
+    <!-- Undo Snackbar -->
     <div id="card_undo">
         <span id="tv_undo_msg">Item dihapus</span>
         <div class="btn-undo-action" onclick="performUndo()">Batal</div>
     </div>
 
+    <!-- Dialog Overlay -->
     <div id="dialog_overlay" class="hidden">
         <div class="dialog-card flex-col">
             <div class="dialog-content">
@@ -261,6 +275,7 @@
         </div>
     </div>
 
+    <!-- Loading -->
     <div id="loading_overlay" class="hidden">
         <div class="spinner"></div>
         <div id="tv_loading_msg" style="margin-top:16px; font-weight:bold;">Memproses...</div>
@@ -311,7 +326,7 @@
         // --- CORE FUNCTIONS ---
         function init() {
             initZoom(); 
-            initSampleProject(); // Panggil inisialisasi project sample SO RH
+            initSampleProject(); 
             loadSavedData();
             
             document.getElementById('et_input_plu').addEventListener('input', function(e) {
@@ -331,7 +346,6 @@
             });
         }
         
-        // --- FITUR BARU: INISIALISASI PROJECT SO RH SECARA OTOMATIS ---
         function initSampleProject() {
             let list = JSON.parse(localStorage.getItem("project_list") || "[]");
             if(!list.includes("SO RH")) {
@@ -353,7 +367,6 @@
                 
                 localStorage.setItem("project_data_SO RH", JSON.stringify(sampleItems));
                 
-                // Jika user belum punya data aktif (baru pertama kali buka)
                 let activeData = localStorage.getItem("saved_items");
                 if (!activeData || activeData === "[]") {
                     localStorage.setItem("saved_items", JSON.stringify(sampleItems));
@@ -819,7 +832,6 @@
             ]);
         }
 
-        // FITUR BARU: Try More Action (Membuka Link)
         function showTryMoreDialog() {
             let html = `
                 <div style="display:flex; padding:14px 16px; border-bottom:1px solid var(--divider); align-items:center; cursor:pointer;" onclick="window.open('https://esonexon.github.io/bio/bepex.html', '_blank')">
@@ -838,12 +850,19 @@
             ]);
         }
 
+        // PEMBARUAN: Melindungi Project "SO RH"
         function actionProject(name) {
             let html = `
                 <div style="padding:16px; color:var(--blue); font-size:16px; font-weight:600; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="openProject('${name}')">📂 Buka Sesi</div>
                 <div style="padding:16px; color:var(--green); font-size:16px; font-weight:600; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="exportProject('${name}')">⬇️ Ekspor ke File</div>
-                <div style="padding:16px; color:var(--red); font-size:16px; font-weight:600; cursor:pointer;" onclick="deleteProject('${name}')">🗑 Hapus Project</div>
             `;
+            
+            if (name !== "SO RH") {
+                html += `<div style="padding:16px; color:var(--red); font-size:16px; font-weight:600; cursor:pointer;" onclick="deleteProject('${name}')">🗑 Hapus Project</div>`;
+            } else {
+                html += `<div style="padding:16px; color:var(--text-muted); font-size:16px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px;">🔒 Project Sample (Paten)</div>`;
+            }
+            
             showDialog(name, "", html, [{ text: "Tutup", class: "", onclick: closeDialog }]);
         }
 
@@ -852,6 +871,13 @@
             if(items.length === 0) { alert("Belum ada item untuk disimpan."); return; }
             showInputDialog("Simpan Project", "", "Cth: Shift Pagi", "", "SIMPAN", "Batal", false, (val) => {
                 if(!val) return;
+                
+                // PEMBARUAN: Mencegah penimpaan (overwrite) nama SO RH
+                if (val.toUpperCase() === "SO RH") {
+                    alert("Nama 'SO RH' adalah data bawaan dan tidak dapat ditimpa. Silakan gunakan nama project lain.");
+                    return;
+                }
+                
                 let list = JSON.parse(localStorage.getItem("project_list") || "[]");
                 if(!list.includes(val)) list.push(val);
                 localStorage.setItem("project_list", JSON.stringify(list));
@@ -890,6 +916,11 @@
         }
 
         function deleteProject(name) {
+            if (name === "SO RH") {
+                alert("Project SO RH tidak dapat dihapus.");
+                return;
+            }
+            
             showConfirmDialog("Hapus Project?", "Project " + name + " akan dihapus.", "HAPUS", "Batal", () => {
                 pendingDeletedProjectName = name;
                 pendingDeletedProjectData = localStorage.getItem("project_data_" + name);
