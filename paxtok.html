@@ -779,6 +779,33 @@
             }
         }
 
+        // FITUR BARU: Fallback jika gagal membuka WhatsApp
+        function showReportFallback(msg) {
+            let html = `
+                <textarea id="report_text_area" style="width:100%; height:200px; font-size:12px; font-family:monospace; padding:12px; border-radius:12px; border:1px solid var(--divider); resize:none; background: #FFF; outline:none; color: var(--text-main);" readonly></textarea>
+            `;
+            showDialog("Laporan", "Silakan salin laporan di bawah ini:", html, [
+                { text: "Batal", class: "red", onclick: closeDialog },
+                { text: "Salin", class: "bold", onclick: () => {
+                    let ta = document.getElementById('report_text_area');
+                    ta.select();
+                    ta.setSelectionRange(0, 99999); // Untuk perangkat mobile
+                    try {
+                        document.execCommand('copy');
+                        alert("Laporan berhasil disalin!");
+                        closeDialog();
+                    } catch (err) {
+                        alert("Gagal menyalin. Silakan salin teks secara manual.");
+                    }
+                }}
+            ]);
+            
+            // Masukkan teks setelah textarea di-render untuk menghindari masalah karakter HTML
+            setTimeout(() => {
+                document.getElementById('report_text_area').value = msg;
+            }, 50);
+        }
+
         function sendWA(reportList) {
             let totalPlus = 0;
             let totalMinus = 0;
@@ -807,7 +834,19 @@
             let finalMsg = `*LAPORAN SO RH*\n${dateStr}\nShift: ${shift}\n\nPLU | ITEM | STOK | FISIK | SELISIH\n\n${sbDetail}`;
             finalMsg += `*TOTAL ESTIMASI RUPIAH*\nTotal Plus (+): Rp ${totalPlus.toLocaleString('id-ID')}\nTotal Minus (-): -Rp ${totalMinus.toLocaleString('id-ID')}\n`;
 
-            window.open(`https://wa.me/?text=${encodeURIComponent(finalMsg)}`);
+            const waUrl = `https://wa.me/?text=${encodeURIComponent(finalMsg)}`;
+            
+            try {
+                // Coba buka WhatsApp
+                const win = window.open(waUrl, '_blank');
+                // Jika window.open diblokir (biasanya mengembalikan null di browser tertentu/webview)
+                if (!win || win.closed || typeof win.closed == 'undefined') {
+                    showReportFallback(finalMsg);
+                }
+            } catch (e) {
+                // Jika terjadi error sistem atau diblokir secara ketat
+                showReportFallback(finalMsg);
+            }
         }
 
         // --- PROJECT MANAGEMENT & TRY MORE ---
@@ -850,7 +889,6 @@
             ]);
         }
 
-        // PEMBARUAN: Melindungi Project "SO RH"
         function actionProject(name) {
             let html = `
                 <div style="padding:16px; color:var(--blue); font-size:16px; font-weight:600; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="openProject('${name}')">📂 Buka Sesi</div>
@@ -872,7 +910,6 @@
             showInputDialog("Simpan Project", "", "Cth: Shift Pagi", "", "SIMPAN", "Batal", false, (val) => {
                 if(!val) return;
                 
-                // PEMBARUAN: Mencegah penimpaan (overwrite) nama SO RH
                 if (val.toUpperCase() === "SO RH") {
                     alert("Nama 'SO RH' adalah data bawaan dan tidak dapat ditimpa. Silakan gunakan nama project lain.");
                     return;
