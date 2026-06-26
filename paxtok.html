@@ -287,7 +287,7 @@
         let masterProducts = {};
         let isReviewMode = false;
 
-        // Zooming System (5 Levels)
+        // Zooming System
         const zoomLevels = [0.8, 0.9, 1.0, 1.1, 1.2];
         const zoomLabels = ["Sangat Kecil", "Kecil", "Normal", "Besar", "Sangat Besar"];
         let currentZoomIdx = 2; 
@@ -314,7 +314,6 @@
             zoomTimeout = setTimeout(() => { indicator.style.opacity = "0"; }, 1500);
         }
 
-        // Undo Variables
         let pendingUndoType = -1; 
         let backupDataForUndo = [];
         let pendingDeletedItem = null;
@@ -323,7 +322,6 @@
         let pendingDeletedProjectData = "";
         let undoTimeout;
 
-        // --- CORE FUNCTIONS ---
         function init() {
             initZoom(); 
             initSampleProject(); 
@@ -391,7 +389,6 @@
             updateGlobalActionsVisibility();
         }
 
-        // --- DOM RENDERERS ---
         function renderList() {
             const container = document.getElementById('container_list');
             container.innerHTML = '';
@@ -450,7 +447,6 @@
             return div;
         }
 
-        // --- ACTIONS ---
         function updateItemValue(index, field, value) {
             items[index][field] = value;
             saveData();
@@ -558,7 +554,6 @@
             }
         }
 
-        // --- CSV HANDLING ---
         function handleCSVUpload(event) {
             const file = event.target.files[0];
             if(!file) return;
@@ -601,7 +596,6 @@
             }
         }
 
-        // --- UNDO SYSTEM ---
         function showUndoSnackbar(msg, type) {
             pendingUndoType = type;
             document.getElementById('tv_undo_msg').textContent = msg;
@@ -639,7 +633,6 @@
             pendingUndoType = -1;
         }
 
-        // --- REVIEW & WHATSAPP ---
         function toggleReviewMode() {
             commitPendingDeletion();
             isReviewMode = !isReviewMode;
@@ -779,7 +772,7 @@
             }
         }
 
-        // FITUR BARU: Fallback jika gagal membuka WhatsApp
+        // PEMBARUAN: Selalu tampilkan dialog fallback
         function showReportFallback(msg) {
             let html = `
                 <textarea id="report_text_area" style="width:100%; height:200px; font-size:12px; font-family:monospace; padding:12px; border-radius:12px; border:1px solid var(--divider); resize:none; background: #FFF; outline:none; color: var(--text-main);" readonly></textarea>
@@ -789,7 +782,7 @@
                 { text: "Salin", class: "bold", onclick: () => {
                     let ta = document.getElementById('report_text_area');
                     ta.select();
-                    ta.setSelectionRange(0, 99999); // Untuk perangkat mobile
+                    ta.setSelectionRange(0, 99999);
                     try {
                         document.execCommand('copy');
                         alert("Laporan berhasil disalin!");
@@ -799,11 +792,7 @@
                     }
                 }}
             ]);
-            
-            // Masukkan teks setelah textarea di-render untuk menghindari masalah karakter HTML
-            setTimeout(() => {
-                document.getElementById('report_text_area').value = msg;
-            }, 50);
+            setTimeout(() => { document.getElementById('report_text_area').value = msg; }, 50);
         }
 
         function sendWA(reportList) {
@@ -834,19 +823,8 @@
             let finalMsg = `*LAPORAN SO RH*\n${dateStr}\nShift: ${shift}\n\nPLU | ITEM | STOK | FISIK | SELISIH\n\n${sbDetail}`;
             finalMsg += `*TOTAL ESTIMASI RUPIAH*\nTotal Plus (+): Rp ${totalPlus.toLocaleString('id-ID')}\nTotal Minus (-): -Rp ${totalMinus.toLocaleString('id-ID')}\n`;
 
-            const waUrl = `https://wa.me/?text=${encodeURIComponent(finalMsg)}`;
-            
-            try {
-                // Coba buka WhatsApp
-                const win = window.open(waUrl, '_blank');
-                // Jika window.open diblokir (biasanya mengembalikan null di browser tertentu/webview)
-                if (!win || win.closed || typeof win.closed == 'undefined') {
-                    showReportFallback(finalMsg);
-                }
-            } catch (e) {
-                // Jika terjadi error sistem atau diblokir secara ketat
-                showReportFallback(finalMsg);
-            }
+            // Tampilkan dialog fallback SELALU
+            showReportFallback(finalMsg);
         }
 
         // --- PROJECT MANAGEMENT & TRY MORE ---
@@ -1027,7 +1005,6 @@
             }
         }
 
-        // Initialize on load
         window.onload = init;
 
     </script>
