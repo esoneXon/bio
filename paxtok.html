@@ -9,7 +9,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     
@@ -30,15 +30,14 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            /* Menggunakan font Poppins */
             font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
-            padding-bottom: 120px; /* Space for FAB */
-            transition: zoom 0.3s ease; /* Transisi halus saat ganti ukuran */
+            padding-bottom: 120px; 
+            transition: zoom 0.3s ease; 
         }
 
         /* Utility Classes */
@@ -55,7 +54,19 @@
         /* Header */
         header { padding: 20px; }
         .logo-img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
-        .logo-text { font-size: 24px; margin-left: 12px; flex-grow: 1; letter-spacing: -0.5px; }
+        
+        /* PEMBARUAN TEKS LOGO PAXTOK */
+        .logo-text { 
+            font-size: 26px; 
+            margin-left: 12px; 
+            flex-grow: 1; 
+            letter-spacing: -1px; 
+            font-weight: 800; /* Ekstra Tebal */
+            background: linear-gradient(90deg, #007AFF 0%, #34C759 100%); /* Gradasi Biru ke Hijau */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.05);
+        }
         
         .btn-header {
             border-radius: 17px; padding: 0 14px; height: 34px;
@@ -182,7 +193,7 @@
 
     <header class="flex items-center">
         <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" alt="Logo" class="logo-img">
-        <div class="logo-text font-bold">PaXtok</div>
+        <div class="logo-text">PaXtok</div>
         
         <div class="btn-header btn-zoom" onclick="toggleZoom()" title="Ubah Ukuran Tampilan">Aa</div>
         
