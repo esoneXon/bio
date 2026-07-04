@@ -94,6 +94,7 @@
         .timeline {
             position: relative;
             padding-left: 20px;
+            margin-bottom: 25px;
         }
 
         /* Vertical Line */
@@ -207,6 +208,108 @@
         .bg-yellow.task-item.done .checkbox-container::after { color: #78350f; }
         .bg-green.task-item.done .checkbox-container::after { color: #064e3b; }
 
+        /* Action Buttons */
+        .action-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #20ba59;
+        }
+
+        .btn-reset {
+            background-color: #f1f5f9;
+            color: #64748b;
+        }
+
+        .btn-reset:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Custom Modal (Dialog Salin) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            padding: 20px;
+            opacity: 0; pointer-events: none;
+            transition: 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1; pointer-events: auto;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: scale(0.9);
+            transition: 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            font-size: 16px; color: #1a1a24; margin-bottom: 8px;
+        }
+
+        .modal-content p {
+            font-size: 12px; color: #64748b; margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .modal-content textarea {
+            width: 100%; height: 160px;
+            padding: 12px; border-radius: 12px;
+            border: 1px solid #e2e8f0; font-size: 11px;
+            resize: none; font-family: monospace;
+            margin-bottom: 15px; background: #f8f9fe;
+            color: #334155;
+            outline: none;
+        }
+
+        .modal-btn {
+            width: 100%; padding: 12px; border-radius: 12px;
+            border: none; font-weight: 600; font-size: 14px;
+            cursor: pointer; margin-bottom: 8px;
+        }
+
+        .btn-modal-copy { background: #4c6ef5; color: white; }
+        .btn-modal-close { background: #f1f5f9; color: #627d98; margin-bottom: 0; }
+
     </style>
 </head>
 <body>
@@ -216,7 +319,8 @@
         <h1>Laporan Rutinitas</h1>
         <p>Centang tugas yang sudah diselesaikan. Menjadi acuan untuk tertib!</p>
         <div class="note-box">
-            <b>Info:</b> Semua personil dalam 1 toko wajib salah 1 menghandle laporan ini (Chief, Ssl, Sjl, Scb, Scg).
+            <b>Info:</b> Semua personil dalam 1 toko wajib salah 1 menghandle laporan ini.
+            <div id="time-status" style="margin-top: 6px; font-size: 10px; color: #64748b; font-weight: 600;">🌐 Memeriksa waktu server WIB...</div>
         </div>
     </div>
 
@@ -227,6 +331,26 @@
 
     <div class="timeline" id="task-list">
         </div>
+
+    <div class="action-container">
+        <button class="btn-action btn-whatsapp" onclick="shareToWhatsApp()">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397 0 11.948 0c3.179.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.239 3.482 8.416-.002 6.596-5.339 11.945-11.89 11.945-2.005-.001-3.973-.507-5.729-1.475L0 24zm6.59-4.846c1.665.989 3.3.15 5.302.151 5.373 0 9.743-4.373 9.745-9.753.001-2.583-1.004-5.013-2.831-6.841-1.827-1.827-4.258-2.83-6.842-2.831-5.375 0-9.745 4.373-9.747 9.756-.001 2.125.557 4.198 1.612 6.007l-.996 3.635 3.725-.976zM15.898 13.04c-.327-.164-1.93-.955-2.229-1.064-.299-.11-.517-.164-.734.164-.217.327-.844 1.064-1.034 1.282-.19.218-.379.245-.706.081-.326-.164-1.379-.508-2.626-1.622-.969-.865-1.624-1.932-1.814-2.259-.19-.327-.02-.504.143-.666.147-.146.327-.382.49-.573.164-.191.218-.328.327-.546.11-.218.055-.409-.027-.573-.082-.164-.734-1.768-1.007-2.422-.266-.64-.535-.552-.734-.562-.19-.01-.408-.012-.625-.012-.218 0-.571.082-.871.409-.3.327-1.143 1.118-1.143 2.727s1.17 3.164 1.334 3.382c.164.218 2.301 3.513 5.574 4.922.779.335 1.386.535 1.861.686.782.249 1.493.214 2.055.13.627-.094 1.93-.79 2.201-1.554.272-.764.272-1.418.19-1.554-.082-.137-.299-.219-.626-.383z"/></svg>
+            Bagikan ke WhatsApp
+        </button>
+        <button class="btn-action btn-reset" onclick="resetAllProgress()">
+            Reset Progress Manual
+        </button>
+    </div>
+</div>
+
+<div id="copyModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Gagal Membuka WhatsApp?</h3>
+        <p>Silakan salin format laporan di bawah ini untuk ditempel secara manual di WhatsApp grup toko:</p>
+        <textarea id="reportTextarea" readonly></textarea>
+        <button class="modal-btn btn-modal-copy" onclick="copyTextFromModal()">Salin Teks Laporan</button>
+        <button class="modal-btn btn-modal-close" onclick="closeModal()">Tutup</button>
+    </div>
 </div>
 
 <script>
@@ -234,10 +358,10 @@
     const tasks = {
         1: [
             { time: "06.30", title: "Initial briefing", color: "bg-pink" },
-            { time: "07.00", title: "Laporan kebersihan shift 1", color: "bg-blue" },
+            { time: "07.00", title: "laporan kebersihan shift 1", color: "bg-blue" },
             { time: "08.00", title: "Store Activity & Qscv Shift 1", color: "bg-yellow" },
-            { time: "09.00", title: "Kesiapan Display prodsus", color: "bg-green" },
-            { time: "10.00", title: "Foto kondisi dalam toko & teras (BTB)", color: "bg-pink" },
+            { time: "09.00", title: "kesiapan Display prodsus", color: "bg-green" },
+            { time: "10.00", title: "Foto kondisi dalam toko dan teras Dan BTB ( Back to Basic )", color: "bg-pink" },
             { time: "11.00", title: "Pjr & Itt rak terdaftar", color: "bg-blue" },
             { time: "12.00", title: "Hit And Run/GPK", color: "bg-yellow" },
             { time: "13.00", title: "Input QRFP", color: "bg-green" },
@@ -246,31 +370,105 @@
             { time: "16.00", title: "Foto kebersihan Gudang dan Toilet", color: "bg-yellow" }
         ],
         2: [
-            { time: "14.30", title: "Briefing", color: "bg-pink" },
-            { time: "15.00", title: "Laporan kebersihan Shift 2", color: "bg-blue" },
-            { time: "16.00", title: "Ceklis Store Activity & r", color: "bg-yellow" },
+            { time: "14.30", title: "BRIEFING", color: "bg-pink" },
+            { time: "15.00", title: "laporan kebersihan Shift 2", color: "bg-blue" },
+            { time: "16.00", title: "Ceklis Store Activity & qscv", color: "bg-yellow" },
             { time: "17.00", title: "PJR & Itt Rak terdaftar", color: "bg-green" },
-            { time: "20.00", title: "Input QRFP dan Hit And Run/GPK", color: "bg-pink" },
+            { time: "20.00", title: "input QRFP dan Hit And Run/GPK", color: "bg-pink" },
             { time: "21.00", title: "Laporan Full Display shif 2", color: "bg-blue" },
-            { time: "22.00", title: "Laporan kebersihan sarana prodsus", color: "bg-yellow" },
-            { time: "22.00", title: "Laporan kebersihan Toko, gudang & Toilet", color: "bg-green" },
+            { time: "22.00", title: "laporan kebersihan sarana prodsus", color: "bg-yellow" },
+            { time: "22.00", title: "laporankebersihan Toko,gudang dan Toilet", color: "bg-green" },
             { time: "22.30", title: "Laporan TTSS", color: "bg-pink" },
-            { time: "23.00", title: "SOP TUTUP TOKO", color: "bg-blue" }
+            { time: "23.00", title: "SOP TUTUP TOKo", color: "bg-blue" }
         ]
     };
 
-    // Fungsi Render Tugas
+    let currentShift = 1;
+
+    // --- UTILITY: MENGAMBIL WAKTU WIB REAL-TIME DARI INTERNET SERVER ---
+    async function getNetworkWIBDate() {
+        const statusEl = document.getElementById("time-status");
+        try {
+            // Mengambil data waktu server dunia khusus zona waktu Asia/Jakarta (WIB)
+            const response = await fetch('https://worldtimeapi.org/api/timezone/Asia/Jakarta', {
+                method: 'GET',
+                cache: 'no-store'
+            });
+            if (!response.ok) throw new Error('API server down');
+            const data = await response.json();
+            
+            // Konversi teks waktu API menjadi objek Date JavaScript
+            const networkDate = new Date(data.datetime);
+            if (statusEl) statusEl.innerHTML = "🟢 Waktu Internet Server WIB Aktif (Anti-Curang)";
+            return networkDate;
+        } catch (error) {
+            console.warn("Gagal terhubung ke waktu server. Menggunakan cadangan waktu lokal HP:", error);
+            if (statusEl) statusEl.innerHTML = "⚠️ Sinyal Jelek/Offline. Menggunakan Waktu Cadangan HP";
+            return new Date(); // Cadangan jika internet mati total
+        }
+    }
+
+    // --- FITUR AUTO RESET JAM 7 PAGI BERDASARKAN WAKTU SERVER ---
+    function getCycleId(dateObj) {
+        const currentHour = dateObj.getHours();
+        const cycleDate = new Date(dateObj);
+        
+        // JIKA JAM SEKARANG MASIH DI BAWAH 07.00 PAGI, HITUNG SEBAGAI BAGIAN DARI HARI SEBELUMNYA
+        if (currentHour < 7) {
+            cycleDate.setDate(dateObj.getDate() - 1);
+        }
+        
+        const year = cycleDate.getFullYear();
+        const month = String(cycleDate.getMonth() + 1).padStart(2, '0');
+        const day = String(cycleDate.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    async function checkAndResetCycle() {
+        // Ambil waktu server akurat terlebih dahulu
+        const serverTimeDate = await getNetworkWIBDate();
+        const currentCycle = getCycleId(serverTimeDate);
+        const storedCycle = localStorage.getItem("active_cycle_date");
+        
+        // Jika siklus hari server berbeda dengan data lokal yang tersimpan
+        if (storedCycle !== currentCycle) {
+            // Hapus otomatis seluruh centang tugas lama
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith("task_shift_")) {
+                    localStorage.removeItem(key);
+                }
+            }
+            // Simpan penanda siklus hari yang baru
+            localStorage.setItem("active_cycle_date", currentCycle);
+        }
+    }
+
+    // Fungsi Render Tampilan Daftar Tugas
     function renderTasks(shiftNumber) {
         const taskListContainer = document.getElementById("task-list");
-        taskListContainer.innerHTML = ""; // Bersihkan list sebelumnya
+        taskListContainer.innerHTML = ""; 
 
         tasks[shiftNumber].forEach((task, index) => {
             const taskEl = document.createElement("div");
             taskEl.className = "task-item";
             
-            // Toggle Done pada saat kartu diklik
+            const storageKey = `task_shift_${shiftNumber}_${index}`;
+            const isDone = localStorage.getItem(storageKey) === "true";
+            
+            if (isDone) {
+                taskEl.classList.add("done");
+            }
+
             taskEl.onclick = function() {
-                this.classList.toggle("done");
+                const currentStatus = this.classList.contains("done");
+                if (currentStatus) {
+                    this.classList.remove("done");
+                    localStorage.setItem(storageKey, "false");
+                } else {
+                    this.classList.add("done");
+                    localStorage.setItem(storageKey, "true");
+                }
             };
 
             taskEl.innerHTML = `
@@ -286,19 +484,107 @@
         });
     }
 
-    // Fungsi Ganti Shift
     function changeShift(shiftNumber) {
-        // Ganti warna tombol
+        currentShift = shiftNumber;
         document.getElementById("btn-shift1").classList.remove("active");
         document.getElementById("btn-shift2").classList.remove("active");
         document.getElementById("btn-shift" + shiftNumber).classList.add("active");
-
-        // Render ulang tugas
         renderTasks(shiftNumber);
     }
 
-    // Inisialisasi awal saat halaman dibuka
-    renderTasks(1);
+    function generateReportText() {
+        let text = "*LAPORAN*\n*RUTINITAS HARIAN*\nCentang Jika sudah\n\n";
+        
+        text += "Jam / SHIFT 1\n\n";
+        tasks[1].forEach((task, idx) => {
+            const isDone = localStorage.getItem(`task_shift_1_${idx}`) === "true";
+            text += `${task.time} ${task.title} ${isDone ? "✅" : ""}\n`;
+        });
+        
+        text += "\nJam / SHIFT 2\n\n";
+        tasks[2].forEach((task, idx) => {
+            const isDone = localStorage.getItem(`task_shift_2_${idx}`) === "true";
+            text += `${task.time} ${task.title} ${isDone ? "✅" : ""}\n`;
+        });
+        
+        text += "\nCelis keseharian ku Sesuai jam Pengerjaan\n";
+        text += "Semua personil di dalam 1 toko yg sama wajib salah 1 menghandle laporan ini Berlaku untuk Chief,Ssl,Sjl,Scb,Scg\n";
+        text += "Ini Menjadi Acuan Untuk Tertib";
+        
+        return text;
+    }
+
+    function shareToWhatsApp() {
+        const reportText = generateReportText();
+        const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(reportText);
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(reportText).catch(() => {});
+        }
+
+        const startTimestamp = Date.now();
+        const waWindow = window.open(url, '_blank');
+
+        setTimeout(() => {
+            const timeElapsed = Date.now() - startTimestamp;
+            if (!waWindow || waWindow.closed || typeof waWindow.closed === 'undefined' || timeElapsed < 100) {
+                openModal(reportText);
+            } else {
+                setTimeout(() => openModal(reportText), 1000);
+            }
+        }, 200);
+    }
+
+    function openModal(text) {
+        document.getElementById("reportTextarea").value = text;
+        document.getElementById("copyModal").classList.add("active");
+    }
+
+    function closeModal() {
+        document.getElementById("copyModal").classList.remove("active");
+    }
+
+    function copyTextFromModal() {
+        const textarea = document.getElementById("reportTextarea");
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+
+        try {
+            navigator.clipboard.writeText(textarea.value);
+            alert("Laporan berhasil disalin ke papan klip!");
+        } catch (err) {
+            document.execCommand('copy');
+            alert("Laporan berhasil disalin!");
+        }
+        closeModal();
+    }
+
+    function resetAllProgress() {
+        if (confirm("Apakah Anda yakin ingin menghapus semua centang secara manual?")) {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith("task_shift_")) {
+                    localStorage.removeItem(key);
+                }
+            }
+            renderTasks(currentShift);
+        }
+    }
+
+    // --- ALUR INISIALISASI UTAMA APLIKASI (ASYNC) ---
+    async function initApp() {
+        // 1. Render data awal instan dari localstorage (biar user tidak nunggu layar blank)
+        renderTasks(currentShift);
+        
+        // 2. Cek siklus berdasarkan jam real-time server internet di latar belakang
+        await checkAndResetCycle();
+        
+        // 3. Render ulang hasil final jika sistem mendeteksi sudah lewat jam 7 pagi dan butuh auto-reset
+        renderTasks(currentShift);
+    }
+
+    // Jalankan inisialisasi aplikasi saat halaman dimuat
+    initApp();
 </script>
 
 </body>
