@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutinitas Harian Toko</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f4f6fb;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        /* Mobile App Container */
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background: #ffffff;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+            padding: 25px 20px;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 25px;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            color: #1a1a24;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #8c8c9a;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .note-box {
+            background: #f8f9fe;
+            border-left: 4px solid #4c6ef5;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #555;
+            margin-top: 15px;
+        }
+
+        /* Shift Toggles */
+        .shift-toggle {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #f4f6fb;
+            padding: 5px;
+            border-radius: 12px;
+        }
+
+        .shift-btn {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #8c8c9a;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .shift-btn.active {
+            background: #4c6ef5;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(76, 110, 245, 0.3);
+        }
+
+        /* Timeline & Tasks */
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        /* Vertical Line */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            bottom: 20px;
+            left: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .task-item {
+            position: relative;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        /* Timeline Dot */
+        .task-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 25px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            z-index: 2;
+            transition: 0.3s;
+        }
+
+        .task-item.done::before {
+            background: #4c6ef5;
+            border-color: #4c6ef5;
+        }
+
+        /* Task Card */
+        .task-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        /* Colors based on image */
+        .bg-pink { background: #ff6b81; color: white; }
+        .bg-pink .task-time, .bg-pink .task-title { color: white; }
+        
+        .bg-blue { background: #eef2ff; }
+        .bg-blue .task-time { color: #4338ca; }
+        .bg-blue .task-title { color: #312e81; }
+
+        .bg-yellow { background: #fffbeb; }
+        .bg-yellow .task-time { color: #b45309; }
+        .bg-yellow .task-title { color: #78350f; }
+
+        .bg-green { background: #ecfdf5; }
+        .bg-green .task-time { color: #047857; }
+        .bg-green .task-title { color: #064e3b; }
+
+        .task-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .task-time {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        /* Checkbox Custom */
+        .checkbox-container {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            transition: 0.3s;
+        }
+
+        .bg-pink .checkbox-container { border-color: rgba(255,255,255,0.5); }
+        .task-item.done .task-card { opacity: 0.6; }
+        .task-item.done .checkbox-container { background: rgba(0,0,0,0.1); }
+        
+        .task-item.done .checkbox-container::after {
+            content: '✓';
+            color: inherit;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .bg-pink.task-item.done .checkbox-container::after { color: white; }
+        .bg-blue.task-item.done .checkbox-container::after { color: #312e81; }
+        .bg-yellow.task-item.done .checkbox-container::after { color: #78350f; }
+        .bg-green.task-item.done .checkbox-container::after { color: #064e3b; }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>Laporan Rutinitas</h1>
+        <p>Centang tugas yang sudah diselesaikan. Menjadi acuan untuk tertib!</p>
+        <div class="note-box">
+            <b>Info:</b> Semua personil dalam 1 toko wajib salah 1 menghandle laporan ini (Chief, Ssl, Sjl, Scb, Scg).
+        </div>
+    </div>
+
+    <div class="shift-toggle">
+        <button class="shift-btn active" onclick="changeShift(1)" id="btn-shift1">Shift 1</button>
+        <button class="shift-btn" onclick="changeShift(2)" id="btn-shift2">Shift 2</button>
+    </div>
+
+    <div class="timeline" id="task-list">
+        </div>
+</div>
+
+<script>
+    // Data Tugas
+    const tasks = {
+        1: [
+            { time: "06.30", title: "Initial briefing", color: "bg-pink" },
+            { time: "07.00", title: "Laporan kebersihan shift 1", color: "bg-blue" },
+            { time: "08.00", title: "Store Activity & Qscv Shift 1", color: "bg-yellow" },
+            { time: "09.00", title: "Kesiapan Display prodsus", color: "bg-green" },
+            { time: "10.00", title: "Foto kondisi dalam toko & teras (BTB)", color: "bg-pink" },
+            { time: "11.00", title: "Pjr & Itt rak terdaftar", color: "bg-blue" },
+            { time: "12.00", title: "Hit And Run/GPK", color: "bg-yellow" },
+            { time: "13.00", title: "Input QRFP", color: "bg-green" },
+            { time: "14.00", title: "Setoran Ori Adm", color: "bg-pink" },
+            { time: "15.00", title: "Laporan Full Display Shift 1", color: "bg-blue" },
+            { time: "16.00", title: "Foto kebersihan Gudang dan Toilet", color: "bg-yellow" }
+        ],
+        2: [
+            { time: "14.30", title: "Briefing", color: "bg-pink" },
+            { time: "15.00", title: "Laporan kebersihan Shift 2", color: "bg-blue" },
+            { time: "16.00", title: "Ceklis Store Activity & r", color: "bg-yellow" },
+            { time: "17.00", title: "PJR & Itt Rak terdaftar", color: "bg-green" },
+            { time: "20.00", title: "Input QRFP dan Hit And Run/GPK", color: "bg-pink" },
+            { time: "21.00", title: "Laporan Full Display shif 2", color: "bg-blue" },
+            { time: "22.00", title: "Laporan kebersihan sarana prodsus", color: "bg-yellow" },
+            { time: "22.00", title: "Laporan kebersihan Toko, gudang & Toilet", color: "bg-green" },
+            { time: "22.30", title: "Laporan TTSS", color: "bg-pink" },
+            { time: "23.00", title: "SOP TUTUP TOKO", color: "bg-blue" }
+        ]
+    };
+
+    // Fungsi Render Tugas
+    function renderTasks(shiftNumber) {
+        const taskListContainer = document.getElementById("task-list");
+        taskListContainer.innerHTML = ""; // Bersihkan list sebelumnya
+
+        tasks[shiftNumber].forEach((task, index) => {
+            const taskEl = document.createElement("div");
+            taskEl.className = "task-item";
+            
+            // Toggle Done pada saat kartu diklik
+            taskEl.onclick = function() {
+                this.classList.toggle("done");
+            };
+
+            taskEl.innerHTML = `
+                <div class="task-card ${task.color}">
+                    <div class="task-info">
+                        <span class="task-time">${task.time}</span>
+                        <span class="task-title">${task.title}</span>
+                    </div>
+                    <div class="checkbox-container"></div>
+                </div>
+            `;
+            taskListContainer.appendChild(taskEl);
+        });
+    }
+
+    // Fungsi Ganti Shift
+    function changeShift(shiftNumber) {
+        // Ganti warna tombol
+        document.getElementById("btn-shift1").classList.remove("active");
+        document.getElementById("btn-shift2").classList.remove("active");
+        document.getElementById("btn-shift" + shiftNumber).classList.add("active");
+
+        // Render ulang tugas
+        renderTasks(shiftNumber);
+    }
+
+    // Inisialisasi awal saat halaman dibuka
+    renderTasks(1);
+</script>
+
+</body>
+</html>
