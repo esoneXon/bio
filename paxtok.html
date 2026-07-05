@@ -54,6 +54,16 @@
         .text-center { text-align: center; }
         .font-bold { font-weight: 700; }
 
+        /* Mencegah teks bertabrakan dengan barcode hitam pekat */
+        .text-outline {
+            text-shadow: 
+                -1.5px -1.5px 0 #FFF,  
+                 1.5px -1.5px 0 #FFF,
+                -1.5px  1.5px 0 #FFF,
+                 1.5px  1.5px 0 #FFF,
+                 0px 2px 10px rgba(255,255,255,1);
+        }
+
         /* Header */
         header { padding: 20px; }
         .logo-img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
@@ -94,28 +104,49 @@
         .text-orange { color: var(--orange); }
         .text-red { color: var(--red); }
 
-        /* List Items - NEW WA FORMAT */
+        /* List Items - NEW WA FORMAT DENGAN BARCODE PEKAT BACKGROUND */
         #container_list { display: flex; flex-direction: column; gap: 12px; padding: 4px 16px 0; }
-        .item-card { overflow: hidden; }
+        .item-card { position: relative; overflow: hidden; background: #FFF; }
+        
+        /* Barcode Pekat Background */
+        .barcode-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 1; /* Hitam Pekat */
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .barcode-bg svg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
         
         .wa-format-row { 
             display: flex; align-items: center; justify-content: space-between; 
-            padding: 12px 16px 16px; gap: 6px; 
+            padding: 8px 16px 16px; gap: 6px; 
+            position: relative; z-index: 1;
         }
         .wa-item-name { 
-            flex: 1.4; font-size: 13px; font-weight: 700; line-height: 1.2; word-break: break-word; 
+            flex: 1.4; font-size: 13px; font-weight: 800; line-height: 1.2; word-break: break-word; color: #000;
         }
         .wa-separator { color: var(--text-muted); font-weight: bold; margin: 0 2px; }
-        .wa-input-wrapper { flex: 1; }
+        .wa-input-wrapper { flex: 1; position: relative; z-index: 1; }
         .sf-input-small {
             width: 100%; height: 40px; border-radius: 8px; border: none; text-align: center;
-            font-size: 16px; font-weight: 700; outline: none;
+            font-size: 16px; font-weight: 700; outline: none; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
         .input-stok { background: #F2F2F7; color: var(--text-main); }
         .input-fisik { background: #E5F0FF; color: var(--blue); }
-        .wa-selisih { flex: 0.8; text-align: right; font-size: 20px; font-weight: 700; }
+        .wa-selisih { flex: 0.8; text-align: right; font-size: 20px; font-weight: 800; }
 
-        .item-actions { border-top: 1px solid rgba(229, 229, 234, 0.6); display: flex; height: 45px; background: #FFF; }
+        .item-actions { position: relative; z-index: 1; border-top: 1px solid rgba(229, 229, 234, 0.6); display: flex; height: 45px; background: rgba(255, 255, 255, 0.95); }
         .action-btn { flex: 1; background: none; border: none; font-size: 12px; font-weight: 600; cursor: pointer; border-right: 1px solid rgba(229, 229, 234, 0.6); }
         .action-btn:last-child { border-right: none; }
         .btn-reset-item { color: var(--orange); }
@@ -379,7 +410,7 @@
             updateGlobalActionsVisibility();
         }
 
-        // PEMBARUAN: Barcode hitam pekat, PLU di samping, Input di bawah
+        // PEMBARUAN: Barcode sebagai Background Solid, PLU Disamping Kanan (Outline)
         function createItemCard(item, index) {
             const intStok = parseInt(item.stok) || 0;
             const intFisik = parseInt(item.fisik) || 0;
@@ -390,39 +421,39 @@
             const div = document.createElement('div');
             div.className = 'card item-card';
             div.innerHTML = `
-                <!-- Barcode & PLU -->
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 8px;">
-                    <div style="flex: 1; max-width: 65%; text-align: left;">
-                        <svg id="barcode-${item.plu}" style="width: 100%; height: 45px;"></svg>
-                    </div>
-                    <div style="font-size: 16px; font-weight: 800; letter-spacing: 1px; text-align: right; color: var(--text-main);">
+                <!-- Background Barcode Pekat -->
+                <div class="barcode-bg">
+                    <svg id="barcode-${item.plu}"></svg>
+                </div>
+
+                <!-- PLU & Konten Utama yang Muncul di Atas Barcode -->
+                <div style="position: relative; z-index: 1;">
+                    <div class="text-outline" style="text-align: right; padding: 12px 16px 0; font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--text-main);">
                         ${item.plu}
                     </div>
-                </div>
 
-                <!-- Tampilan Mirip WA Report -->
-                <div class="wa-format-row" style="padding-top: 4px;">
-                    <div class="wa-item-name">(${item.item.toUpperCase()})</div>
-                    <div class="wa-separator">|</div>
-                    <div class="wa-input-wrapper">
-                        <input type="number" class="sf-input-small input-stok" placeholder="STOK" value="${item.stok}" oninput="updateItemValue(${index}, 'stok', this.value)">
+                    <div class="wa-format-row">
+                        <div class="wa-item-name text-outline">(${item.item.toUpperCase()})</div>
+                        <div class="wa-separator text-outline">|</div>
+                        <div class="wa-input-wrapper">
+                            <input type="number" class="sf-input-small input-stok" placeholder="STOK" value="${item.stok}" oninput="updateItemValue(${index}, 'stok', this.value)">
+                        </div>
+                        <div class="wa-separator text-outline">|</div>
+                        <div class="wa-input-wrapper">
+                            <input type="number" class="sf-input-small input-fisik" placeholder="FISIK" value="${item.fisik}" oninput="updateItemValue(${index}, 'fisik', this.value)">
+                        </div>
+                        <div class="wa-separator text-outline">|</div>
+                        <div class="wa-selisih text-outline" style="color: ${selisihColor}">
+                            ${selisih > 0 ? "+" + selisih : selisih}
+                        </div>
                     </div>
-                    <div class="wa-separator">|</div>
-                    <div class="wa-input-wrapper">
-                        <input type="number" class="sf-input-small input-fisik" placeholder="FISIK" value="${item.fisik}" oninput="updateItemValue(${index}, 'fisik', this.value)">
-                    </div>
-                    <div class="wa-separator">|</div>
-                    <div class="wa-selisih" style="color: ${selisihColor}">
-                        ${selisih > 0 ? "+" + selisih : selisih}
-                    </div>
-                </div>
 
-                <!-- Aksi -->
-                <div class="item-actions">
-                    <button class="action-btn btn-reset-item ${hasInput ? '' : 'hidden'}" onclick="resetItem(${index})">↺ Reset</button>
-                    <button class="action-btn btn-updown" onclick="moveItem(${index}, -1)">▲ Naik</button>
-                    <button class="action-btn btn-updown" onclick="moveItem(${index}, 1)">▼ Turun</button>
-                    <button class="action-btn btn-delete" onclick="deleteItem(${index})">Hapus</button>
+                    <div class="item-actions">
+                        <button class="action-btn btn-reset-item ${hasInput ? '' : 'hidden'}" onclick="resetItem(${index})">↺ Reset</button>
+                        <button class="action-btn btn-updown" onclick="moveItem(${index}, -1)">▲ Naik</button>
+                        <button class="action-btn btn-updown" onclick="moveItem(${index}, 1)">▼ Turun</button>
+                        <button class="action-btn btn-delete" onclick="deleteItem(${index})">Hapus</button>
+                    </div>
                 </div>
             `;
 
@@ -435,7 +466,7 @@
                         lineColor: "#000000",
                         background: "transparent",
                         width: 2,
-                        height: 40
+                        height: 100
                     }); 
                 } catch(e){} 
             }, 10);
@@ -658,7 +689,6 @@
             updateGlobalActionsVisibility();
         }
 
-        // Tampilan Web: HANYA TAMPILKAN YANG ADA SELISIH (!= 0)
         function renderReviewTable() {
             const container = document.getElementById('container_review_rows');
             container.innerHTML = '';
@@ -711,7 +741,6 @@
                 
                 let price = prices[item.plu] || 0;
                 
-                // Hanya tarik harga dari internet jika item tersebut ada selisih dan belum punya harga manual
                 if(selisih !== 0 && price === 0) {
                     try {
                         const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.klikindomaret.com/xpress/' + item.plu)}`);
@@ -736,7 +765,6 @@
             }
             const item = reportList[index];
             
-            // Hanya minta input harga manual bila selisih tidak nol dan harga masih 0
             if (item.selisih !== 0 && item.harga === 0) {
                 showInputDialog("Input Harga Baru", `${item.plu} - ${item.item}`, "Rp 0", "", "SIMPAN", "Lewati", true, (val) => {
                     if(val) {
@@ -752,7 +780,6 @@
             }
         }
 
-        // Laporan: TAMPILKAN SEMUA ITEM (YANG KOSONG DIJADIKAN 0)
         function generateWAWithAllItems(reportList) {
             let totalPlus = 0;
             let totalMinus = 0;
