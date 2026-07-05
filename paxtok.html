@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PaXtok Web</title>
     
+    <!-- Favicon -->
     <link rel="icon" href="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" type="image/png">
 
+    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Library untuk Generate Barcode -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     
     <style>
@@ -188,12 +191,16 @@
 </head>
 <body>
 
+    <!-- Indikator Zoom -->
     <div id="zoom_indicator">Ukuran: Normal</div>
 
+    <!-- Header -->
     <header class="flex items-center">
+        <!-- Logo Aplikasi -->
         <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" alt="Logo" class="logo-img">
         <div class="logo-text">PaXtok</div>
         
+        <!-- Tombol Pengatur Ukuran -->
         <div class="btn-header btn-zoom" onclick="toggleZoom()" title="Ubah Ukuran Tampilan">Aa</div>
         
         <div class="btn-header btn-projects" onclick="showProjectManager()">PROYEK</div>
@@ -201,6 +208,7 @@
         <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
     </header>
 
+    <!-- Input Manual -->
     <div id="container_input_manual" class="card flex items-center">
         <div style="flex:1; margin-right:8px; display:flex; gap:8px;">
             <input type="number" id="et_input_plu" class="input-box" placeholder="PLU" list="plu_list" style="flex:1;">
@@ -210,13 +218,16 @@
         <button class="add-btn font-bold" onclick="performManualAdd()">+</button>
     </div>
 
+    <!-- Global Actions -->
     <div id="container_global_actions" class="flex global-actions">
         <span id="btn_reset_stok" class="text-orange hidden" onclick="resetAllStokFisik()">Kosongkan Stok</span>
         <span id="btn_reset_all" class="text-red hidden" onclick="deleteAllItems()">Hapus Semua</span>
     </div>
 
+    <!-- Main List -->
     <div id="container_list"></div>
 
+    <!-- Review Section -->
     <div id="container_review" class="hidden">
         <div class="card flex-col">
             <div class="review-header">
@@ -232,6 +243,7 @@
         <button class="btn-wa" onclick="prepareWhatsAppReport()">BAGIKAN KE WHATSAPP</button>
     </div>
 
+    <!-- FAB -->
     <div id="fab_container" class="fab-container">
         <div id="btn_quick_save" class="fab-btn" onclick="saveNewProjectDialog()">💾 Simpan</div>
         <div id="fab_divider" class="fab-divider"></div>
@@ -241,11 +253,13 @@
         <div id="btn_try_more" class="fab-btn" onclick="showTryMoreDialog()">✨ Try More</div>
     </div>
 
+    <!-- Undo Snackbar -->
     <div id="card_undo">
         <span id="tv_undo_msg">Item dihapus</span>
         <div class="btn-undo-action" onclick="performUndo()">Batal</div>
     </div>
 
+    <!-- Dialog Overlay -->
     <div id="dialog_overlay" class="hidden">
         <div class="dialog-card flex-col">
             <div class="dialog-content">
@@ -261,6 +275,7 @@
         </div>
     </div>
 
+    <!-- Loading -->
     <div id="loading_overlay" class="hidden">
         <div class="spinner"></div>
         <div id="tv_loading_msg" style="margin-top:16px; font-weight:bold;">Memproses...</div>
@@ -593,6 +608,7 @@
             updateGlobalActionsVisibility();
         }
 
+        // Tampilan Web: HANYA TAMPILKAN YANG ADA SELISIH (!= 0)
         function renderReviewTable() {
             const container = document.getElementById('container_review_rows');
             container.innerHTML = '';
@@ -601,20 +617,25 @@
                 const s = parseInt(item.stok) || 0;
                 const f = parseInt(item.fisik) || 0;
                 const selisih = f - s;
-                const price = prices[item.plu] || 0;
-                const priceStr = price > 0 ? "Rp " + price.toLocaleString('id-ID') : "Rp 0";
                 
-                const row = document.createElement('div');
-                row.className = 'review-row';
-                row.innerHTML = `
-                    <div class="r-plu">${item.plu}</div>
-                    <div class="r-item">${item.item}</div>
-                    <div class="r-hrg" onclick="askPrice('${item.plu}', '${item.item.replace(/'/g, "\\'")}', ${price})">${priceStr}</div>
-                    <div class="r-stk">${s}</div>
-                    <div class="r-fsk">${f}</div>
-                    <div class="r-sls" style="color:${selisih < 0 ? 'var(--red)' : selisih > 0 ? 'var(--green)' : '#000'}">${selisih > 0 ? "+" + selisih : selisih}</div>
-                `;
-                container.appendChild(row);
+                if (selisih !== 0) {
+                    const price = prices[item.plu] || 0;
+                    const priceStr = price > 0 ? "Rp " + price.toLocaleString('id-ID') : "Rp 0";
+                    const selisihColor = selisih < 0 ? "var(--red)" : "var(--green)";
+                    const selisihStr = selisih > 0 ? "+" + selisih : selisih;
+
+                    const row = document.createElement('div');
+                    row.className = 'review-row';
+                    row.innerHTML = `
+                        <div class="r-plu">${item.plu}</div>
+                        <div class="r-item">${item.item}</div>
+                        <div class="r-hrg" onclick="askPrice('${item.plu}', '${item.item.replace(/'/g, "\\'")}', ${price})">${priceStr}</div>
+                        <div class="r-stk">${s}</div>
+                        <div class="r-fsk">${f}</div>
+                        <div class="r-sls" style="color:${selisihColor}">${selisihStr}</div>
+                    `;
+                    container.appendChild(row);
+                }
             });
         }
 
@@ -631,14 +652,17 @@
             setLoading(true, "Menarik harga...");
             let prices = JSON.parse(localStorage.getItem("ManualPrices") || "{}");
             
-            // Buat laporan untuk SEMUA item (bukan cuma selisih)
             let reportData = [];
             for (let i = 0; i < items.length; i++) {
                 let item = items[i];
+                const s = parseInt(item.stok) || 0;
+                const f = parseInt(item.fisik) || 0;
+                const selisih = f - s;
+                
                 let price = prices[item.plu] || 0;
                 
-                // Jika belum ada harga, coba tarik dari web
-                if(price === 0) {
+                // Hanya tarik harga dari internet jika item tersebut ada selisih dan belum punya harga manual
+                if(selisih !== 0 && price === 0) {
                     try {
                         const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.klikindomaret.com/xpress/' + item.plu)}`);
                         if(res.ok) {
@@ -648,37 +672,62 @@
                         }
                     } catch(e) {}
                 }
-                reportData.push({...item, harga: price});
+                reportData.push({...item, stok: s, fisik: f, selisih: selisih, harga: price});
             }
             
             setLoading(false);
-            generateWAWithAllItems(reportData);
+            promptMissingPrices(reportData, 0);
         }
 
+        function promptMissingPrices(reportList, index) {
+            if (index >= reportList.length) {
+                generateWAWithAllItems(reportList);
+                return;
+            }
+            const item = reportList[index];
+            
+            // Hanya minta input harga manual bila selisih tidak nol dan harga masih 0
+            if (item.selisih !== 0 && item.harga === 0) {
+                showInputDialog("Input Harga Baru", `${item.plu} - ${item.item}`, "Rp 0", "", "SIMPAN", "Lewati", true, (val) => {
+                    if(val) {
+                        item.harga = parseInt(val);
+                        let prices = JSON.parse(localStorage.getItem("ManualPrices") || "{}");
+                        prices[item.plu] = item.harga;
+                        localStorage.setItem("ManualPrices", JSON.stringify(prices));
+                    }
+                    promptMissingPrices(reportList, index + 1);
+                });
+            } else {
+                promptMissingPrices(reportList, index + 1);
+            }
+        }
+
+        // Laporan: TAMPILKAN SEMUA ITEM (YANG KOSONG DIJADIKAN 0)
         function generateWAWithAllItems(reportList) {
             let totalPlus = 0;
             let totalMinus = 0;
             let sbDetail = "";
 
             reportList.forEach(item => {
-                const s = parseInt(item.stok) || 0;
-                const f = parseInt(item.fisik) || 0;
-                const selisih = f - s;
-                const sStr = selisih > 0 ? "+" + selisih : selisih;
+                const sStr = item.selisih > 0 ? "+" + item.selisih : item.selisih;
                 
                 sbDetail += `${item.plu}\n(${item.item}) | ${item.stok} | ${item.fisik} | ${sStr}\n`;
                 
-                const rupiah = Math.abs(selisih * item.harga);
-                if(selisih > 0) totalPlus += rupiah;
-                else if(selisih < 0) totalMinus += rupiah;
+                const rupiah = Math.abs(item.selisih * item.harga);
+                if(item.selisih > 0) totalPlus += rupiah;
+                else if(item.selisih < 0) totalMinus += rupiah;
                 
-                if(selisih !== 0) sbDetail += `Rp. ${rupiah.toLocaleString('id-ID')}\n`;
+                if(item.selisih !== 0) sbDetail += `Rp. ${rupiah.toLocaleString('id-ID')}\n`;
                 sbDetail += `\n`;
             });
 
             const now = new Date();
             const dateStr = now.toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) + ", " + now.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
-            const shift = (now.getHours() >= 6 && now.getHours() < 14) ? "1" : (now.getHours() >= 14 && now.getHours() < 22) ? "2" : "3";
+            
+            const hours = now.getHours();
+            const mins = now.getMinutes();
+            const timeVal = hours * 100 + mins;
+            const shift = (timeVal >= 630 && timeVal < 1430) ? "1" : (timeVal >= 1430 && timeVal < 2230) ? "2" : "3";
 
             let finalMsg = `*LAPORAN SO RH*\n${dateStr}\nShift: ${shift}\n\nPLU | ITEM | STOK | FISIK | SELISIH\n\n${sbDetail}*TOTAL ESTIMASI RUPIAH*\nTotal Plus (+): Rp ${totalPlus.toLocaleString('id-ID')}\nTotal Minus (-): -Rp ${totalMinus.toLocaleString('id-ID')}\n`;
 
