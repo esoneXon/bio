@@ -8,24 +8,25 @@
     <!-- Favicon -->
     <link rel="icon" href="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" type="image/png">
 
-    <!-- Google Fonts: Poppins -->
+    <!-- Google Fonts: Inter (Lebih nyaman untuk dibaca di layar) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Library untuk Generate Barcode -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     
     <style>
         :root {
-            --bg-color: #F2F2F7;
+            /* Warna dilembutkan agar tidak membuat mata cepat lelah */
+            --bg-color: #F4F4F9; 
             --card-bg: #FFFFFF;
-            --text-main: #000000;
+            --text-main: #2D3142; /* Abu-abu gelap (Slate), bukan hitam pekat */
             --text-muted: #8E8E93;
-            --blue: #007AFF;
-            --red: #FF3B30;
-            --green: #34C759;
-            --orange: #FF9500;
+            --blue: #0A84FF; /* Biru yang lebih soft */
+            --red: #FF453A; /* Merah yang lebih soft */
+            --green: #32D74B; /* Hijau yang lebih soft */
+            --orange: #FF9F0A;
             --divider: #E5E5EA;
         }
 
@@ -33,7 +34,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -41,11 +42,12 @@
             background-color: var(--bg-color);
             padding-bottom: 120px; 
             transition: zoom 0.3s ease; 
+            color: var(--text-main);
         }
 
         /* Utility Classes */
         .hidden { display: none !important; }
-        .card { background: var(--card-bg); border-radius: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .card { background: var(--card-bg); border-radius: 20px; box-shadow: 0 2px 8px rgba(45, 49, 66, 0.06); }
         .flex { display: flex; }
         .flex-col { display: flex; flex-direction: column; }
         .items-center { align-items: center; }
@@ -53,30 +55,30 @@
         .justify-center { justify-content: center; }
         .text-center { text-align: center; }
         .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
 
-        /* Mencegah teks bertabrakan dengan barcode hitam pekat */
+        /* Mencegah teks bertabrakan dengan barcode pekat (outline dihaluskan) */
         .text-outline {
             text-shadow: 
-                -1.5px -1.5px 0 #FFF,  
-                 1.5px -1.5px 0 #FFF,
-                -1.5px  1.5px 0 #FFF,
-                 1.5px  1.5px 0 #FFF,
-                 0px 2px 10px rgba(255,255,255,1);
+                -1px -1px 0 rgba(255,255,255,0.9),  
+                 1px -1px 0 rgba(255,255,255,0.9),
+                -1px  1px 0 rgba(255,255,255,0.9),
+                 1px  1px 0 rgba(255,255,255,0.9),
+                 0px 2px 6px rgba(255,255,255,1);
         }
 
         /* Header */
         header { padding: 20px; }
         .logo-img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
         .logo-text { 
-            font-size: 26px; 
+            font-size: 24px; 
             margin-left: 12px; 
             flex-grow: 1; 
-            letter-spacing: -1px; 
-            font-weight: 800;
-            background: linear-gradient(90deg, #007AFF 0%, #34C759 100%);
+            letter-spacing: -0.5px; 
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--blue) 0%, var(--green) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0px 2px 4px rgba(0,0,0,0.05);
         }
         
         .btn-header {
@@ -84,7 +86,7 @@
             font-size: 12px; font-weight: 600; line-height: 34px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
-        .btn-zoom { background: #D1D1D6; color: #000; margin-right: 8px; font-size: 14px; }
+        .btn-zoom { background: #D1D1D6; color: var(--text-main); margin-right: 8px; font-size: 14px; }
         .btn-projects { background: var(--divider); color: var(--blue); margin-right: 8px; }
         .btn-csv { background: var(--text-main); color: #FFF; }
 
@@ -92,11 +94,14 @@
         #container_input_manual { margin: 0 16px; padding: 8px; border-radius: 24px; }
         .input-box {
             background: var(--bg-color); border-radius: 16px; height: 48px; border: none;
-            padding: 0 16px; font-size: 14px; width: 100%; outline: none; font-weight: 600;
+            padding: 0 16px; font-size: 14px; width: 100%; outline: none; font-weight: 500;
+            color: var(--text-main);
         }
+        .input-box::placeholder { color: var(--text-muted); font-weight: 400; }
+        
         .add-btn {
             background: var(--blue); color: #FFF; border-radius: 24px; width: 48px; height: 48px;
-            font-size: 26px; border: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; border: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
         }
 
         /* Global Actions */
@@ -104,11 +109,10 @@
         .text-orange { color: var(--orange); }
         .text-red { color: var(--red); }
 
-        /* List Items - NEW WA FORMAT DENGAN BARCODE PEKAT BACKGROUND */
+        /* List Items - NEW WA FORMAT */
         #container_list { display: flex; flex-direction: column; gap: 12px; padding: 4px 16px 0; }
         .item-card { position: relative; overflow: hidden; background: #FFF; }
         
-        /* Barcode Pekat Background */
         .barcode-bg {
             position: absolute;
             top: 0;
@@ -116,7 +120,7 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 1; /* Hitam Pekat */
+            opacity: 0.9; /* Sedikit dilunakkan agar tidak mencolok pekat */
             pointer-events: none;
             display: flex;
             align-items: center;
@@ -134,78 +138,79 @@
             position: relative; z-index: 1;
         }
         .wa-item-name { 
-            flex: 1.4; font-size: 13px; font-weight: 800; line-height: 1.2; word-break: break-word; color: #000;
+            flex: 1.4; font-size: 13px; font-weight: 700; line-height: 1.3; word-break: break-word; color: var(--text-main);
         }
-        .wa-separator { color: var(--text-muted); font-weight: bold; margin: 0 2px; }
+        .wa-separator { color: var(--text-muted); font-weight: 500; margin: 0 2px; }
         .wa-input-wrapper { flex: 1; position: relative; z-index: 1; }
         .sf-input-small {
-            width: 100%; height: 40px; border-radius: 8px; border: none; text-align: center;
-            font-size: 16px; font-weight: 700; outline: none; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            width: 100%; height: 40px; border-radius: 8px; border: 1px solid rgba(229, 229, 234, 0.5); text-align: center;
+            font-size: 15px; font-weight: 600; outline: none; box-shadow: 0 1px 4px rgba(45,49,66,0.08);
         }
-        .input-stok { background: #F2F2F7; color: var(--text-main); }
-        .input-fisik { background: #E5F0FF; color: var(--blue); }
-        .wa-selisih { flex: 0.8; text-align: right; font-size: 20px; font-weight: 800; }
+        .input-stok { background: #F8F8FA; color: var(--text-main); }
+        .input-fisik { background: #EAF2FF; color: var(--blue); }
+        .wa-selisih { flex: 0.8; text-align: right; font-size: 18px; font-weight: 700; }
 
-        .item-actions { position: relative; z-index: 1; border-top: 1px solid rgba(229, 229, 234, 0.6); display: flex; height: 45px; background: rgba(255, 255, 255, 0.95); }
-        .action-btn { flex: 1; background: none; border: none; font-size: 12px; font-weight: 600; cursor: pointer; border-right: 1px solid rgba(229, 229, 234, 0.6); }
+        .item-actions { position: relative; z-index: 1; border-top: 1px solid var(--divider); display: flex; height: 45px; background: rgba(255, 255, 255, 0.96); }
+        .action-btn { flex: 1; background: none; border: none; font-size: 12px; font-weight: 600; cursor: pointer; border-right: 1px solid var(--divider); color: var(--text-muted); }
         .action-btn:last-child { border-right: none; }
         .btn-reset-item { color: var(--orange); }
-        .btn-updown { color: var(--text-muted); }
-        .btn-delete { color: var(--red); font-weight: 700; }
+        .btn-delete { color: var(--red); }
 
         /* FAB Bottom */
         .fab-container {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
             background: var(--blue); border-radius: 27px; height: 55px; color: #FFF;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15); display: flex; align-items: center; overflow: hidden; z-index: 100;
+            box-shadow: 0 6px 16px rgba(10, 132, 255, 0.3); display: flex; align-items: center; overflow: hidden; z-index: 100;
             width: max-content; 
         }
-        .fab-container.mode-review { background: var(--red); }
-        .fab-btn { padding: 0 14px; font-size: 13px; font-weight: 700; cursor: pointer; height: 100%; display: flex; align-items: center; white-space: nowrap; }
-        .fab-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.3); }
+        .fab-container.mode-review { background: var(--red); box-shadow: 0 6px 16px rgba(255, 69, 58, 0.3); }
+        .fab-btn { padding: 0 14px; font-size: 13px; font-weight: 600; cursor: pointer; height: 100%; display: flex; align-items: center; white-space: nowrap; }
+        .fab-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.2); }
 
         /* Undo Snackbar */
         #card_undo {
-            position: fixed; bottom: 100px; left: 20px; right: 20px; background: #1C1C1E; color: #FFF;
+            position: fixed; bottom: 100px; left: 20px; right: 20px; background: var(--text-main); color: #FFF;
             border-radius: 25px; height: 50px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 8px 0 24px; z-index: 101; transform: translateY(150px); transition: transform 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         #card_undo.show { transform: translateY(0); }
-        .btn-undo-action { background: #323232; color: #3478F6; border-radius: 17px; padding: 6px 16px; font-weight: 700; font-size: 14px; cursor: pointer; }
+        .btn-undo-action { background: rgba(255,255,255,0.15); color: #FFF; border-radius: 17px; padding: 6px 16px; font-weight: 600; font-size: 13px; cursor: pointer; }
 
         /* Dialogs */
         #dialog_overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(45,49,66,0.5);
             z-index: 200; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(2px);
         }
-        .dialog-card { background: #F2F2F7; border-radius: 18px; width: 80%; max-width: 340px; overflow: hidden; }
-        .dialog-content { padding: 20px; text-align: center; }
-        .dialog-title { font-size: 17px; font-weight: 700; color: #000; margin-bottom: 6px; }
-        .dialog-message { font-size: 13px; color: #3C3C43; margin-bottom: 16px; }
+        .dialog-card { background: var(--card-bg); border-radius: 18px; width: 80%; max-width: 340px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .dialog-content { padding: 22px 20px 20px; text-align: center; }
+        .dialog-title { font-size: 17px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+        .dialog-message { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4; }
         .dialog-body { margin-bottom: 16px; }
-        .dialog-actions { display: flex; border-top: 1px solid rgba(60,60,67,0.29); height: 48px; }
-        .dialog-btn { flex: 1; border: none; background: transparent; font-size: 17px; font-weight: 600; color: var(--blue); cursor: pointer; }
+        .dialog-actions { display: flex; border-top: 1px solid var(--divider); height: 48px; }
+        .dialog-btn { flex: 1; border: none; background: transparent; font-size: 16px; font-weight: 500; color: var(--blue); cursor: pointer; }
         .dialog-btn.bold { font-weight: 700; }
         .dialog-btn.red { color: var(--red); }
-        .dialog-divider { width: 1px; background: rgba(60,60,67,0.29); }
+        .dialog-divider { width: 1px; background: var(--divider); }
 
         /* Review Container */
         #container_review { padding: 16px; }
         .review-header, .review-row { display: flex; padding: 16px; font-size: 11px; align-items: center; }
-        .review-header { background: #F2F2F7; font-weight: 700; color: var(--text-muted); border-radius: 20px 20px 0 0;}
+        .review-header { background: #F8F8FA; font-weight: 600; color: var(--text-muted); border-radius: 20px 20px 0 0;}
         .review-row { border-bottom: 1px solid var(--divider); }
         .review-row:last-child { border-bottom: none; }
         .r-plu { flex: 1.1; color: var(--text-muted); }
-        .r-item { flex: 1.6; font-size: 12px; font-weight: 700; }
-        .r-hrg { flex: 1.3; color: var(--blue); font-weight: 700; text-align: center; cursor: pointer; }
+        .r-item { flex: 1.6; font-size: 12px; font-weight: 600; }
+        .r-hrg { flex: 1.3; color: var(--blue); font-weight: 600; text-align: center; cursor: pointer; }
         .r-stk { flex: 0.8; text-align: center; }
         .r-fsk { flex: 0.8; text-align: center; }
         .r-sls { flex: 1.0; font-size: 14px; font-weight: 700; text-align: right; }
-        .btn-wa { background: var(--green); color: #FFF; border-radius: 16px; height: 55px; width: 100%; border: none; font-size: 15px; font-weight: 700; margin-top: 24px; cursor: pointer; }
+        .btn-wa { background: var(--green); color: #FFF; border-radius: 16px; height: 55px; width: 100%; border: none; font-size: 15px; font-weight: 700; margin-top: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(50, 215, 75, 0.2); }
 
         /* Loading */
         #loading_overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9);
             z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--blue); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
@@ -214,8 +219,9 @@
         /* Level Ukuran Info */
         #zoom_indicator {
             position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.8); color: white; padding: 6px 16px; border-radius: 20px;
-            font-size: 12px; font-weight: 600; z-index: 400; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            background: rgba(45,49,66,0.85); color: white; padding: 6px 16px; border-radius: 20px;
+            font-size: 12px; font-weight: 500; z-index: 400; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            backdrop-filter: blur(4px);
         }
     </style>
 </head>
@@ -308,7 +314,7 @@
     <!-- Loading -->
     <div id="loading_overlay" class="hidden">
         <div class="spinner"></div>
-        <div id="tv_loading_msg" style="margin-top:16px; font-weight:bold;">Memproses...</div>
+        <div id="tv_loading_msg" style="margin-top:16px; font-weight:600;">Memproses...</div>
     </div>
 
     <script>
@@ -410,25 +416,22 @@
             updateGlobalActionsVisibility();
         }
 
-        // PEMBARUAN: Barcode sebagai Background Solid, PLU Disamping Kanan (Outline)
         function createItemCard(item, index) {
             const intStok = parseInt(item.stok) || 0;
             const intFisik = parseInt(item.fisik) || 0;
             const selisih = (item.stok === "" && item.fisik === "") ? 0 : (intFisik - intStok);
-            const selisihColor = selisih < 0 ? "var(--red)" : (selisih > 0 ? "var(--green)" : "#000");
+            const selisihColor = selisih < 0 ? "var(--red)" : (selisih > 0 ? "var(--green)" : "var(--text-main)");
             const hasInput = item.stok !== "" || item.fisik !== "";
 
             const div = document.createElement('div');
             div.className = 'card item-card';
             div.innerHTML = `
-                <!-- Background Barcode Pekat -->
                 <div class="barcode-bg">
                     <svg id="barcode-${item.plu}"></svg>
                 </div>
 
-                <!-- PLU & Konten Utama yang Muncul di Atas Barcode -->
                 <div style="position: relative; z-index: 1;">
-                    <div class="text-outline" style="text-align: right; padding: 12px 16px 0; font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--text-main);">
+                    <div class="text-outline" style="text-align: right; padding: 12px 16px 0; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; color: var(--text-main);">
                         ${item.plu}
                     </div>
 
@@ -463,7 +466,7 @@
                         format: "CODE128", 
                         displayValue: false, 
                         margin: 0,
-                        lineColor: "#000000",
+                        lineColor: "rgba(45, 49, 66, 0.9)", // Warna garis barcode slate yang agak gelap
                         background: "transparent",
                         width: 2,
                         height: 100
@@ -481,7 +484,7 @@
             const intFisik = parseInt(items[index].fisik) || 0;
             const selisih = (items[index].stok === "" && items[index].fisik === "") ? 0 : (intFisik - intStok);
             const selisihStr = selisih > 0 ? "+" + selisih : selisih;
-            const selisihColor = selisih < 0 ? "var(--red)" : (selisih > 0 ? "var(--green)" : "#000");
+            const selisihColor = selisih < 0 ? "var(--red)" : (selisih > 0 ? "var(--green)" : "var(--text-main)");
             
             const card = document.getElementById('container_list').children[index];
             const selisihEl = card.querySelector('.wa-selisih');
