@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PaXtok Web</title>
     
-    <!-- Favicon -->
     <link rel="icon" href="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" type="image/png">
 
-    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Library untuk Generate Barcode -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     
     <style>
@@ -191,16 +188,12 @@
 </head>
 <body>
 
-    <!-- Indikator Zoom -->
     <div id="zoom_indicator">Ukuran: Normal</div>
 
-    <!-- Header -->
     <header class="flex items-center">
-        <!-- Logo Aplikasi -->
         <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" alt="Logo" class="logo-img">
         <div class="logo-text">PaXtok</div>
         
-        <!-- Tombol Pengatur Ukuran -->
         <div class="btn-header btn-zoom" onclick="toggleZoom()" title="Ubah Ukuran Tampilan">Aa</div>
         
         <div class="btn-header btn-projects" onclick="showProjectManager()">PROYEK</div>
@@ -208,7 +201,6 @@
         <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
     </header>
 
-    <!-- Input Manual -->
     <div id="container_input_manual" class="card flex items-center">
         <div style="flex:1; margin-right:8px; display:flex; gap:8px;">
             <input type="number" id="et_input_plu" class="input-box" placeholder="PLU" list="plu_list" style="flex:1;">
@@ -218,16 +210,13 @@
         <button class="add-btn font-bold" onclick="performManualAdd()">+</button>
     </div>
 
-    <!-- Global Actions -->
     <div id="container_global_actions" class="flex global-actions">
         <span id="btn_reset_stok" class="text-orange hidden" onclick="resetAllStokFisik()">Kosongkan Stok</span>
         <span id="btn_reset_all" class="text-red hidden" onclick="deleteAllItems()">Hapus Semua</span>
     </div>
 
-    <!-- Main List -->
     <div id="container_list"></div>
 
-    <!-- Review Section -->
     <div id="container_review" class="hidden">
         <div class="card flex-col">
             <div class="review-header">
@@ -243,7 +232,6 @@
         <button class="btn-wa" onclick="prepareWhatsAppReport()">BAGIKAN KE WHATSAPP</button>
     </div>
 
-    <!-- FAB -->
     <div id="fab_container" class="fab-container">
         <div id="btn_quick_save" class="fab-btn" onclick="saveNewProjectDialog()">💾 Simpan</div>
         <div id="fab_divider" class="fab-divider"></div>
@@ -253,13 +241,11 @@
         <div id="btn_try_more" class="fab-btn" onclick="showTryMoreDialog()">✨ Try More</div>
     </div>
 
-    <!-- Undo Snackbar -->
     <div id="card_undo">
         <span id="tv_undo_msg">Item dihapus</span>
         <div class="btn-undo-action" onclick="performUndo()">Batal</div>
     </div>
 
-    <!-- Dialog Overlay -->
     <div id="dialog_overlay" class="hidden">
         <div class="dialog-card flex-col">
             <div class="dialog-content">
@@ -275,7 +261,6 @@
         </div>
     </div>
 
-    <!-- Loading -->
     <div id="loading_overlay" class="hidden">
         <div class="spinner"></div>
         <div id="tv_loading_msg" style="margin-top:16px; font-weight:bold;">Memproses...</div>
@@ -287,7 +272,6 @@
         let masterProducts = {};
         let isReviewMode = false;
 
-        // Zooming System
         const zoomLevels = [0.8, 0.9, 1.0, 1.1, 1.2];
         const zoomLabels = ["Sangat Kecil", "Kecil", "Normal", "Besar", "Sangat Besar"];
         let currentZoomIdx = 2; 
@@ -305,11 +289,9 @@
             currentZoomIdx = (currentZoomIdx + 1) % 5;
             document.body.style.zoom = zoomLevels[currentZoomIdx];
             localStorage.setItem("app_zoom_idx", currentZoomIdx);
-            
             const indicator = document.getElementById("zoom_indicator");
             indicator.textContent = "Ukuran: " + zoomLabels[currentZoomIdx];
             indicator.style.opacity = "1";
-            
             clearTimeout(zoomTimeout);
             zoomTimeout = setTimeout(() => { indicator.style.opacity = "0"; }, 1500);
         }
@@ -326,7 +308,6 @@
             initZoom(); 
             initSampleProject(); 
             loadSavedData();
-            
             document.getElementById('et_input_plu').addEventListener('input', function(e) {
                 const val = this.value;
                 if(val.includes(" - ")) {
@@ -338,7 +319,6 @@
                     }
                 }
             });
-
             document.getElementById('et_input_item').addEventListener('keypress', function(e) {
                 if(e.key === 'Enter') performManualAdd();
             });
@@ -349,26 +329,15 @@
             if(!list.includes("SO RH")) {
                 list.push("SO RH");
                 localStorage.setItem("project_list", JSON.stringify(list));
-                
                 const sampleData = `20024079,TELUR AYAM\n20020184,ASIN MATANG\n10004977,AYAM KAMPUNG\n20080025,TLR MEGA 10's\n20062506,SANFORD\n20062507,GALON SANFORD\n10036631,AQUA\n20121514,LE MINERAL\n20063700,GAS KCL\n20000458,GAS BSR\n20110320,MATERAI\n20134344,SOSIS ORI\n20134345,SOSIS KEJU`;
-                
                 let sampleItems = [];
-                const lines = sampleData.split("\n");
-                lines.forEach(line => {
+                sampleData.split("\n").forEach(line => {
                     let parts = line.split(",");
-                    if(parts.length >= 2) {
-                        let plu = parts[0].trim();
-                        let item = parts[1].trim();
-                        sampleItems.push({plu: plu, item: item, stok: "", fisik: ""});
-                    }
+                    if(parts.length >= 2) sampleItems.push({plu: parts[0].trim(), item: parts[1].trim(), stok: "", fisik: ""});
                 });
-                
                 localStorage.setItem("project_data_SO RH", JSON.stringify(sampleItems));
-                
                 let activeData = localStorage.getItem("saved_items");
-                if (!activeData || activeData === "[]") {
-                    localStorage.setItem("saved_items", JSON.stringify(sampleItems));
-                }
+                if (!activeData || activeData === "[]") localStorage.setItem("saved_items", JSON.stringify(sampleItems));
             }
         }
 
@@ -392,9 +361,7 @@
         function renderList() {
             const container = document.getElementById('container_list');
             container.innerHTML = '';
-            items.forEach((item, index) => {
-                container.appendChild(createItemCard(item, index));
-            });
+            items.forEach((item, index) => { container.appendChild(createItemCard(item, index)); });
             updateGlobalActionsVisibility();
         }
 
@@ -402,10 +369,6 @@
             const intStok = parseInt(item.stok) || 0;
             const intFisik = parseInt(item.fisik) || 0;
             const selisih = (item.stok === "" && item.fisik === "") ? 0 : (intFisik - intStok);
-            const selisihStr = selisih > 0 ? "+" + selisih : selisih;
-            const selisihColor = selisih < 0 ? "var(--red)" : (selisih > 0 ? "var(--green)" : "#000");
-            const hasInput = item.stok !== "" || item.fisik !== "";
-
             const div = document.createElement('div');
             div.className = 'card item-card';
             div.innerHTML = `
@@ -414,67 +377,34 @@
                         <div class="item-name">${item.item.toUpperCase()}</div>
                         <div class="item-plu">PLU: ${item.plu}</div>
                     </div>
-                    <div class="item-selisih" style="color: ${selisihColor}">${selisihStr}</div>
+                    <div class="item-selisih">${selisih > 0 ? "+" + selisih : selisih}</div>
                 </div>
-                
-                <div class="barcode-container">
-                    <svg id="barcode-${item.plu}"></svg>
-                </div>
-
+                <div class="barcode-container"><svg id="barcode-${item.plu}"></svg></div>
                 <div class="stok-fisik-row flex">
-                    <div class="sf-box flex-col">
-                        <div class="sf-label stok-label">STOK SISTEM</div>
-                        <input type="number" class="sf-input input-stok" value="${item.stok}" oninput="updateItemValue(${index}, 'stok', this.value)">
-                    </div>
-                    <div class="sf-box flex-col">
-                        <div class="sf-label fisik-label">CEK FISIK</div>
-                        <input type="number" class="sf-input input-fisik" value="${item.fisik}" oninput="updateItemValue(${index}, 'fisik', this.value)">
-                    </div>
+                    <div class="sf-box flex-col"><div class="sf-label stok-label">STOK SISTEM</div><input type="number" class="sf-input input-stok" value="${item.stok}" oninput="updateItemValue(${index}, 'stok', this.value)"></div>
+                    <div class="sf-box flex-col"><div class="sf-label fisik-label">CEK FISIK</div><input type="number" class="sf-input input-fisik" value="${item.fisik}" oninput="updateItemValue(${index}, 'fisik', this.value)"></div>
                 </div>
-
                 <div class="item-actions">
-                    <button class="action-btn btn-reset-item ${hasInput ? '' : 'hidden'}" onclick="resetItem(${index})">↺ Reset</button>
+                    <button class="action-btn btn-reset-item ${item.stok === "" && item.fisik === "" ? 'hidden' : ''}" onclick="resetItem(${index})">↺ Reset</button>
                     <button class="action-btn btn-updown" onclick="moveItem(${index}, -1)">▲ Naik</button>
                     <button class="action-btn btn-updown" onclick="moveItem(${index}, 1)">▼ Turun</button>
                     <button class="action-btn btn-delete" onclick="deleteItem(${index})">Hapus</button>
                 </div>
             `;
-
-            setTimeout(() => {
-                try { JsBarcode(`#barcode-${item.plu}`, item.plu, { format: "CODE128", width: 2, height: 40, displayValue: false }); } catch(e){}
-            }, 10);
-
+            setTimeout(() => { try { JsBarcode(`#barcode-${item.plu}`, item.plu, { format: "CODE128", width: 2, height: 40, displayValue: false }); } catch(e){} }, 10);
             return div;
         }
 
         function updateItemValue(index, field, value) {
             items[index][field] = value;
             saveData();
-            
-            const intStok = parseInt(items[index].stok) || 0;
-            const intFisik = parseInt(items[index].fisik) || 0;
-            const selisih = (items[index].stok === "" && items[index].fisik === "") ? 0 : (intFisik - intStok);
-            const selisihStr = selisih > 0 ? "+" + selisih : selisih;
-            const selisihColor = selisih < 0 ? "var(--red)" : (selisih > 0 ? "var(--green)" : "#000");
-            
-            const card = document.getElementById('container_list').children[index];
-            card.querySelector('.item-selisih').textContent = selisihStr;
-            card.querySelector('.item-selisih').style.color = selisihColor;
-            
-            const btnReset = card.querySelector('.btn-reset-item');
-            if(items[index].stok !== "" || items[index].fisik !== "") {
-                btnReset.classList.remove('hidden');
-            } else {
-                btnReset.classList.add('hidden');
-            }
-            updateGlobalActionsVisibility();
+            renderList();
         }
 
         function performManualAdd() {
             commitPendingDeletion();
             const plu = document.getElementById('et_input_plu').value.trim();
             const itemName = document.getElementById('et_input_item').value.trim().toUpperCase();
-
             if(plu && itemName) {
                 if(!/^\d+$/.test(plu)) { alert("PLU harus berupa angka"); return; }
                 items.push({ plu: plu, item: itemName, stok: "", fisik: "" });
@@ -564,7 +494,6 @@
                 commitPendingDeletion();
                 items = [];
                 masterProducts = {};
-                
                 lines.forEach((line, index) => {
                     if(!line.trim()) return;
                     const parts = line.split(",");
@@ -644,24 +573,19 @@
                 fab.classList.add('mode-review');
                 document.getElementById('btn_quick_save').classList.add('hidden');
                 document.getElementById('fab_divider').classList.add('hidden');
-                
                 document.getElementById('fab_divider_2').classList.add('hidden');
                 document.getElementById('btn_try_more').classList.add('hidden');
-                
                 document.getElementById('container_input_manual').classList.add('hidden');
                 document.getElementById('container_list').classList.add('hidden');
                 document.getElementById('container_review').classList.remove('hidden');
-                
                 renderReviewTable();
             } else {
                 tvFab.textContent = "Review Selisih";
                 fab.classList.remove('mode-review');
                 document.getElementById('btn_quick_save').classList.remove('hidden');
                 document.getElementById('fab_divider').classList.remove('hidden');
-                
                 document.getElementById('fab_divider_2').classList.remove('hidden');
                 document.getElementById('btn_try_more').classList.remove('hidden');
-                
                 document.getElementById('container_input_manual').classList.remove('hidden');
                 document.getElementById('container_list').classList.remove('hidden');
                 document.getElementById('container_review').classList.add('hidden');
@@ -672,32 +596,25 @@
         function renderReviewTable() {
             const container = document.getElementById('container_review_rows');
             container.innerHTML = '';
-            
             let prices = JSON.parse(localStorage.getItem("ManualPrices") || "{}");
-
             items.forEach((item) => {
                 const s = parseInt(item.stok) || 0;
                 const f = parseInt(item.fisik) || 0;
                 const selisih = f - s;
+                const price = prices[item.plu] || 0;
+                const priceStr = price > 0 ? "Rp " + price.toLocaleString('id-ID') : "Rp 0";
                 
-                if (selisih !== 0 && (item.stok !== "" || item.fisik !== "")) {
-                    const price = prices[item.plu] || 0;
-                    const priceStr = price > 0 ? "Rp " + price.toLocaleString('id-ID') : "Rp 0";
-                    const selisihColor = selisih < 0 ? "var(--red)" : "var(--green)";
-                    const selisihStr = selisih > 0 ? "+" + selisih : selisih;
-
-                    const row = document.createElement('div');
-                    row.className = 'review-row';
-                    row.innerHTML = `
-                        <div class="r-plu">${item.plu}</div>
-                        <div class="r-item">${item.item}</div>
-                        <div class="r-hrg" onclick="askPrice('${item.plu}', '${item.item.replace(/'/g, "\\'")}', ${price})">${priceStr}</div>
-                        <div class="r-stk">${s}</div>
-                        <div class="r-fsk">${f}</div>
-                        <div class="r-sls" style="color:${selisihColor}">${selisihStr}</div>
-                    `;
-                    container.appendChild(row);
-                }
+                const row = document.createElement('div');
+                row.className = 'review-row';
+                row.innerHTML = `
+                    <div class="r-plu">${item.plu}</div>
+                    <div class="r-item">${item.item}</div>
+                    <div class="r-hrg" onclick="askPrice('${item.plu}', '${item.item.replace(/'/g, "\\'")}', ${price})">${priceStr}</div>
+                    <div class="r-stk">${s}</div>
+                    <div class="r-fsk">${f}</div>
+                    <div class="r-sls" style="color:${selisih < 0 ? 'var(--red)' : selisih > 0 ? 'var(--green)' : '#000'}">${selisih > 0 ? "+" + selisih : selisih}</div>
+                `;
+                container.appendChild(row);
             });
         }
 
@@ -711,138 +628,88 @@
         }
 
         async function prepareWhatsAppReport() {
-            const selisihItems = [];
-            items.forEach(i => {
-                const s = parseInt(i.stok) || 0;
-                const f = parseInt(i.fisik) || 0;
-                const sls = f - s;
-                if(sls !== 0 && (i.stok !== "" || i.fisik !== "")) {
-                    selisihItems.push({ plu: i.plu, item: i.item, stok: s, fisik: f, selisih: sls, harga: 0 });
-                }
-            });
-
-            if(selisihItems.length === 0) {
-                alert("Tidak ada data selisih untuk dibagikan.");
-                return;
-            }
-
-            setLoading(true, "Menarik harga dari HTML KlikIndomaret...");
+            setLoading(true, "Menarik harga...");
             let prices = JSON.parse(localStorage.getItem("ManualPrices") || "{}");
-
-            for (let i = 0; i < selisihItems.length; i++) {
-                let item = selisihItems[i];
-                if(prices[item.plu]) {
-                    item.harga = prices[item.plu];
-                } else {
+            
+            // Buat laporan untuk SEMUA item (bukan cuma selisih)
+            let reportData = [];
+            for (let i = 0; i < items.length; i++) {
+                let item = items[i];
+                let price = prices[item.plu] || 0;
+                
+                // Jika belum ada harga, coba tarik dari web
+                if(price === 0) {
                     try {
                         const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.klikindomaret.com/xpress/' + item.plu)}`);
                         if(res.ok) {
                             const data = await res.json();
-                            const html = data.contents;
-                            const match = html.match(/Rp\s*([0-9]{1,3}(?:\.[0-9]{3})*)/) || html.match(/"price"\s*:\s*"?(\d+)"?/);
-                            if(match) {
-                                item.harga = parseInt(match[1].replace(/\./g, ''));
-                            }
+                            const match = data.contents.match(/Rp\s*([0-9]{1,3}(?:\.[0-9]{3})*)/) || data.contents.match(/"price"\s*:\s*"?(\d+)"?/);
+                            if(match) price = parseInt(match[1].replace(/\./g, ''));
                         }
-                    } catch(e) { console.log("Fetch failed for", item.plu); }
+                    } catch(e) {}
                 }
+                reportData.push({...item, harga: price});
             }
+            
             setLoading(false);
-            promptMissingPrices(selisihItems, 0);
+            generateWAWithAllItems(reportData);
         }
 
-        function promptMissingPrices(reportList, index) {
-            if (index >= reportList.length) {
-                sendWA(reportList);
-                return;
-            }
-            const item = reportList[index];
-            if (item.harga === 0) {
-                showInputDialog("Input Harga Baru", `${item.plu} - ${item.item}`, "Rp 0", "", "SIMPAN", "Lewati", true, (val) => {
-                    if(val) {
-                        item.harga = parseInt(val);
-                        let prices = JSON.parse(localStorage.getItem("ManualPrices") || "{}");
-                        prices[item.plu] = item.harga;
-                        localStorage.setItem("ManualPrices", JSON.stringify(prices));
-                    }
-                    promptMissingPrices(reportList, index + 1);
-                });
-            } else {
-                promptMissingPrices(reportList, index + 1);
-            }
-        }
-
-        // PEMBARUAN: Selalu tampilkan dialog fallback
-        function showReportFallback(msg) {
-            let html = `
-                <textarea id="report_text_area" style="width:100%; height:200px; font-size:12px; font-family:monospace; padding:12px; border-radius:12px; border:1px solid var(--divider); resize:none; background: #FFF; outline:none; color: var(--text-main);" readonly></textarea>
-            `;
-            showDialog("Laporan", "Silakan salin laporan di bawah ini:", html, [
-                { text: "Batal", class: "red", onclick: closeDialog },
-                { text: "Salin", class: "bold", onclick: () => {
-                    let ta = document.getElementById('report_text_area');
-                    ta.select();
-                    ta.setSelectionRange(0, 99999);
-                    try {
-                        document.execCommand('copy');
-                        alert("Laporan berhasil disalin!");
-                        closeDialog();
-                    } catch (err) {
-                        alert("Gagal menyalin. Silakan salin teks secara manual.");
-                    }
-                }}
-            ]);
-            setTimeout(() => { document.getElementById('report_text_area').value = msg; }, 50);
-        }
-
-        function sendWA(reportList) {
+        function generateWAWithAllItems(reportList) {
             let totalPlus = 0;
             let totalMinus = 0;
             let sbDetail = "";
 
             reportList.forEach(item => {
-                const sStr = item.selisih > 0 ? "+" + item.selisih : item.selisih;
+                const s = parseInt(item.stok) || 0;
+                const f = parseInt(item.fisik) || 0;
+                const selisih = f - s;
+                const sStr = selisih > 0 ? "+" + selisih : selisih;
+                
                 sbDetail += `${item.plu}\n(${item.item}) | ${item.stok} | ${item.fisik} | ${sStr}\n`;
                 
-                const rupiah = Math.abs(item.selisih * item.harga);
-                if(item.selisih > 0) totalPlus += rupiah;
-                else totalMinus += rupiah;
+                const rupiah = Math.abs(selisih * item.harga);
+                if(selisih > 0) totalPlus += rupiah;
+                else if(selisih < 0) totalMinus += rupiah;
                 
-                sbDetail += `Rp. ${rupiah.toLocaleString('id-ID')}\n\n`;
+                if(selisih !== 0) sbDetail += `Rp. ${rupiah.toLocaleString('id-ID')}\n`;
+                sbDetail += `\n`;
             });
 
             const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) + ", " + 
-                            now.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
-            
-            const hours = now.getHours();
-            const mins = now.getMinutes();
-            const timeVal = hours * 100 + mins;
-            const shift = (timeVal >= 630 && timeVal < 1430) ? "1" : (timeVal >= 1430 && timeVal < 2230) ? "2" : "3";
+            const dateStr = now.toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) + ", " + now.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
+            const shift = (now.getHours() >= 6 && now.getHours() < 14) ? "1" : (now.getHours() >= 14 && now.getHours() < 22) ? "2" : "3";
 
-            let finalMsg = `*LAPORAN SO RH*\n${dateStr}\nShift: ${shift}\n\nPLU | ITEM | STOK | FISIK | SELISIH\n\n${sbDetail}`;
-            finalMsg += `*TOTAL ESTIMASI RUPIAH*\nTotal Plus (+): Rp ${totalPlus.toLocaleString('id-ID')}\nTotal Minus (-): -Rp ${totalMinus.toLocaleString('id-ID')}\n`;
+            let finalMsg = `*LAPORAN SO RH*\n${dateStr}\nShift: ${shift}\n\nPLU | ITEM | STOK | FISIK | SELISIH\n\n${sbDetail}*TOTAL ESTIMASI RUPIAH*\nTotal Plus (+): Rp ${totalPlus.toLocaleString('id-ID')}\nTotal Minus (-): -Rp ${totalMinus.toLocaleString('id-ID')}\n`;
 
-            // Tampilkan dialog fallback SELALU
             showReportFallback(finalMsg);
         }
 
-        // --- PROJECT MANAGEMENT & TRY MORE ---
+        function showReportFallback(msg) {
+            let html = `<textarea id="report_text_area" style="width:100%; height:200px; font-size:12px; font-family:monospace; padding:12px; border-radius:12px; border:1px solid var(--divider); resize:none; background: #FFF; outline:none; color: var(--text-main);" readonly></textarea>`;
+            showDialog("Laporan", "Silakan salin laporan di bawah ini:", html, [
+                { text: "Batal", class: "red", onclick: closeDialog },
+                { text: "Salin", class: "bold", onclick: () => {
+                    let ta = document.getElementById('report_text_area');
+                    ta.select();
+                    document.execCommand('copy');
+                    alert("Laporan berhasil disalin!");
+                    closeDialog();
+                }}
+            ]);
+            setTimeout(() => { document.getElementById('report_text_area').value = msg; }, 50);
+        }
+
         function showProjectManager() {
             let list = JSON.parse(localStorage.getItem("project_list") || "[]");
             let html = "";
-            if(list.length > 0) {
-                list.forEach(p => {
-                    html += `
-                    <div style="display:flex; padding:14px 16px; border-bottom:1px solid var(--divider); align-items:center; cursor:pointer;" onclick="actionProject('${p}')">
+            list.forEach(p => {
+                html += `<div style="display:flex; padding:14px 16px; border-bottom:1px solid var(--divider); align-items:center; cursor:pointer;" onclick="actionProject('${p}')">
                         <span style="font-size:18px; margin-right:12px;">📁</span>
                         <span style="flex:1; font-weight: 600;">${p}</span>
                         <span style="color:#C7C7CC; font-size:22px;">›</span>
                     </div>`;
-                });
-            } else {
-                html = `<div style="padding:16px; text-align:center;">Belum ada project tersimpan.</div>`;
-            }
+            });
             showDialog("Kelola Sesi Project", "", html, [
                 { text: "Tutup", class: "", onclick: closeDialog },
                 { text: "+ Baru", class: "bold", onclick: saveNewProjectDialog }
@@ -854,17 +721,13 @@
                 <div style="display:flex; padding:14px 16px; border-bottom:1px solid var(--divider); align-items:center; cursor:pointer;" onclick="window.open('https://esonexon.github.io/bio/bepex.html', '_blank')">
                     <span style="font-size:20px; margin-right:12px;">📦</span>
                     <span style="flex:1; font-weight: 600; text-align: left; color: var(--text-main);">1. BepEx</span>
-                    <span style="color:#C7C7CC; font-size:22px;">›</span>
                 </div>
                 <div style="display:flex; padding:14px 16px; align-items:center; cursor:pointer;" onclick="window.open('https://esonexon.github.io/bio/bargen.html', '_blank')">
                     <span style="font-size:20px; margin-right:12px;">🔣</span>
                     <span style="flex:1; font-weight: 600; text-align: left; color: var(--text-main);">2. BarGen</span>
-                    <span style="color:#C7C7CC; font-size:22px;">›</span>
                 </div>
             `;
-            showDialog("Coba Aplikasi Lainnya", "Jelajahi project portofolio lainnya:", html, [
-                { text: "Tutup", class: "bold", onclick: closeDialog }
-            ]);
+            showDialog("Coba Aplikasi Lainnya", "Jelajahi project portofolio lainnya:", html, [{ text: "Tutup", class: "bold", onclick: closeDialog }]);
         }
 
         function actionProject(name) {
@@ -872,27 +735,17 @@
                 <div style="padding:16px; color:var(--blue); font-size:16px; font-weight:600; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="openProject('${name}')">📂 Buka Sesi</div>
                 <div style="padding:16px; color:var(--green); font-size:16px; font-weight:600; border-bottom:1px solid var(--divider); cursor:pointer;" onclick="exportProject('${name}')">⬇️ Ekspor ke File</div>
             `;
-            
-            if (name !== "SO RH") {
-                html += `<div style="padding:16px; color:var(--red); font-size:16px; font-weight:600; cursor:pointer;" onclick="deleteProject('${name}')">🗑 Hapus Project</div>`;
-            } else {
-                html += `<div style="padding:16px; color:var(--text-muted); font-size:16px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px;">🔒 Project Sample (Paten)</div>`;
-            }
-            
+            if (name !== "SO RH") html += `<div style="padding:16px; color:var(--red); font-size:16px; font-weight:600; cursor:pointer;" onclick="deleteProject('${name}')">🗑 Hapus Project</div>`;
+            else html += `<div style="padding:16px; color:var(--text-muted); font-size:16px; font-weight:600;">🔒 Project Sample</div>`;
             showDialog(name, "", html, [{ text: "Tutup", class: "", onclick: closeDialog }]);
         }
 
         function saveNewProjectDialog() {
             closeDialog();
-            if(items.length === 0) { alert("Belum ada item untuk disimpan."); return; }
-            showInputDialog("Simpan Project", "", "Cth: Shift Pagi", "", "SIMPAN", "Batal", false, (val) => {
+            if(items.length === 0) { alert("Belum ada item."); return; }
+            showInputDialog("Simpan Project", "", "Nama Project", "", "SIMPAN", "Batal", false, (val) => {
                 if(!val) return;
-                
-                if (val.toUpperCase() === "SO RH") {
-                    alert("Nama 'SO RH' adalah data bawaan dan tidak dapat ditimpa. Silakan gunakan nama project lain.");
-                    return;
-                }
-                
+                if (val.toUpperCase() === "SO RH") { alert("Tidak bisa menimpa SO RH."); return; }
                 let list = JSON.parse(localStorage.getItem("project_list") || "[]");
                 if(!list.includes(val)) list.push(val);
                 localStorage.setItem("project_list", JSON.stringify(list));
@@ -902,43 +755,26 @@
         }
 
         function openProject(name) {
-            showConfirmDialog("Buka Project?", "Data di layar saat ini akan diganti.", "YA BUKA", "Batal", () => {
+            showConfirmDialog("Buka Project?", "Data saat ini akan diganti.", "YA BUKA", "Batal", () => {
                 if(isReviewMode) toggleReviewMode();
                 let data = localStorage.getItem("project_data_" + name);
-                if(data) {
-                    items = JSON.parse(data);
-                    saveData();
-                    renderList();
-                }
+                if(data) { items = JSON.parse(data); saveData(); renderList(); }
             });
         }
 
         function exportProject(name) {
             let data = JSON.parse(localStorage.getItem("project_data_" + name) || "[]");
             let csv = "PLU,ITEM,STOK,FISIK,SELISIH\n";
-            data.forEach(i => {
-                const s = parseInt(i.stok) || 0;
-                const f = parseInt(i.fisik) || 0;
-                csv += `${i.plu},${i.item},${i.stok},${i.fisik},${f-s}\n`;
-            });
+            data.forEach(i => csv += `${i.plu},${i.item},${i.stok},${i.fisik},${parseInt(i.fisik||0)-parseInt(i.stok||0)}\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `PaXtok_${name}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
+            a.href = url; a.download = `PaXtok_${name}.csv`; a.click();
         }
 
         function deleteProject(name) {
-            if (name === "SO RH") {
-                alert("Project SO RH tidak dapat dihapus.");
-                return;
-            }
-            
+            if (name === "SO RH") return;
             showConfirmDialog("Hapus Project?", "Project " + name + " akan dihapus.", "HAPUS", "Batal", () => {
-                pendingDeletedProjectName = name;
-                pendingDeletedProjectData = localStorage.getItem("project_data_" + name);
                 let list = JSON.parse(localStorage.getItem("project_list") || "[]");
                 list = list.filter(p => p !== name);
                 localStorage.setItem("project_list", JSON.stringify(list));
@@ -947,14 +783,10 @@
             });
         }
 
-        // --- UI UTILS (MODALS) ---
         function showDialog(title, msg, customHtml, buttons) {
             document.getElementById('dialog_title').textContent = title;
-            const msgEl = document.getElementById('dialog_message');
-            if(msg) { msgEl.textContent = msg; msgEl.classList.remove('hidden'); } else { msgEl.classList.add('hidden'); }
-            
+            document.getElementById('dialog_message').textContent = msg;
             document.getElementById('dialog_body').innerHTML = customHtml;
-            
             const actions = document.querySelector('.dialog-actions');
             actions.innerHTML = '';
             buttons.forEach((b, i) => {
@@ -963,46 +795,34 @@
                 btn.textContent = b.text;
                 btn.onclick = () => { if(b.onclick) b.onclick(); };
                 actions.appendChild(btn);
-                if(i < buttons.length - 1) {
-                    const div = document.createElement('div'); div.className = 'dialog-divider'; actions.appendChild(div);
-                }
             });
             document.getElementById('dialog_overlay').classList.remove('hidden');
         }
 
-        function closeDialog() {
-            document.getElementById('dialog_overlay').classList.add('hidden');
-        }
+        function closeDialog() { document.getElementById('dialog_overlay').classList.add('hidden'); }
 
         function showConfirmDialog(title, msg, posBtn, negBtn, onPos) {
-            const isRed = posBtn === "HAPUS" ? "red bold" : "bold";
             showDialog(title, msg, "", [
                 { text: negBtn, class: "", onclick: closeDialog },
-                { text: posBtn, class: isRed, onclick: () => { closeDialog(); onPos(); } }
+                { text: posBtn, class: posBtn === "HAPUS" ? "red bold" : "bold", onclick: () => { closeDialog(); onPos(); } }
             ]);
         }
 
         function showInputDialog(title, msg, hint, defVal, posBtn, negBtn, isNumber, onSave) {
             const inputHtml = `<input type="${isNumber ? 'number' : 'text'}" id="dialog_input_val" class="input-box" style="text-align:center; background:#FFF;" placeholder="${hint}" value="${defVal}">`;
             showDialog(title, msg, inputHtml, [
-                { text: negBtn, class: "", onclick: () => { closeDialog(); onSave(""); } },
+                { text: negBtn, class: "", onclick: closeDialog },
                 { text: posBtn, class: "bold", onclick: () => { 
                     const val = document.getElementById('dialog_input_val').value.trim();
-                    if(!val && posBtn !== "Lewati") { alert("Input tidak boleh kosong"); return; }
-                    closeDialog(); onSave(val);
+                    if(!val) alert("Input tidak boleh kosong"); else { closeDialog(); onSave(val); }
                 }}
             ]);
-            setTimeout(() => { document.getElementById('dialog_input_val').focus(); }, 100);
         }
 
         function setLoading(show, msg) {
             const el = document.getElementById('loading_overlay');
-            if(show) {
-                document.getElementById('tv_loading_msg').textContent = msg;
-                el.classList.remove('hidden');
-            } else {
-                el.classList.add('hidden');
-            }
+            if(show) { document.getElementById('tv_loading_msg').textContent = msg; el.classList.remove('hidden'); } 
+            else { el.classList.add('hidden'); }
         }
 
         window.onload = init;
