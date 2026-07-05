@@ -94,36 +94,9 @@
         .text-orange { color: var(--orange); }
         .text-red { color: var(--red); }
 
-        /* List Items - NEW WA FORMAT DENGAN BARCODE BACKGROUND */
+        /* List Items - NEW WA FORMAT */
         #container_list { display: flex; flex-direction: column; gap: 12px; padding: 4px 16px 0; }
-        .item-card { position: relative; overflow: hidden; } /* position relative penting untuk background absolute */
-        
-        /* Pengaturan Barcode sebagai Watermark */
-        .barcode-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0; /* Taruh di paling belakang */
-            opacity: 0.08; /* Transparansi agar teks depan terbaca */
-            pointer-events: none; /* Agar tidak bisa diklik secara tak sengaja */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .barcode-bg svg {
-            width: 120%; /* Sedikit diperlebar agar menutupi seluruh kartu */
-            height: 120%;
-            object-fit: cover;
-        }
-
-        /* Konten utama kartu harus ada di atas barcode (z-index 1) */
-        .card-content {
-            position: relative;
-            z-index: 1;
-            padding-top: 16px; /* Padding dipindah ke dalam konten */
-        }
+        .item-card { overflow: hidden; }
         
         .wa-format-row { 
             display: flex; align-items: center; justify-content: space-between; 
@@ -138,12 +111,11 @@
             width: 100%; height: 40px; border-radius: 8px; border: none; text-align: center;
             font-size: 16px; font-weight: 700; outline: none;
         }
-        /* Penyesuaian warna input agar kontras dengan background barcode */
-        .input-stok { background: rgba(242, 242, 247, 0.9); color: var(--text-main); }
-        .input-fisik { background: rgba(229, 240, 255, 0.9); color: var(--blue); }
+        .input-stok { background: #F2F2F7; color: var(--text-main); }
+        .input-fisik { background: #E5F0FF; color: var(--blue); }
         .wa-selisih { flex: 0.8; text-align: right; font-size: 20px; font-weight: 700; }
 
-        .item-actions { border-top: 1px solid rgba(229, 229, 234, 0.6); display: flex; height: 45px; background: rgba(255, 255, 255, 0.8); }
+        .item-actions { border-top: 1px solid rgba(229, 229, 234, 0.6); display: flex; height: 45px; background: #FFF; }
         .action-btn { flex: 1; background: none; border: none; font-size: 12px; font-weight: 600; cursor: pointer; border-right: 1px solid rgba(229, 229, 234, 0.6); }
         .action-btn:last-child { border-right: none; }
         .btn-reset-item { color: var(--orange); }
@@ -407,7 +379,7 @@
             updateGlobalActionsVisibility();
         }
 
-        // PEMBARUAN: Kartu dengan Barcode Background
+        // PEMBARUAN: Barcode hitam pekat, PLU di samping, Input di bawah
         function createItemCard(item, index) {
             const intStok = parseInt(item.stok) || 0;
             const intFisik = parseInt(item.fisik) || 0;
@@ -418,44 +390,55 @@
             const div = document.createElement('div');
             div.className = 'card item-card';
             div.innerHTML = `
-                <!-- Background Barcode Watermark -->
-                <div class="barcode-bg">
-                    <svg id="barcode-${item.plu}"></svg>
+                <!-- Barcode & PLU -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 8px;">
+                    <div style="flex: 1; max-width: 65%; text-align: left;">
+                        <svg id="barcode-${item.plu}" style="width: 100%; height: 45px;"></svg>
+                    </div>
+                    <div style="font-size: 16px; font-weight: 800; letter-spacing: 1px; text-align: right; color: var(--text-main);">
+                        ${item.plu}
+                    </div>
                 </div>
 
-                <!-- Konten Utama Kartu -->
-                <div class="card-content">
-                    <div class="text-center" style="margin-bottom: 8px;">
-                        <div style="font-size: 18px; font-weight: 800; letter-spacing: 1px;">${item.plu}</div>
+                <!-- Tampilan Mirip WA Report -->
+                <div class="wa-format-row" style="padding-top: 4px;">
+                    <div class="wa-item-name">(${item.item.toUpperCase()})</div>
+                    <div class="wa-separator">|</div>
+                    <div class="wa-input-wrapper">
+                        <input type="number" class="sf-input-small input-stok" placeholder="STOK" value="${item.stok}" oninput="updateItemValue(${index}, 'stok', this.value)">
                     </div>
+                    <div class="wa-separator">|</div>
+                    <div class="wa-input-wrapper">
+                        <input type="number" class="sf-input-small input-fisik" placeholder="FISIK" value="${item.fisik}" oninput="updateItemValue(${index}, 'fisik', this.value)">
+                    </div>
+                    <div class="wa-separator">|</div>
+                    <div class="wa-selisih" style="color: ${selisihColor}">
+                        ${selisih > 0 ? "+" + selisih : selisih}
+                    </div>
+                </div>
 
-                    <div class="wa-format-row">
-                        <div class="wa-item-name">(${item.item.toUpperCase()})</div>
-                        <div class="wa-separator">|</div>
-                        <div class="wa-input-wrapper">
-                            <input type="number" class="sf-input-small input-stok" placeholder="STOK" value="${item.stok}" oninput="updateItemValue(${index}, 'stok', this.value)">
-                        </div>
-                        <div class="wa-separator">|</div>
-                        <div class="wa-input-wrapper">
-                            <input type="number" class="sf-input-small input-fisik" placeholder="FISIK" value="${item.fisik}" oninput="updateItemValue(${index}, 'fisik', this.value)">
-                        </div>
-                        <div class="wa-separator">|</div>
-                        <div class="wa-selisih" style="color: ${selisihColor}">
-                            ${selisih > 0 ? "+" + selisih : selisih}
-                        </div>
-                    </div>
-
-                    <div class="item-actions">
-                        <button class="action-btn btn-reset-item ${hasInput ? '' : 'hidden'}" onclick="resetItem(${index})">↺ Reset</button>
-                        <button class="action-btn btn-updown" onclick="moveItem(${index}, -1)">▲ Naik</button>
-                        <button class="action-btn btn-updown" onclick="moveItem(${index}, 1)">▼ Turun</button>
-                        <button class="action-btn btn-delete" onclick="deleteItem(${index})">Hapus</button>
-                    </div>
+                <!-- Aksi -->
+                <div class="item-actions">
+                    <button class="action-btn btn-reset-item ${hasInput ? '' : 'hidden'}" onclick="resetItem(${index})">↺ Reset</button>
+                    <button class="action-btn btn-updown" onclick="moveItem(${index}, -1)">▲ Naik</button>
+                    <button class="action-btn btn-updown" onclick="moveItem(${index}, 1)">▼ Turun</button>
+                    <button class="action-btn btn-delete" onclick="deleteItem(${index})">Hapus</button>
                 </div>
             `;
 
-            // Parameter margin diset ke 0 agar barcode melebar optimal di background
-            setTimeout(() => { try { JsBarcode(`#barcode-${item.plu}`, item.plu, { format: "CODE128", displayValue: false, margin: 0 }); } catch(e){} }, 10);
+            setTimeout(() => { 
+                try { 
+                    JsBarcode(`#barcode-${item.plu}`, item.plu, { 
+                        format: "CODE128", 
+                        displayValue: false, 
+                        margin: 0,
+                        lineColor: "#000000",
+                        background: "transparent",
+                        width: 2,
+                        height: 40
+                    }); 
+                } catch(e){} 
+            }, 10);
             return div;
         }
 
@@ -675,6 +658,7 @@
             updateGlobalActionsVisibility();
         }
 
+        // Tampilan Web: HANYA TAMPILKAN YANG ADA SELISIH (!= 0)
         function renderReviewTable() {
             const container = document.getElementById('container_review_rows');
             container.innerHTML = '';
@@ -727,6 +711,7 @@
                 
                 let price = prices[item.plu] || 0;
                 
+                // Hanya tarik harga dari internet jika item tersebut ada selisih dan belum punya harga manual
                 if(selisih !== 0 && price === 0) {
                     try {
                         const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.klikindomaret.com/xpress/' + item.plu)}`);
@@ -751,6 +736,7 @@
             }
             const item = reportList[index];
             
+            // Hanya minta input harga manual bila selisih tidak nol dan harga masih 0
             if (item.selisih !== 0 && item.harga === 0) {
                 showInputDialog("Input Harga Baru", `${item.plu} - ${item.item}`, "Rp 0", "", "SIMPAN", "Lewati", true, (val) => {
                     if(val) {
@@ -766,6 +752,7 @@
             }
         }
 
+        // Laporan: TAMPILKAN SEMUA ITEM (YANG KOSONG DIJADIKAN 0)
         function generateWAWithAllItems(reportList) {
             let totalPlus = 0;
             let totalMinus = 0;
