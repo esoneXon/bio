@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PaXtok Web</title>
     
-    <!-- Favicon -->
     <link rel="icon" href="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" type="image/png">
 
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Library untuk Generate Barcode -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     
     <style>
@@ -55,16 +52,6 @@
         .text-center { text-align: center; }
         .font-bold { font-weight: 700; }
         .font-semibold { font-weight: 600; }
-
-        /* Mencegah teks bertabrakan dengan barcode pekat (outline putih halus) */
-        .text-outline {
-            text-shadow: 
-                -1.5px -1.5px 0 rgba(255,255,255,0.95),  
-                 1.5px -1.5px 0 rgba(255,255,255,0.95),
-                -1.5px  1.5px 0 rgba(255,255,255,0.95),
-                 1.5px  1.5px 0 rgba(255,255,255,0.95),
-                 0px 2px 6px rgba(255,255,255,1);
-        }
 
         /* Header */
         header { padding: 20px; }
@@ -112,29 +99,9 @@
         #container_list { display: flex; flex-direction: column; gap: 12px; padding: 4px 16px 0; }
         .item-card { position: relative; overflow: hidden; background: #FFF; }
         
-        /* Barcode Background Pekat */
-        .barcode-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            opacity: 0.95; 
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .barcode-bg svg {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
         .wa-format-row { 
             display: flex; align-items: center; justify-content: space-between; 
-            padding: 24px 16px 20px; gap: 6px; 
+            padding: 16px 16px 20px; gap: 6px; 
             position: relative; z-index: 1;
         }
         
@@ -241,16 +208,12 @@
 </head>
 <body>
 
-    <!-- Indikator Zoom -->
     <div id="zoom_indicator">Ukuran: Normal</div>
 
-    <!-- Header -->
     <header class="flex items-center">
-        <!-- Logo Aplikasi -->
         <img src="https://raw.githubusercontent.com/esoneXon/bio/refs/heads/main/assets/imgs/paxtokimg.png" alt="Logo" class="logo-img">
         <div class="logo-text">PaXtok</div>
         
-        <!-- Tombol Pengatur Ukuran -->
         <div class="btn-header btn-zoom" onclick="toggleZoom()" title="Ubah Ukuran Tampilan">Aa</div>
         
         <div class="btn-header btn-projects" onclick="showProjectManager()">PROYEK</div>
@@ -258,7 +221,6 @@
         <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
     </header>
 
-    <!-- Input Manual -->
     <div id="container_input_manual" class="card flex items-center">
         <div style="flex:1; margin-right:8px; display:flex; gap:8px;">
             <input type="number" id="et_input_plu" class="input-box" placeholder="PLU" list="plu_list" style="flex:1;">
@@ -268,16 +230,13 @@
         <button class="add-btn font-bold" onclick="performManualAdd()">+</button>
     </div>
 
-    <!-- Global Actions -->
     <div id="container_global_actions" class="flex global-actions">
         <span id="btn_reset_stok" class="text-orange hidden" onclick="resetAllStokFisik()">Kosongkan Stok</span>
         <span id="btn_reset_all" class="text-red hidden" onclick="deleteAllItems()">Hapus Semua</span>
     </div>
 
-    <!-- Main List -->
     <div id="container_list"></div>
 
-    <!-- Review Section -->
     <div id="container_review" class="hidden">
         <div class="card flex-col">
             <div class="review-header">
@@ -293,7 +252,6 @@
         <button class="btn-wa" onclick="prepareWhatsAppReport()">BAGIKAN KE WHATSAPP</button>
     </div>
 
-    <!-- FAB -->
     <div id="fab_container" class="fab-container">
         <div id="btn_quick_save" class="fab-btn" onclick="saveNewProjectDialog()">💾 Simpan</div>
         <div id="fab_divider" class="fab-divider"></div>
@@ -303,13 +261,11 @@
         <div id="btn_try_more" class="fab-btn" onclick="showTryMoreDialog()">✨ Try More</div>
     </div>
 
-    <!-- Undo Snackbar -->
     <div id="card_undo">
         <span id="tv_undo_msg">Item dihapus</span>
         <div class="btn-undo-action" onclick="performUndo()">Batal</div>
     </div>
 
-    <!-- Dialog Overlay -->
     <div id="dialog_overlay" class="hidden">
         <div class="dialog-card flex-col">
             <div class="dialog-content">
@@ -325,7 +281,6 @@
         </div>
     </div>
 
-    <!-- Loading -->
     <div id="loading_overlay" class="hidden">
         <div class="spinner"></div>
         <div id="tv_loading_msg" style="margin-top:16px; font-weight:600;">Memproses...</div>
@@ -448,7 +403,7 @@
             updateGlobalActionsVisibility();
         }
 
-        // PEMBARUAN: Kartu dengan Toggle Teks PLU & Item
+        // PEMBARUAN: Barcode diletakkan di luar (atas tengah)
         function createItemCard(item, index) {
             const intStok = parseInt(item.stok) || 0;
             const intFisik = parseInt(item.fisik) || 0;
@@ -459,30 +414,27 @@
             const div = document.createElement('div');
             div.className = 'card item-card';
             div.innerHTML = `
-                <!-- Background Barcode Pekat -->
-                <div class="barcode-bg">
+                <div style="text-align: center; padding-top: 18px;">
                     <svg id="barcode-${item.plu}"></svg>
                 </div>
 
-                <!-- Konten Utama Kartu -->
                 <div style="position: relative; z-index: 1;">
                     <div class="wa-format-row">
-                        <!-- Kontainer Toggle untuk animasi silang -->
                         <div class="toggle-container">
-                            <div class="toggle-text text-outline show-plu" style="opacity: ${isShowingPlu ? '1' : '0'}; transform: ${isShowingPlu ? 'translateY(0)' : 'translateY(-5px)'};">${item.plu}</div>
-                            <div class="toggle-text text-outline show-name" style="opacity: ${isShowingPlu ? '0' : '1'}; transform: ${isShowingPlu ? 'translateY(5px)' : 'translateY(0)'};">(${item.item.toUpperCase()})</div>
+                            <div class="toggle-text show-plu" style="opacity: ${isShowingPlu ? '1' : '0'}; transform: ${isShowingPlu ? 'translateY(0)' : 'translateY(-5px)'};">${item.plu}</div>
+                            <div class="toggle-text show-name" style="opacity: ${isShowingPlu ? '0' : '1'}; transform: ${isShowingPlu ? 'translateY(5px)' : 'translateY(0)'};">(${item.item.toUpperCase()})</div>
                         </div>
 
-                        <div class="wa-separator text-outline">|</div>
+                        <div class="wa-separator">|</div>
                         <div class="wa-input-wrapper">
                             <input type="number" class="sf-input-small input-stok" placeholder="STOK" value="${item.stok}" oninput="updateItemValue(${index}, 'stok', this.value)">
                         </div>
-                        <div class="wa-separator text-outline">|</div>
+                        <div class="wa-separator">|</div>
                         <div class="wa-input-wrapper">
                             <input type="number" class="sf-input-small input-fisik" placeholder="FISIK" value="${item.fisik}" oninput="updateItemValue(${index}, 'fisik', this.value)">
                         </div>
-                        <div class="wa-separator text-outline">|</div>
-                        <div class="wa-selisih text-outline" style="color: ${selisihColor}">
+                        <div class="wa-separator">|</div>
+                        <div class="wa-selisih" style="color: ${selisihColor}">
                             ${selisih > 0 ? "+" + selisih : selisih}
                         </div>
                     </div>
@@ -502,10 +454,10 @@
                         format: "CODE128", 
                         displayValue: false, 
                         margin: 0,
-                        lineColor: "rgba(45, 49, 66, 0.8)", // Sedikit dilembutkan warnanya agar tidak merusak mata
+                        lineColor: "#2D3142", // Warna slate solid
                         background: "transparent",
                         width: 2,
-                        height: 100
+                        height: 45 // Tinggi barcode disesuaikan
                     }); 
                 } catch(e){} 
             }, 10);
