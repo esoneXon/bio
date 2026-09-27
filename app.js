@@ -50,9 +50,41 @@ const progressBar = document.getElementById('progress-bar');
 
 const alphabet = ['A', 'B', 'C', 'D', 'E'];
 
+// FITUR: Deteksi tombol Enter
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    if (screenIntro.classList.contains('active')) {
+      btnMulai.click();
+    } else if (screenQuiz.classList.contains('active') && !btnNext.disabled) {
+      btnNext.click();
+    }
+  }
+});
+
+// FITUR: Handle tombol Back dari HP/Browser (History Popstate)
+window.addEventListener('popstate', (event) => {
+  if (event.state && event.state.step !== undefined) {
+    currentStep = event.state.step;
+    screenIntro.classList.remove('active');
+    screenOutro.classList.remove('active');
+    screenQuiz.classList.add('active');
+    renderQuestion();
+  } else {
+    // Jika tidak ada history (sudah di awal), tampilkan intro
+    currentStep = 0;
+    screenQuiz.classList.remove('active');
+    screenOutro.classList.remove('active');
+    screenIntro.classList.add('active');
+  }
+});
+
 btnMulai.addEventListener('click', () => {
   screenIntro.classList.remove('active');
   screenQuiz.classList.add('active');
+  currentStep = 0;
+  
+  // Catat halaman pertama ke History
+  history.pushState({ step: currentStep }, "", "?soal=" + currentStep);
   renderQuestion();
 });
 
@@ -83,6 +115,12 @@ function renderQuestion() {
       btn.appendChild(label);
       btn.appendChild(textNode);
       
+      // FITUR UX: Otomatis menyeleksi kembali jawaban jika user menekan tombol "Kembali"
+      if (answersData[q.id] === opt) {
+        btn.classList.add('selected');
+        btnNext.disabled = false;
+      }
+      
       btn.onclick = () => {
         document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
@@ -95,11 +133,21 @@ function renderQuestion() {
     const input = document.createElement('input');
     input.type = 'number';
     input.placeholder = q.placeholder;
+    
+    // FITUR UX: Mengisi otomatis kolom angka jika user kembali ke pertanyaan ini
+    if (answersData[q.id]) {
+      input.value = answersData[q.id];
+      btnNext.disabled = false;
+    }
+
     input.oninput = (e) => {
       answersData[q.id] = e.target.value;
       btnNext.disabled = e.target.value.trim() === '';
     };
     inputArea.appendChild(input);
+    
+    // Fokus otomatis ke input angka untuk kemudahan Enter
+    setTimeout(() => input.focus(), 100); 
   }
 }
 
@@ -111,6 +159,8 @@ btnNext.addEventListener('click', async () => {
 
   if (currentStep < questions.length - 1) {
     currentStep++;
+    // Catat halaman selanjutnya ke History
+    history.pushState({ step: currentStep }, "", "?soal=" + currentStep);
     renderQuestion();
   } else {
     btnNext.disabled = true;
