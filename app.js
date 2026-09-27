@@ -25,30 +25,31 @@ const tombolSubmit = document.getElementById('tombolSubmit');
 formKuis.addEventListener('submit', async (e) => {
   e.preventDefault(); // Mencegah halaman reload
 
-  // Ubah status tombol
+  // Ubah status tombol agar tidak bisa diklik berkali-kali
   tombolSubmit.disabled = true;
   tombolSubmit.textContent = "Mengirim data...";
 
-  // Ambil nilai dari input form (pastikan ID ini sama dengan yang ada di index.html)
-  const inputNama = document.getElementById('nama').value;
-  const inputJawaban1 = document.getElementById('jawaban1').value;
+  // Gunakan FormData untuk mengambil seluruh input secara otomatis
+  const formData = new FormData(formKuis);
+  
+  // Ubah input menjadi format Object JSON agar mudah dikirim ke Firebase
+  const dataKuesioner = Object.fromEntries(formData.entries());
+  
+  // Tambahkan pencatat waktu otomatis dari server Firebase
+  dataKuesioner.waktu_submit = serverTimestamp();
 
   try {
     // Simpan data ke Firestore di koleksi "jawaban_responden"
-    await addDoc(collection(db, "jawaban_responden"), {
-      nama: inputNama,
-      jawaban_1: inputJawaban1,
-      waktu_submit: serverTimestamp()
-    });
+    await addDoc(collection(db, "jawaban_responden"), dataKuesioner);
 
-    alert("Berhasil! Jawaban Anda telah terkirim.");
-    formKuis.reset(); // Kosongkan form kembali
+    alert("Berhasil! Jawaban kuesioner Anda telah terkirim.");
+    formKuis.reset(); // Kosongkan form kembali setelah berhasil
   } catch (error) {
     console.error("Terjadi kesalahan: ", error);
-    alert("Gagal mengirim jawaban. Coba periksa koneksi internet Anda.");
+    alert("Gagal mengirim kuesioner. Coba periksa koneksi internet Anda.");
   } finally {
     // Kembalikan tombol seperti semula
     tombolSubmit.disabled = false;
-    tombolSubmit.textContent = "Kirim Jawaban";
+    tombolSubmit.textContent = "Kirim Kuesioner";
   }
 });
