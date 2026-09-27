@@ -7,19 +7,28 @@
   <style>
     body { font-family: sans-serif; padding: 40px; background-color: #f4f7f6; text-align: center; }
     .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    button { padding: 15px 25px; font-size: 16px; font-weight: bold; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; }
-    button:hover { background-color: #218838; }
-    button:disabled { background-color: #ccc; cursor: not-allowed; }
-    p { color: #555; margin-bottom: 20px; }
+    .btn-group { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+    button { padding: 15px 25px; font-size: 16px; font-weight: bold; color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+    #btnUnduhAngka { background-color: #007bff; }
+    #btnUnduhAngka:hover { background-color: #0056b3; }
+    #btnUnduhTeks { background-color: #28a745; }
+    #btnUnduhTeks:hover { background-color: #218838; }
+    button:disabled { background-color: #ccc !important; cursor: not-allowed; }
+    p { color: #555; margin-bottom: 20px; line-height: 1.5; }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h2>Panel Admin Kuesioner</h2>
-    <p>Klik tombol di bawah ini untuk menarik semua data jawaban dari database dan mengunduhnya sebagai file CSV dengan Header dan Keterangan Lengkap.</p>
-    <button id="btnUnduh">Unduh Data (CSV)</button>
-    <p id="statusText" style="margin-top: 15px; font-weight: bold; color: #007bff;"></p>
+    <p>Silakan pilih format unduhan data Anda. Versi "Angka" cocok untuk diolah di aplikasi statistik (SPSS), sedangkan versi "Teks" cocok untuk dibaca dan dilampirkan pada laporan.</p>
+    
+    <div class="btn-group">
+      <button id="btnUnduhAngka">Unduh Versi Terdata (Angka & Kode Singkat)</button>
+      <button id="btnUnduhTeks">Unduh Versi Konversi (Teks Pertanyaan & Jawaban)</button>
+    </div>
+    
+    <p id="statusText" style="margin-top: 20px; font-weight: bold; color: #333;"></p>
   </div>
 
   <script type="module">
@@ -40,10 +49,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const btnUnduh = document.getElementById('btnUnduh');
+    const btnUnduhAngka = document.getElementById('btnUnduhAngka');
+    const btnUnduhTeks = document.getElementById('btnUnduhTeks');
     const statusText = document.getElementById('statusText');
 
-    // MAPPING HEADER: Pertanyaan
     const headerMapping = {
       "waktu_submit": "Waktu Submit",
       "demo_1": "1. Apakah Anda pernah berbelanja di Indomaret Bengkong Kolam 11 minimal 2 kali?",
@@ -66,7 +75,6 @@
       "q14": "14 (Z). Saya bersedia merekomendasikan gerai Indomaret ini kepada keluarga, teman, atau tetangga."
     };
 
-    // MAPPING JAWABAN: Menerjemahkan angka 1-5 menjadi teks keterangan
     const skalaLikertMapping = {
       "1": "Sangat Tidak Setuju (STS)",
       "2": "Tidak Setuju (TS)",
@@ -75,14 +83,14 @@
       "5": "Sangat Setuju (SS)"
     };
 
-    // Urutan kolom yang diinginkan di file Excel
     const urutanKolom = [
       "waktu_submit", "demo_1", "demo_2", "demo_3", "demo_4",
       "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14"
     ];
 
-    btnUnduh.addEventListener('click', async () => {
-      btnUnduh.disabled = true;
+    async function prosesUnduhData(modeKonversi) {
+      btnUnduhAngka.disabled = true;
+      btnUnduhTeks.disabled = true;
       statusText.textContent = "Sedang mengambil data dari database...";
 
       try {
@@ -91,7 +99,6 @@
         if (querySnapshot.empty) {
           alert("Belum ada data jawaban di database.");
           statusText.textContent = "";
-          btnUnduh.disabled = false;
           return;
         }
 
@@ -104,17 +111,21 @@
           dataArray.push(data);
         });
 
-        // 1. Susun Baris Pertama (Header)
-        const headerCsv = urutanKolom.map(kunci => `"${headerMapping[kunci] || kunci}"`).join(",");
+        // 1. Tentukan Header (Kode Singkat vs Teks Panjang)
+        const headerCsv = urutanKolom.map(kunci => {
+          let namaKolom = modeKonversi ? (headerMapping[kunci] || kunci) : kunci;
+          return `"${namaKolom}"`;
+        }).join(",");
+        
         let csvContent = headerCsv + "\n";
 
-        // 2. Susun Baris Isi (Data Jawaban)
+        // 2. Tentukan Isi (Angka Mentah vs Teks Keterangan)
         dataArray.forEach(row => {
           let rowData = urutanKolom.map(kunci => {
             let isiSel = row[kunci] === undefined || row[kunci] === null ? "" : row[kunci];
             
-            // Jika kolom yang sedang diproses adalah q1 sampai q14, terjemahkan angkanya menjadi keterangan teks
-            if (kunci.startsWith("q") && skalaLikertMapping[isiSel]) {
+            // Konversi jawaban khusus mode teks
+            if (modeKonversi && kunci.startsWith("q") && skalaLikertMapping[isiSel]) {
               isiSel = skalaLikertMapping[isiSel];
             }
 
@@ -123,27 +134,33 @@
           csvContent += rowData.join(",") + "\n";
         });
 
-        // 3. Proses Pengunduhan
+        // 3. Nama File & Pengunduhan
+        const namaFile = modeKonversi ? "Data_Kuesioner_Teks_Konversi.csv" : "Data_Kuesioner_Angka_SPSS.csv";
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         
         link.setAttribute("href", url);
-        link.setAttribute("download", "Data_Kuesioner_Teks.csv");
+        link.setAttribute("download", namaFile);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
-        statusText.textContent = `Berhasil mengunduh ${dataArray.length} data responden!`;
+        statusText.textContent = `Berhasil mengunduh ${dataArray.length} data (${modeKonversi ? 'Versi Teks' : 'Versi Angka'}).`;
       } catch (error) {
         console.error(error);
         statusText.textContent = "Gagal mengambil data.";
         alert("Terjadi kesalahan saat mengambil data.");
       } finally {
-        btnUnduh.disabled = false;
+        btnUnduhAngka.disabled = false;
+        btnUnduhTeks.disabled = false;
       }
-    });
+    }
+
+    // Pasang Event Listener ke masing-masing tombol
+    btnUnduhAngka.addEventListener('click', () => prosesUnduhData(false));
+    btnUnduhTeks.addEventListener('click', () => prosesUnduhData(true));
   </script>
 </body>
 </html>
