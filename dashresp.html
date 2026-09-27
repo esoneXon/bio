@@ -30,9 +30,10 @@
       color: var(--text-dark);
       display: flex;
       min-height: 100vh;
+      width: 100%;
     }
 
-    /* Sidebar Layout */
+    /* Sidebar Layout Responsif */
     .sidebar {
       width: 240px;
       background-color: var(--card-bg);
@@ -42,6 +43,7 @@
       flex-direction: column;
       gap: 30px;
       flex-shrink: 0;
+      transition: all 0.3s ease;
     }
 
     .brand {
@@ -88,21 +90,22 @@
     /* Main Content Area */
     .main-content {
       flex-grow: 1;
-      padding: 30px;
+      padding: 24px;
       overflow-y: auto;
+      width: 100%;
     }
 
     /* Top Stats Grid */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     .stat-card {
       background: var(--card-bg);
-      padding: 20px;
+      padding: 18px 20px;
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
       display: flex;
@@ -112,8 +115,8 @@
     }
 
     .stat-icon {
-      width: 48px;
-      height: 48px;
+      width: 46px;
+      height: 46px;
       border-radius: 12px;
       background-color: #E0F2FE;
       color: var(--primary-dark);
@@ -121,10 +124,11 @@
       justify-content: center;
       align-items: center;
       font-size: 20px;
+      flex-shrink: 0;
     }
 
     .stat-info h3 {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
       color: var(--text-dark);
     }
@@ -134,25 +138,27 @@
       color: var(--text-muted);
     }
 
-    /* TABS BAR (Diletakkan Tepat di Atas/Kiri Grafik) */
+    /* Tab Switcher Utama */
     .tab-bar {
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
       border-bottom: 2px solid var(--border-color);
       padding-bottom: 10px;
+      overflow-x: auto;
     }
 
     .tab-btn {
       background: none;
       border: none;
-      padding: 10px 20px;
-      font-size: 14px;
+      padding: 10px 18px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
       border-radius: 10px;
       transition: all 0.2s ease;
+      white-space: nowrap;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -168,7 +174,6 @@
       color: white;
     }
 
-    /* Tab Content Switcher */
     .tab-content {
       display: none;
     }
@@ -177,43 +182,95 @@
       display: block;
     }
 
-    /* Side-by-Side Grid Layout (Untuk Tab Grafik) */
+    /* Grid Layout Grafik & Tabel */
     .dashboard-grid {
       display: grid;
-      grid-template-columns: 1.3fr 1fr;
-      gap: 24px;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 20px;
       align-items: start;
     }
 
     .card {
       background: var(--card-bg);
       border-radius: 20px;
-      padding: 24px;
+      padding: 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
       border: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
+      width: 100%;
     }
 
     .card-header {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .card-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--text-dark);
+      line-height: 1.4;
+    }
+
+    /* LAYOUT KHUSUS GRAFIK DENGAN SIDE-TAB DI KIRI GRAFIK */
+    .chart-layout-wrapper {
+      display: flex;
+      gap: 16px;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    /* Tab List Pertanyaan di Samping Kiri Grafik */
+    .q-sidebar-tabs {
+      width: 130px;
+      max-height: 380px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 8px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .q-tab-item {
+      padding: 8px 10px;
+      border-radius: 8px;
+      background-color: #F8FAFC;
+      border: 1px solid var(--border-color);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .q-tab-item:hover {
+      background-color: #E2E8F0;
+      color: var(--text-dark);
+    }
+
+    .q-tab-item.active {
+      background-color: var(--primary-dark);
+      color: white;
+      border-color: var(--primary-dark);
     }
 
     .chart-container {
       position: relative;
-      height: 400px;
+      height: 380px;
+      flex-grow: 1;
       width: 100%;
+      min-width: 0;
     }
 
-    /* Scrollable Interactive Tables */
+    /* Scrollable Container Untuk Tabel */
     .table-container {
-      max-height: 400px;
+      max-height: 380px;
       overflow-y: auto;
       overflow-x: auto;
       border-radius: 12px;
@@ -228,8 +285,8 @@
     }
 
     th {
-      padding: 12px 14px;
-      font-size: 12px;
+      padding: 10px 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-muted);
       border-bottom: 2px solid var(--border-color);
@@ -240,10 +297,9 @@
     }
 
     td {
-      padding: 12px 14px;
-      font-size: 13px;
+      padding: 10px 12px;
+      font-size: 12px;
       border-bottom: 1px solid var(--border-color);
-      line-height: 1.4;
     }
 
     tr.question-row {
@@ -266,7 +322,7 @@
 
     .badge {
       display: inline-block;
-      padding: 2px 8px;
+      padding: 2px 6px;
       border-radius: 20px;
       font-size: 10px;
       font-weight: 600;
@@ -275,14 +331,66 @@
     .badge-demo { background: #FEF3C7; color: #D97706; }
     .badge-likert { background: #E0F2FE; color: #0369A1; }
 
-    /* Layout Responsif */
+    /* Custom Scrollbar */
+    .q-sidebar-tabs::-webkit-scrollbar,
+    .table-container::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .q-sidebar-tabs::-webkit-scrollbar-thumb,
+    .table-container::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 10px;
+    }
+
+    /* MEDIA QUERIES UNTUK TAMPILAN RESPONSIF (HP & TABLET) */
     @media (max-width: 1024px) {
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
-      body { flex-direction: column; }
-      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); }
-      .main-content { padding: 16px; }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        padding: 16px 20px;
+        gap: 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .nav-menu {
+        flex-direction: row;
+      }
+      .main-content {
+        padding: 16px;
+      }
+      /* Mengubah Side-Tab Kiri Grafik Menjadi Horizontal Scroll di HP */
+      .chart-layout-wrapper {
+        flex-direction: column;
+      }
+      .q-sidebar-tabs {
+        width: 100%;
+        max-height: none;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding-right: 0;
+        padding-bottom: 8px;
+      }
+      .q-tab-item {
+        flex-shrink: 0;
+      }
+      .chart-container {
+        height: 300px;
+      }
     }
   </style>
 </head>
@@ -295,7 +403,6 @@
     </div>
     <ul class="nav-menu">
       <li class="nav-item active"><a href="#">📊 Dashboard</a></li>
-      <li class="nav-item"><a href="#">📝 Respon Kuesioner</a></li>
     </ul>
   </aside>
 
@@ -320,7 +427,7 @@
       </div>
     </div>
 
-    <!-- TABS NAVIGASI PAS DI ATAS/KIRI GRAFIK -->
+    <!-- TAB NAVIGASI UTAMA -->
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-btn-chart" onclick="switchTab('chart')">
         📊 Grafik & Pertanyaan
@@ -330,27 +437,36 @@
       </button>
     </div>
 
-    <!-- TAB 1: VIEW GRAFIK & DAFTAR PERTANYAAN -->
+    <!-- TAB 1: GRAFIK DENGAN TAB LIST PERTANYAAN DI SISI KIRI -->
     <div id="view-chart" class="tab-content active">
       <div class="dashboard-grid">
         
-        <!-- KIRI: Kartu Grafik Utama -->
+        <!-- KARTU GRAFIK (Dilengkapi Tab Pertanyaan di Kiri) -->
         <div class="card">
           <div class="card-header">
             <h2 class="card-title" id="current-chart-title">Visualisasi Jawaban</h2>
             <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="current-chart-subtitle">
-              Klik pertanyaan di sebelah kanan untuk melihat detail grafik.
+              Pilih ID pertanyaan di sebelah kiri grafik untuk berpindah secara cepat.
             </p>
           </div>
-          <div class="chart-container">
-            <canvas id="analyticsChart"></canvas>
+          
+          <div class="chart-layout-wrapper">
+            <!-- TAB LIST PERTANYAAN (DI SEBELAH KIRI GRAFIK) -->
+            <div class="q-sidebar-tabs" id="q-sidebar-list">
+              <!-- Item Tab Dimuat Secara Dinamis via JS -->
+            </div>
+
+            <!-- AREA GRAFIK -->
+            <div class="chart-container">
+              <canvas id="analyticsChart"></canvas>
+            </div>
           </div>
         </div>
 
-        <!-- KANAN: Kartu Daftar Pertanyaan (Interactive) -->
+        <!-- KARTU DAFTAR PERTANYAAN LENGKAP -->
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title">Pilih Pertanyaan</h2>
+            <h2 class="card-title">Daftar Pertanyaan</h2>
           </div>
           <div class="table-container">
             <table>
@@ -371,16 +487,13 @@
       </div>
     </div>
 
-    <!-- TAB 2: VIEW TABEL DETAIL JAWABAN PER RESPONDEN -->
+    <!-- TAB 2: TABEL RESPONDEN -->
     <div id="view-table" class="tab-content">
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">Data Detail Jawaban Responden</h2>
-          <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-            Tabel berikut menampilkan seluruh masukan/jawaban lengkap dari tiap responden secara individual.
-          </p>
         </div>
-        <div class="table-container" style="max-height: 550px;">
+        <div class="table-container" style="max-height: 520px;">
           <table>
             <thead>
               <tr id="respondent-table-header">
@@ -416,7 +529,7 @@
 
   </main>
 
-  <!-- Script Firebase & Logic -->
+  <!-- Script Firebase & Dynamic Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -460,7 +573,6 @@
     let respondentsData = [];
     let myChart = null;
 
-    // FITUR: Fungsi Switch Tab
     window.switchTab = function(tabName) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -505,6 +617,7 @@
         });
 
         document.getElementById('stat-total-responden').innerText = respondentsData.length;
+        renderQuestionSidebarTabs();
         renderQuestionsTable();
         renderRespondentDetailsTable();
         
@@ -514,6 +627,25 @@
       } catch (error) {
         console.error("Gagal mengambil data Firestore:", error);
       }
+    }
+
+    // Render Tab List Pertanyaan di Samping Kiri Grafik
+    function renderQuestionSidebarTabs() {
+      const container = document.getElementById('q-sidebar-list');
+      container.innerHTML = '';
+
+      questions.forEach((q, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'q-tab-item' + (index === 0 ? ' active' : '');
+        btn.setAttribute('data-id', q.id);
+        btn.innerText = q.id;
+
+        btn.addEventListener('click', () => {
+          updateChart(q.id);
+        });
+
+        container.appendChild(btn);
+      });
     }
 
     function renderQuestionsTable() {
@@ -534,8 +666,6 @@
         `;
 
         tr.addEventListener('click', () => {
-          document.querySelectorAll('.question-row').forEach(row => row.classList.remove('active'));
-          tr.classList.add('active');
           updateChart(q.id);
         });
 
@@ -543,7 +673,6 @@
       });
     }
 
-    // FITUR: Render Tabel Masing-Masing Responden
     function renderRespondentDetailsTable() {
       const tbody = document.getElementById('respondent-table-body');
       tbody.innerHTML = '';
@@ -555,8 +684,6 @@
 
       respondentsData.forEach((resp, index) => {
         const tr = document.createElement('tr');
-        
-        // Format Timestamp jika ada
         let waktu = "-";
         if (resp.waktu_submit && resp.waktu_submit.toDate) {
           waktu = resp.waktu_submit.toDate().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
@@ -589,12 +716,32 @@
       });
     }
 
+    // Update Grafik & Sinkronisasi Semua Tab Active State
     function updateChart(questionId) {
       const question = questions.find(q => q.id === questionId);
       if (!question) return;
 
       document.getElementById('current-chart-title').innerText = `[${question.id}] ${question.text}`;
       
+      // Update Active state di Side-Tab Kiri Grafik
+      document.querySelectorAll('.q-tab-item').forEach(item => {
+        if (item.getAttribute('data-id') === questionId) {
+          item.classList.add('active');
+          item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      // Update Active state di Tabel Kanan
+      document.querySelectorAll('.question-row').forEach(row => {
+        if (row.getAttribute('data-id') === questionId) {
+          row.classList.add('active');
+        } else {
+          row.classList.remove('active');
+        }
+      });
+
       let labels = [];
       let counts = [];
 
