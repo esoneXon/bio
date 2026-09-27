@@ -134,10 +134,53 @@
       color: var(--text-muted);
     }
 
-    /* Side-by-Side Dashboard Grid Layout */
+    /* TABS BAR (Diletakkan Tepat di Atas/Kiri Grafik) */
+    .tab-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      background-color: #E2E8F0;
+      color: var(--text-dark);
+    }
+
+    .tab-btn.active {
+      background-color: var(--text-dark);
+      color: white;
+    }
+
+    /* Tab Content Switcher */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Side-by-Side Grid Layout (Untuk Tab Grafik) */
     .dashboard-grid {
       display: grid;
-      grid-template-columns: 1.3fr 1fr; /* Grafik di Kiri (Lebih Luas), Pertanyaan di Kanan */
+      grid-template-columns: 1.3fr 1fr;
       gap: 24px;
       align-items: start;
     }
@@ -168,10 +211,11 @@
       width: 100%;
     }
 
-    /* Scrollable Interactive Questions List */
+    /* Scrollable Interactive Tables */
     .table-container {
       max-height: 400px;
       overflow-y: auto;
+      overflow-x: auto;
       border-radius: 12px;
       border: 1px solid var(--border-color);
     }
@@ -180,6 +224,7 @@
       width: 100%;
       border-collapse: collapse;
       text-align: left;
+      white-space: nowrap;
     }
 
     th {
@@ -230,10 +275,10 @@
     .badge-demo { background: #FEF3C7; color: #D97706; }
     .badge-likert { background: #E0F2FE; color: #0369A1; }
 
-    /* Layout Responsif untuk Layar Kecil / HP */
+    /* Layout Responsif */
     @media (max-width: 1024px) {
       .dashboard-grid {
-        grid-template-columns: 1fr; /* Kembali bertumpuk jika di HP/Tablet */
+        grid-template-columns: 1fr;
       }
       body { flex-direction: column; }
       .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); }
@@ -275,48 +320,103 @@
       </div>
     </div>
 
-    <!-- Grid Samping-sampingan (Grafik + Daftar Pertanyaan) -->
-    <div class="dashboard-grid">
-      
-      <!-- KIRI: Kartu Grafik Utama -->
+    <!-- TABS NAVIGASI PAS DI ATAS/KIRI GRAFIK -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-btn-chart" onclick="switchTab('chart')">
+        📊 Grafik & Pertanyaan
+      </button>
+      <button class="tab-btn" id="tab-btn-table" onclick="switchTab('table')">
+        📋 Tabel Jawaban Per Responden
+      </button>
+    </div>
+
+    <!-- TAB 1: VIEW GRAFIK & DAFTAR PERTANYAAN -->
+    <div id="view-chart" class="tab-content active">
+      <div class="dashboard-grid">
+        
+        <!-- KIRI: Kartu Grafik Utama -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title" id="current-chart-title">Visualisasi Jawaban</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="current-chart-subtitle">
+              Klik pertanyaan di sebelah kanan untuk melihat detail grafik.
+            </p>
+          </div>
+          <div class="chart-container">
+            <canvas id="analyticsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- KANAN: Kartu Daftar Pertanyaan (Interactive) -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Pilih Pertanyaan</h2>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tipe</th>
+                  <th>Pertanyaan</th>
+                </tr>
+              </thead>
+              <tbody id="questions-table-body">
+                <!-- Dimuat via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: VIEW TABEL DETAIL JAWABAN PER RESPONDEN -->
+    <div id="view-table" class="tab-content">
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title" id="current-chart-title">Visualisasi Jawaban</h2>
-          <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="current-chart-subtitle">
-            Klik pertanyaan di sebelah kanan untuk melihat detail grafik.
+          <h2 class="card-title">Data Detail Jawaban Responden</h2>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+            Tabel berikut menampilkan seluruh masukan/jawaban lengkap dari tiap responden secara individual.
           </p>
         </div>
-        <div class="chart-container">
-          <canvas id="analyticsChart"></canvas>
-        </div>
-      </div>
-
-      <!-- KANAN: Kartu Daftar Pertanyaan (Interactive) -->
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Pilih Pertanyaan</h2>
-        </div>
-        <div class="table-container">
+        <div class="table-container" style="max-height: 550px;">
           <table>
             <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tipe</th>
-                <th>Pertanyaan</th>
+              <tr id="respondent-table-header">
+                <th># Responden</th>
+                <th>Waktu Submit</th>
+                <th>Belanja 2x?</th>
+                <th>Gender</th>
+                <th>Usia</th>
+                <th>Pekerjaan</th>
+                <th>Q1</th>
+                <th>Q2</th>
+                <th>Q3</th>
+                <th>Q4</th>
+                <th>Q5</th>
+                <th>Q6</th>
+                <th>Q7</th>
+                <th>Q8</th>
+                <th>Q9</th>
+                <th>Q10</th>
+                <th>Q11</th>
+                <th>Q12</th>
+                <th>Q13</th>
+                <th>Q14</th>
               </tr>
             </thead>
-            <tbody id="questions-table-body">
-              <!-- Baris Pertanyaan Dimuat secara Dinamis via JS -->
+            <tbody id="respondent-table-body">
+              <!-- Detail Responden Dimuat via JS -->
             </tbody>
           </table>
         </div>
       </div>
-
     </div>
 
   </main>
 
-  <!-- Script Firebase & Chart.js -->
+  <!-- Script Firebase & Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -360,6 +460,20 @@
     let respondentsData = [];
     let myChart = null;
 
+    // FITUR: Fungsi Switch Tab
+    window.switchTab = function(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      if (tabName === 'chart') {
+        document.getElementById('tab-btn-chart').classList.add('active');
+        document.getElementById('view-chart').classList.add('active');
+      } else if (tabName === 'table') {
+        document.getElementById('tab-btn-table').classList.add('active');
+        document.getElementById('view-table').classList.add('active');
+      }
+    };
+
     function initChart() {
       const ctx = document.getElementById('analyticsChart').getContext('2d');
       myChart = new Chart(ctx, {
@@ -392,6 +506,7 @@
 
         document.getElementById('stat-total-responden').innerText = respondentsData.length;
         renderQuestionsTable();
+        renderRespondentDetailsTable();
         
         if (questions.length > 0) {
           updateChart(questions[0].id);
@@ -423,6 +538,52 @@
           tr.classList.add('active');
           updateChart(q.id);
         });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // FITUR: Render Tabel Masing-Masing Responden
+    function renderRespondentDetailsTable() {
+      const tbody = document.getElementById('respondent-table-body');
+      tbody.innerHTML = '';
+
+      if (respondentsData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 20px; color: var(--text-muted);">Belum ada data responden.</td></tr>`;
+        return;
+      }
+
+      respondentsData.forEach((resp, index) => {
+        const tr = document.createElement('tr');
+        
+        // Format Timestamp jika ada
+        let waktu = "-";
+        if (resp.waktu_submit && resp.waktu_submit.toDate) {
+          waktu = resp.waktu_submit.toDate().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
+        }
+
+        tr.innerHTML = `
+          <td><b>Responden #${index + 1}</b></td>
+          <td>${waktu}</td>
+          <td>${resp.demo_1 || '-'}</td>
+          <td>${resp.demo_2 || '-'}</td>
+          <td>${resp.demo_3 || '-'}</td>
+          <td>${resp.demo_4 || '-'}</td>
+          <td>${resp.q1 || '-'}</td>
+          <td>${resp.q2 || '-'}</td>
+          <td>${resp.q3 || '-'}</td>
+          <td>${resp.q4 || '-'}</td>
+          <td>${resp.q5 || '-'}</td>
+          <td>${resp.q6 || '-'}</td>
+          <td>${resp.q7 || '-'}</td>
+          <td>${resp.q8 || '-'}</td>
+          <td>${resp.q9 || '-'}</td>
+          <td>${resp.q10 || '-'}</td>
+          <td>${resp.q11 || '-'}</td>
+          <td>${resp.q12 || '-'}</td>
+          <td>${resp.q13 || '-'}</td>
+          <td>${resp.q14 || '-'}</td>
+        `;
 
         tbody.appendChild(tr);
       });
