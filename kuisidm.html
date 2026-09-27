@@ -21,10 +21,9 @@
       background-color: var(--bg-color);
       display: flex;
       justify-content: center;
-      /* Menggunakan 100dvh untuk mobile, fallback ke 100vh */
       min-height: 100vh;
       min-height: 100dvh; 
-      overflow: hidden; /* Mencegah body scroll, scroll hanya ada di dalam card */
+      overflow: hidden;
     }
 
     #app-container {
@@ -38,7 +37,7 @@
       background-color: var(--bg-color);
       background-image: radial-gradient(#d1d1d1 1px, transparent 1px);
       background-size: 20px 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.05); /* Memberikan batas halus jika dibuka di PC */
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
     }
 
     .screen {
@@ -83,7 +82,7 @@
     }
     
     .question-text {
-      font-size: clamp(22px, 5vw, 26px); /* Ukuran font dinamis menyesuaikan lebar layar */
+      font-size: clamp(22px, 5vw, 26px);
       font-weight: 800;
       color: var(--text-main);
       line-height: 1.4;
@@ -94,14 +93,13 @@
     .yellow-card {
       background-color: var(--card-color);
       border-radius: 40px 40px 0 0;
-      /* Padding bawah mengakomodasi safe area / area navigasi di HP */
       padding: 40px 30px calc(30px + env(safe-area-inset-bottom)) 30px;
       margin-top: auto;
       display: flex;
       flex-direction: column;
       flex-grow: 1;
-      overflow-y: auto; /* Bisa di-scroll jika opsi terlalu banyak */
-      -webkit-overflow-scrolling: touch; /* Smooth scroll di iOS */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .option-btn {
@@ -119,7 +117,7 @@
       transition: all 0.2s ease;
       text-align: left;
       flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent; /* Menghilangkan highlight biru di HP saat ditekan */
+      -webkit-tap-highlight-color: transparent;
     }
     .option-btn:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-1px); }
     .option-btn:active { transform: translateY(1px); }
@@ -176,7 +174,7 @@
       transition: all 0.3s ease;
       width: 100%;
       flex-shrink: 0;
-      margin-top: auto; /* Mendorong tombol ke paling bawah kartu */
+      margin-top: auto;
       -webkit-tap-highlight-color: transparent;
     }
     .btn-submit:disabled { 
@@ -191,7 +189,7 @@
 
     #btn-mulai { margin-top: 30px; }
 
-    /* Center Content Khusus Intro & Outro */
+    /* Center Content Khusus Intro, Outro & Blocked */
     .center-content {
       text-align: center;
       justify-content: center;
@@ -234,9 +232,15 @@
       <p>Sudah meluangkan waktu untuk mengisi kuis ini ❤️😁</p>
     </div>
 
+    <!-- 4. BLOCKED SCREEN (Jika sudah pernah mengisi) -->
+    <div id="screen-blocked" class="screen center-content">
+      <h1 style="font-size: 40px;">🚫</h1>
+      <h1>Akses Ditolak</h1>
+      <p>Anda/Perangkat ini sudah pernah mengisi kuesioner. Pengisian hanya diperbolehkan 1 kali saja 🙏</p>
+    </div>
+
   </div>
 
-  <!-- Pastikan file app.js berada di folder yang sama dengan kuisidm.html -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
