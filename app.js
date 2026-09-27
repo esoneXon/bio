@@ -1,5 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  getDocs, 
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCWErOEhDXiCyOYh3bggDRLMF7w4xImiKg",
@@ -38,10 +46,15 @@ const questions = [
 
 let currentStep = 0;
 let answersData = {};
+let userIP = "";
+const userAgent = navigator.userAgent;
+let isSubmitted = false;
 
 const screenIntro = document.getElementById('screen-intro');
 const screenQuiz = document.getElementById('screen-quiz');
 const screenOutro = document.getElementById('screen-outro');
+const screenBlocked = document.getElementById('screen-blocked');
+
 const btnMulai = document.getElementById('btn-mulai');
 const btnNext = document.getElementById('btn-next');
 const questionText = document.getElementById('question-text');
@@ -49,6 +62,67 @@ const inputArea = document.getElementById('input-area');
 const progressBar = document.getElementById('progress-bar');
 
 const alphabet = ['A', 'B', 'C', 'D', 'E'];
+
+// 1. Ambil IP Publik
+async function getUserIP() {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip;
+  } catch (err) {
+    console.warn("Gagal mengambil IP:", err);
+    return "UNKNOWN_IP";
+  }
+}
+
+// 2. Cek Pembatasan 1x Respon (LocalStorage + IP + UserAgent)
+async function checkSubmissionRestriction() {
+  if (localStorage.getItem("indomaret_submitted") === "true") {
+    tampilkanBlocked();
+    return true;
+  }
+
+  userIP = await getUserIP();
+
+  try {
+    const q = query(
+      collection(db, "jawaban_responden"),
+      where("ip_address", "==", userIP),
+      where("user_agent", "==", userAgent)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      localStorage.setItem("indomaret_submitted", "true");
+      tampilkanBlocked();
+      return true;
+    }
+  } catch (err) {
+    console.error("Gagal memeriksa pembatasan Firestore:", err);
+  }
+
+  return false;
+}
+
+function tampilkanBlocked() {
+  screenIntro.classList.remove('active');
+  screenQuiz.classList.remove('active');
+  screenOutro.classList.remove('active');
+  screenBlocked.classList.add('active');
+  isSubmitted = true;
+}
+
+function tampilkanOutro() {
+  screenQuiz.classList.remove('active');
+  screenIntro.classList.remove('active');
+  screenOutro.classList.add('active');
+  
+  isSubmitted = true;
+  localStorage.setItem("indomaret_submitted", "true");
+
+  // Kunci riwayat history untuk mencegah navigasi kembali ke kuis
+  history.pushState(null, null, window.location.pathname);
+}
 
 // FITUR: Deteksi tombol Enter
 document.addEventListener('keydown', (event) => {
@@ -61,8 +135,14 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-// FITUR: Handle tombol Back dari HP/Browser (History Popstate)
+// FITUR: Handle tombol Back dari HP/Browser
 window.addEventListener('popstate', (event) => {
+  // Jika pengguna sudah pernah submit / berada di outro / diblokir, tekan BACK akan KELUAR
+  if (isSubmitted || localStorage.getItem("indomaret_submitted") === "true") {
+    window.location.replace("about:blank");
+    return;
+  }
+
   if (event.state && event.state.step !== undefined) {
     currentStep = event.state.step;
     screenIntro.classList.remove('active');
@@ -70,7 +150,6 @@ window.addEventListener('popstate', (event) => {
     screenQuiz.classList.add('active');
     renderQuestion();
   } else {
-    // Jika tidak ada history (sudah di awal), tampilkan intro
     currentStep = 0;
     screenQuiz.classList.remove('active');
     screenOutro.classList.remove('active');
@@ -83,7 +162,6 @@ btnMulai.addEventListener('click', () => {
   screenQuiz.classList.add('active');
   currentStep = 0;
   
-  // Catat halaman pertama ke History
   history.pushState({ step: currentStep }, "", "?soal=" + currentStep);
   renderQuestion();
 });
@@ -115,7 +193,6 @@ function renderQuestion() {
       btn.appendChild(label);
       btn.appendChild(textNode);
       
-      // FITUR UX: Otomatis menyeleksi kembali jawaban jika user menekan tombol "Kembali"
       if (answersData[q.id] === opt) {
         btn.classList.add('selected');
         btnNext.disabled = false;
@@ -134,7 +211,6 @@ function renderQuestion() {
     input.type = 'number';
     input.placeholder = q.placeholder;
     
-    // FITUR UX: Mengisi otomatis kolom angka jika user kembali ke pertanyaan ini
     if (answersData[q.id]) {
       input.value = answersData[q.id];
       btnNext.disabled = false;
@@ -146,7 +222,6 @@ function renderQuestion() {
     };
     inputArea.appendChild(input);
     
-    // Fokus otomatis ke input angka untuk kemudahan Enter
     setTimeout(() => input.focus(), 100); 
   }
 }
@@ -159,7 +234,6 @@ btnNext.addEventListener('click', async () => {
 
   if (currentStep < questions.length - 1) {
     currentStep++;
-    // Catat halaman selanjutnya ke History
     history.pushState({ step: currentStep }, "", "?soal=" + currentStep);
     renderQuestion();
   } else {
@@ -167,7 +241,11 @@ btnNext.addEventListener('click', async () => {
     btnNext.innerText = "Mengirim...";
     
     try {
+      // Menyimpan data IP & Browser/HP ke dalam data Firestore
+      answersData.ip_address = userIP;
+      answersData.user_agent = userAgent;
       answersData.waktu_submit = serverTimestamp();
+
       await addDoc(collection(db, "jawaban_responden"), answersData);
       tampilkanOutro();
     } catch (error) {
@@ -179,7 +257,7 @@ btnNext.addEventListener('click', async () => {
   }
 });
 
-function tampilkanOutro() {
-  screenQuiz.classList.remove('active');
-  screenOutro.classList.add('active');
-}
+// Inisialisasi awal saat dokumen selesai dimuat
+window.addEventListener('DOMContentLoaded', async () => {
+  await checkSubmissionRestriction();
+});
