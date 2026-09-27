@@ -17,17 +17,16 @@
 
   <div class="container">
     <h2>Panel Admin Kuesioner</h2>
-    <p>Klik tombol di bawah ini untuk menarik semua data jawaban dari database dan mengunduhnya sebagai file CSV yang bisa dibuka di Excel.</p>
+    <p>Klik tombol di bawah ini untuk menarik semua data jawaban dari database dan mengunduhnya sebagai file CSV dengan Header Lengkap.</p>
     <button id="btnUnduh">Unduh Data (CSV)</button>
     <p id="statusText" style="margin-top: 15px; font-weight: bold; color: #007bff;"></p>
   </div>
 
   <script type="module">
-    // 1. Import Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // 2. Konfigurasi Firebase Anda
+    // Konfigurasi Firebase Anda
     const firebaseConfig = {
       apiKey: "AIzaSyCWErOEhDXiCyOYh3bggDRLMF7w4xImiKg",
       authDomain: "tanyaaja-17b48.firebaseapp.com",
@@ -44,6 +43,35 @@
     const btnUnduh = document.getElementById('btnUnduh');
     const statusText = document.getElementById('statusText');
 
+    // MAPPING HEADER: Mengubah ID di database menjadi pertanyaan panjang
+    const headerMapping = {
+      "waktu_submit": "Waktu Submit",
+      "demo_1": "1. Apakah Anda pernah berbelanja di Indomaret Bengkong Kolam 11 minimal 2 kali?",
+      "demo_2": "2. Jenis Kelamin",
+      "demo_3": "3. Usia Anda saat ini",
+      "demo_4": "4. Pekerjaan",
+      "q1": "1 (X1). Produk makanan/minuman yang dijual di gerai ini selalu segar dan tidak kedaluwarsa.",
+      "q2": "2 (X1). Variasi dan ketersediaan produk harian yang saya butuhkan di gerai ini tergolong lengkap.",
+      "q3": "3 (X1). Kemasan produk fisik yang dipajang di rak dalam kondisi baik (tidak penyok/rusak).",
+      "q4": "4 (X2). Fasilitas gerai (AC dingin, ruangan bersih, pencahayaan terang) membuat saya nyaman.",
+      "q5": "5 (X2). Proses transaksi di kasir dilayani dengan cepat, tepat, dan antrean teratur.",
+      "q6": "6 (X2). Karyawan sigap dan tanggap membantu ketika saya kesulitan mencari letak barang.",
+      "q7": "7 (X2). Karyawan memberikan informasi harga promo secara jujur dan sesuai dengan label harga.",
+      "q8": "8 (X2). Karyawan menyapa, senyum, dan bersikap ramah selama melayani proses belanja.",
+      "q9": "9 (Y). Pengalaman berbelanja di gerai ini sudah sesuai dengan apa yang saya harapkan.",
+      "q10": "10 (Y). Secara keseluruhan, saya merasa puas dengan produk dan layanan di gerai ini.",
+      "q11": "11 (Y). Saya merasa keputusan saya memilih belanja di gerai ini sudah sangat tepat.",
+      "q12": "12 (Z). Saya akan terus kembali berbelanja di gerai ini untuk kebutuhan harian di masa depan.",
+      "q13": "13 (Z). Saya tetap memilih gerai ini meskipun ada minimarket pesaing lain di sekitar Bengkong Kolam.",
+      "q14": "14 (Z). Saya bersedia merekomendasikan gerai Indomaret ini kepada keluarga, teman, atau tetangga."
+    };
+
+    // Urutan kolom yang diinginkan di file Excel
+    const urutanKolom = [
+      "waktu_submit", "demo_1", "demo_2", "demo_3", "demo_4",
+      "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14"
+    ];
+
     btnUnduh.addEventListener('click', async () => {
       btnUnduh.disabled = true;
       statusText.textContent = "Sedang mengambil data dari database...";
@@ -58,43 +86,36 @@
           return;
         }
 
-        // Siapkan array untuk menampung data
         let dataArray = [];
-        let headers = new Set(); // Menggunakan Set agar nama kolom (header) unik
-
         querySnapshot.forEach((doc) => {
           let data = doc.data();
-          
-          // Konversi timestamp Firebase menjadi teks tanggal dan waktu yang bisa dibaca
           if (data.waktu_submit) {
             data.waktu_submit = data.waktu_submit.toDate().toLocaleString('id-ID');
           }
-          
           dataArray.push(data);
-          Object.keys(data).forEach(key => headers.add(key));
         });
 
-        // Susun format CSV
-        const headerArray = Array.from(headers);
-        let csvContent = headerArray.join(",") + "\n"; // Baris pertama (Header)
+        // 1. Susun Baris Pertama (Header)
+        const headerCsv = urutanKolom.map(kunci => `"${headerMapping[kunci] || kunci}"`).join(",");
+        let csvContent = headerCsv + "\n";
 
+        // 2. Susun Baris Isi (Data Jawaban)
         dataArray.forEach(row => {
-          let rowData = headerArray.map(header => {
-            let cellData = row[header] === undefined || row[header] === null ? "" : row[header];
-            // Bersihkan koma atau baris baru agar tidak merusak format kolom CSV
-            cellData = String(cellData).replace(/,/g, " ").replace(/\n/g, " "); 
-            return cellData;
+          let rowData = urutanKolom.map(kunci => {
+            let isiSel = row[kunci] === undefined || row[kunci] === null ? "" : row[kunci];
+            // Format nilai dengan tanda kutip ganda agar koma di dalam jawaban tidak merusak kolom Excel
+            return `"${String(isiSel).replace(/"/g, '""').replace(/\n/g, " ")}"`;
           });
           csvContent += rowData.join(",") + "\n";
         });
 
-        // Buat file CSV virtual dan paksa browser untuk mengunduhnya
+        // 3. Proses Pengunduhan
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         
         link.setAttribute("href", url);
-        link.setAttribute("download", "Data_Kuesioner.csv");
+        link.setAttribute("download", "Data_Kuesioner_Lengkap.csv");
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
