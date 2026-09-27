@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Konfigurasi Firebase Anda
 const firebaseConfig = {
   apiKey: "AIzaSyCWErOEhDXiCyOYh3bggDRLMF7w4xImiKg",
   authDomain: "tanyaaja-17b48.firebaseapp.com",
@@ -15,7 +14,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Data Pertanyaan
 const optionsLikert = ["Sangat Tidak Setuju (STS)", "Tidak Setuju (TS)", "Netral (N)", "Setuju (S)", "Sangat Setuju (SS)"];
 const questions = [
   { id: 'demo_1', text: 'Apakah Anda pernah berbelanja di Indomaret Bengkong Kolam 11 minimal 2 kali?', type: 'choice', options: ['Ya', 'Tidak'] },
@@ -38,11 +36,9 @@ const questions = [
   { id: 'q14', text: 'Saya bersedia merekomendasikan gerai ini kepada keluarga/teman.', type: 'choice', options: optionsLikert }
 ];
 
-// State Management
 let currentStep = 0;
 let answersData = {};
 
-// Elemen DOM
 const screenIntro = document.getElementById('screen-intro');
 const screenQuiz = document.getElementById('screen-quiz');
 const screenOutro = document.getElementById('screen-outro');
@@ -52,24 +48,20 @@ const questionText = document.getElementById('question-text');
 const inputArea = document.getElementById('input-area');
 const progressBar = document.getElementById('progress-bar');
 
-// Label A, B, C, D, E untuk tombol
 const alphabet = ['A', 'B', 'C', 'D', 'E'];
 
-// Mulai Kuis
 btnMulai.addEventListener('click', () => {
   screenIntro.classList.remove('active');
   screenQuiz.classList.add('active');
   renderQuestion();
 });
 
-// Render Pertanyaan
 function renderQuestion() {
   const q = questions[currentStep];
   questionText.innerText = q.text;
   inputArea.innerHTML = '';
   btnNext.disabled = true;
   
-  // Update Progress Bar
   progressBar.innerHTML = '';
   for (let i = 0; i < questions.length; i++) {
     const dot = document.createElement('div');
@@ -77,7 +69,6 @@ function renderQuestion() {
     progressBar.appendChild(dot);
   }
 
-  // Render Input Type
   if (q.type === 'choice') {
     q.options.forEach((opt, index) => {
       const btn = document.createElement('div');
@@ -93,11 +84,8 @@ function renderQuestion() {
       btn.appendChild(textNode);
       
       btn.onclick = () => {
-        // Hilangkan style selected dari semua opsi
         document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-        // Tambahkan style selected ke yang diklik
         btn.classList.add('selected');
-        // Simpan jawaban (Ubah Teks STS, dll menjadi angka untuk database, atau simpan teksnya langsung. Di sini kita simpan teksnya langsung)
         answersData[q.id] = opt;
         btnNext.disabled = false;
       };
@@ -115,20 +103,16 @@ function renderQuestion() {
   }
 }
 
-// Tombol Next / Submit
 btnNext.addEventListener('click', async () => {
-  // Aturan khusus: Jika Q1 dijawab "Tidak", langsung hentikan
   if (currentStep === 0 && answersData['demo_1'] === 'Tidak') {
     tampilkanOutro();
     return;
   }
 
-  // Pindah ke pertanyaan berikutnya atau submit
   if (currentStep < questions.length - 1) {
     currentStep++;
     renderQuestion();
   } else {
-    // Tombol di akhir kuis ditekan (Submit)
     btnNext.disabled = true;
     btnNext.innerText = "Mengirim...";
     
@@ -140,7 +124,7 @@ btnNext.addEventListener('click', async () => {
       console.error(error);
       alert("Gagal mengirim jawaban. Periksa koneksi Anda.");
       btnNext.disabled = false;
-      btnNext.innerText = "Submit Answer";
+      btnNext.innerText = "Selanjutnya";
     }
   }
 });
