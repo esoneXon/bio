@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Ekspor Data</title>
+  <style>
+    body { font-family: sans-serif; padding: 40px; background-color: #f4f7f6; text-align: center; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    button { padding: 15px 25px; font-size: 16px; font-weight: bold; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+    button:hover { background-color: #218838; }
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
+    p { color: #555; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Panel Admin Kuesioner</h2>
+    <p>Klik tombol di bawah ini untuk menarik semua data jawaban dari database dan mengunduhnya sebagai file CSV yang bisa dibuka di Excel.</p>
+    <button id="btnUnduh">Unduh Data (CSV)</button>
+    <p id="statusText" style="margin-top: 15px; font-weight: bold; color: #007bff;"></p>
+  </div>
+
+  <script type="module">
+    // 1. Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // 2. Konfigurasi Firebase Anda
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWErOEhDXiCyOYh3bggDRLMF7w4xImiKg",
+      authDomain: "tanyaaja-17b48.firebaseapp.com",
+      databaseURL: "https://tanyaaja-17b48.firebaseio.com",
+      projectId: "tanyaaja-17b48",
+      storageBucket: "tanyaaja-17b48.appspot.com",
+      messagingSenderId: "416065878381",
+      appId: "1:416065878381:web:8672bd86cccce067694264"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const btnUnduh = document.getElementById('btnUnduh');
+    const statusText = document.getElementById('statusText');
+
+    btnUnduh.addEventListener('click', async () => {
+      btnUnduh.disabled = true;
+      statusText.textContent = "Sedang mengambil data dari database...";
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "jawaban_responden"));
+        
+        if (querySnapshot.empty) {
+          alert("Belum ada data jawaban di database.");
+          statusText.textContent = "";
+          btnUnduh.disabled = false;
+          return;
+        }
+
+        // Siapkan array untuk menampung data
+        let dataArray = [];
+        let headers = new Set(); // Menggunakan Set agar nama kolom (header) unik
+
+        querySnapshot.forEach((doc) => {
+          let data = doc.data();
+          
+          // Konversi timestamp Firebase menjadi teks tanggal dan waktu yang bisa dibaca
+          if (data.waktu_submit) {
+            data.waktu_submit = data.waktu_submit.toDate().toLocaleString('id-ID');
+          }
+          
+          dataArray.push(data);
+          Object.keys(data).forEach(key => headers.add(key));
+        });
+
+        // Susun format CSV
+        const headerArray = Array.from(headers);
+        let csvContent = headerArray.join(",") + "\n"; // Baris pertama (Header)
+
+        dataArray.forEach(row => {
+          let rowData = headerArray.map(header => {
+            let cellData = row[header] === undefined || row[header] === null ? "" : row[header];
+            // Bersihkan koma atau baris baru agar tidak merusak format kolom CSV
+            cellData = String(cellData).replace(/,/g, " ").replace(/\n/g, " "); 
+            return cellData;
+          });
+          csvContent += rowData.join(",") + "\n";
+        });
+
+        // Buat file CSV virtual dan paksa browser untuk mengunduhnya
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute("href", url);
+        link.setAttribute("download", "Data_Kuesioner.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        statusText.textContent = `Berhasil mengunduh ${dataArray.length} data responden!`;
+      } catch (error) {
+        console.error(error);
+        statusText.textContent = "Gagal mengambil data.";
+        alert("Terjadi kesalahan saat mengambil data.");
+      } finally {
+        btnUnduh.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
