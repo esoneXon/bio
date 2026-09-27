@@ -21,7 +21,7 @@
     #app-container {
       width: 100%;
       max-width: 480px;
-      height: 100dvh; /* Menggunakan dvh agar lebih akurat di layar HP */
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       position: relative;
@@ -29,7 +29,6 @@
       background-size: 20px 20px;
     }
 
-    /* Screen Management */
     .screen {
       display: none;
       flex-direction: column;
@@ -46,7 +45,6 @@
     }
     @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-    /* Top Section (Question) */
     .top-section {
       padding: 40px 30px 20px 30px;
       flex-shrink: 0;
@@ -73,7 +71,6 @@
       margin: 0;
     }
 
-    /* Bottom Section (Yellow Card) */
     .yellow-card {
       background-color: #FFD84D;
       border-radius: 40px 40px 0 0;
@@ -85,7 +82,6 @@
       overflow-y: auto;
     }
 
-    /* Input & Options */
     .option-btn {
       background-color: white;
       border: 3px solid transparent;
@@ -134,7 +130,6 @@
     }
     input[type="number"]:focus { background: white; }
 
-    /* Submit Button - General */
     .btn-submit {
       background-color: #1A1A1A;
       color: white;
@@ -150,17 +145,9 @@
     }
     .btn-submit:disabled { background-color: #666; cursor: not-allowed; }
 
-    /* PERBAIKAN: Jarak khusus untuk tombol Mulai agar tidak terlempar ke bawah */
-    #btn-mulai {
-      margin-top: 30px; 
-    }
+    #btn-mulai { margin-top: 30px; }
+    #btn-next { margin-top: auto; }
 
-    /* PERBAIKAN: Jarak khusus untuk tombol Selanjutnya agar menempel di bawah kartu kuning */
-    #btn-next {
-      margin-top: auto;
-    }
-
-    /* Intro & Outro Special Style */
     .center-content {
       text-align: center;
       justify-content: center;
@@ -169,7 +156,6 @@
     }
     .center-content h1 { font-size: 28px; color: #1A1A1A; margin-bottom: 20px; line-height: 1.4; }
     .center-content p { font-size: 16px; color: #555; margin-bottom: 0; }
-
   </style>
 </head>
 <body>
@@ -205,6 +191,7 @@
 
   </div>
 
+  <!-- Pastikan file app.js berada di folder yang sama dengan kuisidm.html -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
