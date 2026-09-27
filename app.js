@@ -63,6 +63,30 @@ const progressBar = document.getElementById('progress-bar');
 
 const alphabet = ['A', 'B', 'C', 'D', 'E'];
 
+// FITUR SUARA: Membuat Suara Klik Menggunakan Web Audio API Bawaan Browser
+function playClickSound() {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime); 
+    osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.05);
+
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+  } catch (e) {
+    console.warn("Audio tidak didukung atau diblokir browser:", e);
+  }
+}
+
 // 1. Ambil IP Publik
 async function getUserIP() {
   try {
@@ -75,7 +99,7 @@ async function getUserIP() {
   }
 }
 
-// 2. Cek Pembatasan 1x Respon (LocalStorage + IP + UserAgent)
+// 2. Cek Pembatasan 1x Respon
 async function checkSubmissionRestriction() {
   if (localStorage.getItem("indomaret_submitted") === "true") {
     tampilkanBlocked();
@@ -119,25 +143,54 @@ function tampilkanOutro() {
   
   isSubmitted = true;
   localStorage.setItem("indomaret_submitted", "true");
-
-  // Kunci riwayat history untuk mencegah navigasi kembali ke kuis
   history.pushState(null, null, window.location.pathname);
 }
 
-// FITUR: Deteksi tombol Enter
+// FITUR: Navigasi Lanjut Soal / Submit
+async function handleNextStep() {
+  if (currentStep === 0 && answersData['demo_1'] === 'Tidak') {
+    tampilkanOutro();
+    return;
+  }
+
+  if (currentStep < questions.length - 1) {
+    currentStep++;
+    history.pushState({ step: currentStep }, "", "?soal=" + currentStep);
+    renderQuestion();
+  } else {
+    btnNext.disabled = true;
+    btnNext.innerText = "Mengirim...";
+    btnNext.style.display = 'block';
+    
+    try {
+      answersData.ip_address = userIP;
+      answersData.user_agent = userAgent;
+      answersData.waktu_submit = serverTimestamp();
+
+      await addDoc(collection(db, "jawaban_responden"), answersData);
+      tampilkanOutro();
+    } catch (error) {
+      console.error(error);
+      alert("Gagal mengirim jawaban. Periksa koneksi Anda.");
+      btnNext.disabled = false;
+      btnNext.innerText = "Selanjutnya";
+    }
+  }
+}
+
+// Handle tombol enter
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     if (screenIntro.classList.contains('active')) {
       btnMulai.click();
-    } else if (screenQuiz.classList.contains('active') && !btnNext.disabled) {
+    } else if (screenQuiz.classList.contains('active') && !btnNext.disabled && questions[currentStep].type === 'number') {
       btnNext.click();
     }
   }
 });
 
-// FITUR: Handle tombol Back dari HP/Browser
+// Handle tombol Back browser
 window.addEventListener('popstate', (event) => {
-  // Jika pengguna sudah pernah submit / berada di outro / diblokir, tekan BACK akan KELUAR
   if (isSubmitted || localStorage.getItem("indomaret_submitted") === "true") {
     window.location.replace("about:blank");
     return;
@@ -158,6 +211,7 @@ window.addEventListener('popstate', (event) => {
 });
 
 btnMulai.addEventListener('click', () => {
+  playClickSound();
   screenIntro.classList.remove('active');
   screenQuiz.classList.add('active');
   currentStep = 0;
@@ -166,11 +220,15 @@ btnMulai.addEventListener('click', () => {
   renderQuestion();
 });
 
+btnNext.addEventListener('click', () => {
+  playClickSound();
+  handleNextStep();
+});
+
 function renderQuestion() {
   const q = questions[currentStep];
   questionText.innerText = q.text;
   inputArea.innerHTML = '';
-  btnNext.disabled = true;
   
   progressBar.innerHTML = '';
   for (let i = 0; i < questions.length; i++) {
@@ -180,6 +238,9 @@ function renderQuestion() {
   }
 
   if (q.type === 'choice') {
+    // Sembunyikan tombol selanjutnya karena berpindah otomatis saat opsi ditekan
+    btnNext.style.display = 'none';
+
     q.options.forEach((opt, index) => {
       const btn = document.createElement('div');
       btn.className = 'option-btn';
@@ -195,18 +256,28 @@ function renderQuestion() {
       
       if (answersData[q.id] === opt) {
         btn.classList.add('selected');
-        btnNext.disabled = false;
       }
       
+      // FITUR: Suara Klik & Otomatis Lanjut
       btn.onclick = () => {
+        playClickSound();
         document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         answersData[q.id] = opt;
-        btnNext.disabled = false;
+
+        // Jeda 200ms agar efek visual tombol & suara sempat terasa
+        setTimeout(() => {
+          handleNextStep();
+        }, 200);
       };
+
       inputArea.appendChild(btn);
     });
   } else if (q.type === 'number') {
+    // Tampilkan tombol selanjutnya khusus untuk pertanyaan isian angka
+    btnNext.style.display = 'block';
+    btnNext.disabled = true;
+
     const input = document.createElement('input');
     input.type = 'number';
     input.placeholder = q.placeholder;
@@ -226,38 +297,7 @@ function renderQuestion() {
   }
 }
 
-btnNext.addEventListener('click', async () => {
-  if (currentStep === 0 && answersData['demo_1'] === 'Tidak') {
-    tampilkanOutro();
-    return;
-  }
-
-  if (currentStep < questions.length - 1) {
-    currentStep++;
-    history.pushState({ step: currentStep }, "", "?soal=" + currentStep);
-    renderQuestion();
-  } else {
-    btnNext.disabled = true;
-    btnNext.innerText = "Mengirim...";
-    
-    try {
-      // Menyimpan data IP & Browser/HP ke dalam data Firestore
-      answersData.ip_address = userIP;
-      answersData.user_agent = userAgent;
-      answersData.waktu_submit = serverTimestamp();
-
-      await addDoc(collection(db, "jawaban_responden"), answersData);
-      tampilkanOutro();
-    } catch (error) {
-      console.error(error);
-      alert("Gagal mengirim jawaban. Periksa koneksi Anda.");
-      btnNext.disabled = false;
-      btnNext.innerText = "Selanjutnya";
-    }
-  }
-});
-
-// Inisialisasi awal saat dokumen selesai dimuat
+// Inisialisasi awal
 window.addEventListener('DOMContentLoaded', async () => {
   await checkSubmissionRestriction();
 });
