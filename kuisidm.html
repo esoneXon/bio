@@ -2,241 +2,396 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Kuesioner Indomaret</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuesioner Indomaret Bengkong Kolam 11</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Reset & Base Setup */
     :root {
-      --bg-color: #F6F6F2;
-      --card-color: #FFD84D;
-      --text-main: #1A1A1A;
-      --primary-blue: #4CB5F9;
+      --bg-main: #F4F6F9;
+      --card-bg: #FFFFFF;
+      --text-dark: #1E293B;
+      --text-muted: #64748B;
+      --primary: #0284C7;
+      --accent-yellow: #FFD84D;
+      --danger: #EF4444;
+      --border-color: #E2E8F0;
     }
 
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: 'Poppins', sans-serif;
-      background-color: var(--bg-color);
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-dark);
+      padding: 20px 12px;
       display: flex;
       justify-content: center;
-      /* Menggunakan 100dvh untuk mobile, fallback ke 100vh */
+      align-items: center;
       min-height: 100vh;
-      min-height: 100dvh; 
-      overflow: hidden; /* Mencegah body scroll, scroll hanya ada di dalam card */
     }
 
-    #app-container {
+    .container {
       width: 100%;
-      max-width: 480px;
-      height: 100vh;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      background-color: var(--bg-color);
-      background-image: radial-gradient(#d1d1d1 1px, transparent 1px);
-      background-size: 20px 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.05); /* Memberikan batas halus jika dibuka di PC */
+      max-width: 680px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color);
     }
 
-    .screen {
-      display: none;
-      flex-direction: column;
-      height: 100%;
-      width: 100%;
-      box-sizing: border-box;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    .screen.active {
-      display: flex;
-      animation: fadeIn 0.4s ease-out forwards;
-    }
-    @keyframes fadeIn { 
-      from { opacity: 0; transform: translateX(15px); } 
-      to { opacity: 1; transform: translateX(0); } 
-    }
-
-    /* Top Section (Pertanyaan) */
-    .top-section {
-      padding: max(40px, env(safe-area-inset-top)) 30px 20px 30px;
-      flex-shrink: 0;
-    }
-    
-    .progress-bar {
-      display: flex;
-      gap: 6px;
+    .header {
+      text-align: center;
       margin-bottom: 24px;
-    }
-    .progress-dot {
-      height: 6px;
-      flex-grow: 1;
-      background-color: #e0e0e0;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
-    .progress-dot.active {
-      background-color: var(--primary-blue);
-    }
-    
-    .question-text {
-      font-size: clamp(22px, 5vw, 26px); /* Ukuran font dinamis menyesuaikan lebar layar */
-      font-weight: 800;
-      color: var(--text-main);
-      line-height: 1.4;
-      margin: 0;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 16px;
     }
 
-    /* Bottom Section (Opsi Jawaban) */
-    .yellow-card {
-      background-color: var(--card-color);
-      border-radius: 40px 40px 0 0;
-      /* Padding bawah mengakomodasi safe area / area navigasi di HP */
-      padding: 40px 30px calc(30px + env(safe-area-inset-bottom)) 30px;
-      margin-top: auto;
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .q-group {
+      margin-bottom: 22px;
+      padding-bottom: 16px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .q-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .options-list {
       display: flex;
       flex-direction: column;
-      flex-grow: 1;
-      overflow-y: auto; /* Bisa di-scroll jika opsi terlalu banyak */
-      -webkit-overflow-scrolling: touch; /* Smooth scroll di iOS */
+      gap: 10px;
     }
 
-    .option-btn {
-      background-color: white;
-      border: 3px solid transparent;
-      border-radius: 16px;
-      padding: 16px 20px;
-      margin-bottom: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #333;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      transition: all 0.2s ease;
-      text-align: left;
-      flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent; /* Menghilangkan highlight biru di HP saat ditekan */
-    }
-    .option-btn:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-1px); }
-    .option-btn:active { transform: translateY(1px); }
-    .option-btn.selected {
-      border-color: var(--text-main);
-      background-color: #fdfdfd;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    
     .option-label {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background-color: #e0f2fe;
-      color: #0369a1;
       display: flex;
-      justify-content: center;
       align-items: center;
-      margin-right: 15px;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      cursor: pointer;
       font-size: 13px;
-      font-weight: 800;
-      flex-shrink: 0;
+      transition: all 0.2s;
     }
-    
-    input[type="number"] {
+
+    .option-label:hover {
+      background-color: #F0F9FF;
+      border-color: var(--primary);
+    }
+
+    .input-text {
       width: 100%;
-      box-sizing: border-box;
-      padding: 18px 20px;
-      border: 2px solid transparent;
-      border-radius: 16px;
-      font-size: 16px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
+      padding: 12px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 13px;
       outline: none;
-      margin-bottom: 20px;
-      background: rgba(255,255,255,0.7);
-      transition: all 0.3s;
     }
-    input[type="number"]:focus { 
-      background: white; 
-      border-color: var(--text-main);
+
+    .input-text:focus {
+      border-color: var(--primary);
     }
 
     .btn-submit {
-      background-color: var(--text-main);
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary);
       color: white;
       border: none;
-      border-radius: 30px;
-      padding: 18px;
-      font-size: 16px;
+      border-radius: 12px;
+      font-size: 15px;
       font-weight: 600;
-      font-family: 'Poppins', sans-serif;
       cursor: pointer;
-      transition: all 0.3s ease;
-      width: 100%;
-      flex-shrink: 0;
-      margin-top: auto; /* Mendorong tombol ke paling bawah kartu */
-      -webkit-tap-highlight-color: transparent;
-    }
-    .btn-submit:disabled { 
-      background-color: #666; 
-      color: #aaa;
-      cursor: not-allowed; 
-      transform: none;
-    }
-    .btn-submit:not(:disabled):active {
-      transform: scale(0.98);
+      transition: background 0.2s;
     }
 
-    #btn-mulai { margin-top: 30px; }
+    .btn-submit:hover {
+      background-color: #0369A1;
+    }
 
-    /* Center Content Khusus Intro & Outro */
-    .center-content {
+    /* Screen State: Blocking / Success */
+    .status-screen {
+      display: none;
       text-align: center;
-      justify-content: center;
-      align-items: center;
-      padding: 40px;
-      padding-bottom: calc(40px + env(safe-area-inset-bottom));
+      padding: 40px 20px;
     }
-    .center-content h1 { font-size: clamp(24px, 6vw, 28px); color: var(--text-main); margin-bottom: 16px; line-height: 1.4; }
-    .center-content p { font-size: 15px; color: #555; margin-bottom: 0; line-height: 1.6; }
+
+    .status-screen icon {
+      font-size: 50px;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .status-screen h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .status-screen p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .btn-exit {
+      padding: 10px 24px;
+      background-color: var(--text-dark);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-  <div id="app-container">
+  <div class="container">
     
-    <!-- 1. INTRO SCREEN -->
-    <div id="screen-intro" class="screen center-content active">
-      <h1>Selamat Datang 👋</h1>
-      <p>Minta waktunya sebentar ya untuk isi kuis ini 😁🙏</p>
-      <button class="btn-submit" id="btn-mulai">Mulai Kuis</button>
+    <!-- Form Kuesioner Utama -->
+    <form id="quiz-form">
+      <div class="header">
+        <h1>Kuesioner Kepuasan Pelanggan</h1>
+        <p>Indomaret Bengkong Kolam 11</p>
+      </div>
+
+      <div id="questions-container">
+        <!-- Pertanyaan dimuat via JavaScript -->
+      </div>
+
+      <button type="submit" class="btn-submit" id="btn-submit">Kirim Jawaban</button>
+    </form>
+
+    <!-- Layar Blokir (Sudah Pernah Isi) -->
+    <div id="blocked-screen" class="status-screen">
+      <div style="font-size: 50px;">🚫</div>
+      <h2>Akses Ditolak</h2>
+      <p>Perangkat / Jaringan ini sudah pernah mengirimkan jawaban. Anda hanya diizinkan mengisi kuesioner ini satu kali.</p>
+      <button class="btn-exit" onclick="closeOrExit()">Keluar Halaman</button>
     </div>
 
-    <!-- 2. QUIZ SCREEN -->
-    <div id="screen-quiz" class="screen">
-      <div class="top-section">
-        <div class="progress-bar" id="progress-bar"></div>
-        <h2 class="question-text" id="question-text">Loading pertanyaan...</h2>
-      </div>
-      
-      <div class="yellow-card">
-        <div id="input-area"></div>
-        <button class="btn-submit" id="btn-next" disabled>Selanjutnya</button>
-      </div>
-    </div>
-
-    <!-- 3. OUTRO SCREEN -->
-    <div id="screen-outro" class="screen center-content">
-      <h1 style="font-size: 40px;">🎉</h1>
-      <h1>Terimakasih!</h1>
-      <p>Sudah meluangkan waktu untuk mengisi kuis ini ❤️😁</p>
+    <!-- Layar Sukses (Selesai Kirim) -->
+    <div id="success-screen" class="status-screen">
+      <div style="font-size: 50px;">🎉</div>
+      <h2>Terima Kasih!</h2>
+      <p>Jawaban Anda telah berhasil tersimpan. Anda sekarang dapat menutup halaman ini.</p>
+      <button class="btn-exit" onclick="closeOrExit()">Keluar Sekarang</button>
     </div>
 
   </div>
 
-  <!-- Pastikan file app.js berada di folder yang sama dengan kuisidm.html -->
-  <script type="module" src="app.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWErOEhDXiCyOYh3bggDRLMF7w4xImiKg",
+      authDomain: "tanyaaja-17b48.firebaseapp.com",
+      databaseURL: "https://tanyaaja-17b48.firebaseio.com",
+      projectId: "tanyaaja-17b48",
+      storageBucket: "tanyaaja-17b48.appspot.com",
+      messagingSenderId: "416065878381",
+      appId: "1:416065878381:web:8672bd86cccce067694264"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const optionsLikert = ["Sangat Tidak Setuju (STS)", "Tidak Setuju (TS)", "Netral (N)", "Setuju (S)", "Sangat Setuju (SS)"];
+    
+    const questions = [
+      { id: 'demo_1', text: 'Apakah Anda pernah berbelanja di Indomaret Bengkong Kolam 11 minimal 2 kali?', type: 'choice', options: ['Ya', 'Tidak'] },
+      { id: 'demo_2', text: 'Jenis Kelamin Anda?', type: 'choice', options: ['Laki-laki', 'Perempuan'] },
+      { id: 'demo_3', text: 'Berapa usia Anda saat ini?', type: 'number', placeholder: 'Ketik usia (contoh: 22)' },
+      { id: 'demo_4', text: 'Apa pekerjaan Anda saat ini?', type: 'choice', options: ['Pelajar/Mahasiswa', 'Karyawan Swasta', 'Wiraswasta', 'Ibu Rumah Tangga', 'Lainnya'] },
+      { id: 'q1', text: 'Produk makanan/minuman selalu segar dan tidak kedaluwarsa.', type: 'choice', options: optionsLikert },
+      { id: 'q2', text: 'Variasi dan ketersediaan produk harian tergolong lengkap.', type: 'choice', options: optionsLikert },
+      { id: 'q3', text: 'Kemasan produk fisik yang dipajang dalam kondisi baik.', type: 'choice', options: optionsLikert },
+      { id: 'q4', text: 'Fasilitas gerai (AC, bersih, terang) membuat nyaman.', type: 'choice', options: optionsLikert },
+      { id: 'q5', text: 'Proses transaksi di kasir cepat, tepat, dan teratur.', type: 'choice', options: optionsLikert },
+      { id: 'q6', text: 'Karyawan sigap membantu mencari barang.', type: 'choice', options: optionsLikert },
+      { id: 'q7', text: 'Karyawan memberikan informasi harga promo secara jujur.', type: 'choice', options: optionsLikert },
+      { id: 'q8', text: 'Karyawan menyapa, senyum, dan bersikap ramah.', type: 'choice', options: optionsLikert },
+      { id: 'q9', text: 'Pengalaman berbelanja sesuai dengan harapan.', type: 'choice', options: optionsLikert },
+      { id: 'q10', text: 'Secara keseluruhan, puas dengan produk dan layanan.', type: 'choice', options: optionsLikert },
+      { id: 'q11', text: 'Keputusan memilih belanja di gerai ini sudah tepat.', type: 'choice', options: optionsLikert },
+      { id: 'q12', text: 'Akan terus kembali berbelanja di masa depan.', type: 'choice', options: optionsLikert },
+      { id: 'q13', text: 'Tetap memilih gerai ini meskipun ada minimarket pesaing.', type: 'choice', options: optionsLikert },
+      { id: 'q14', text: 'Bersedia merekomendasikan gerai ini kepada keluarga/teman.', type: 'choice', options: optionsLikert }
+    ];
+
+    let userIP = "";
+    const userAgent = navigator.userAgent;
+
+    // 1. Fungsi Ambil IP Publik User
+    async function getUserIP() {
+      try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+      } catch (err) {
+        console.warn("Gagal mengambil IP:", err);
+        return "UNKNOWN_IP";
+      }
+    }
+
+    // 2. Fungsi Validasi Mencegah Submit Ganda (LocalStorage & Firestore)
+    async function checkSubmissionRestriction() {
+      // Cek Lokal Perangkat
+      if (localStorage.getItem("indomaret_submitted") === "true") {
+        showBlockedScreen();
+        return true;
+      }
+
+      userIP = await getUserIP();
+
+      // Cek ke Firestore berdasarkan IP + User Agent (Device/Browser)
+      try {
+        const q = query(
+          collection(db, "jawaban_responden"),
+          where("ip_address", "==", userIP),
+          where("user_agent", "==", userAgent)
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          localStorage.setItem("indomaret_submitted", "true");
+          showBlockedScreen();
+          return true;
+        }
+      } catch (err) {
+        console.error("Error checking Firestore restriction:", err);
+      }
+
+      return false;
+    }
+
+    // 3. Render Form Pertanyaan
+    function renderForm() {
+      const container = document.getElementById('questions-container');
+      container.innerHTML = '';
+
+      questions.forEach((q, idx) => {
+        const group = document.createElement('div');
+        group.className = 'q-group';
+
+        const title = document.createElement('div');
+        title.className = 'q-title';
+        title.innerText = `${idx + 1}. ${q.text}`;
+        group.appendChild(title);
+
+        if (q.type === 'choice') {
+          const optList = document.createElement('div');
+          optList.className = 'options-list';
+
+          q.options.forEach(opt => {
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            label.innerHTML = `
+              <input type="radio" name="${q.id}" value="${opt}" required>
+              <span>${opt}</span>
+            `;
+            optList.appendChild(label);
+          });
+          group.appendChild(optList);
+        } else if (q.type === 'number') {
+          group.innerHTML += `
+            <input type="number" name="${q.id}" class="input-text" placeholder="${q.placeholder}" required>
+          `;
+        }
+
+        container.appendChild(group);
+      });
+    }
+
+    function showBlockedScreen() {
+      document.getElementById('quiz-form').style.display = 'none';
+      document.getElementById('blocked-screen').style.display = 'block';
+    }
+
+    function showSuccessScreen() {
+      document.getElementById('quiz-form').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+      
+      // KUNCI TOMBOL BACK (KEMBALI)
+      setupBackPreventer();
+    }
+
+    // 4. MENCEGAH TOMBOL BACK & KELUAR / REDIRECT
+    function setupBackPreventer() {
+      window.history.pushState(null, null, window.location.href);
+      window.onpopstate = function () {
+        // Ketika tombol back ditekan setelah submit, langsung keluarkan user (ke halaman kosong/blank)
+        window.location.replace("about:blank");
+      };
+    }
+
+    window.closeOrExit = function() {
+      // Mencoba menutup tab atau mengalihkan jika diblokir oleh browser
+      window.close();
+      setTimeout(() => {
+        window.location.replace("https://www.google.com");
+      }, 200);
+    };
+
+    // 5. Prosess Submit Form
+    document.getElementById('quiz-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('btn-submit');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Mengirimkan...';
+
+      const formData = new FormData(e.target);
+      const payload = {
+        ip_address: userIP,
+        user_agent: userAgent,
+        waktu_submit: serverTimestamp()
+      };
+
+      questions.forEach(q => {
+        payload[q.id] = formData.get(q.id);
+      });
+
+      try {
+        await addDoc(collection(db, "jawaban_responden"), payload);
+        localStorage.setItem("indomaret_submitted", "true");
+        showSuccessScreen();
+      } catch (err) {
+        alert("Gagal mengirimkan jawaban. Coba lagi nanti.");
+        console.error(err);
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Kirim Jawaban';
+      }
+    });
+
+    // Inisialisasi awal
+    window.addEventListener('DOMContentLoaded', async () => {
+      const isBlocked = await checkSubmissionRestriction();
+      if (!isBlocked) {
+        renderForm();
+      }
+    });
+  </script>
 </body>
 </html>
