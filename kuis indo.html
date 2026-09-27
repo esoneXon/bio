@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuesioner Penelitian - Indomaret Bengkong Kolam 11</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f0ebf8;
+      margin: 0;
+      padding: 20px;
+      color: #202124;
+    }
+    .form-container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .card {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      border-top: 8px solid #673ab7; /* Warna khas Google Form */
+    }
+    .card:not(:first-child) {
+      border-top: none;
+    }
+    h1 { font-size: 24px; margin-top: 0; }
+    h2 { font-size: 16px; margin-bottom: 10px; background-color: #f1f3f4; padding: 10px; border-radius: 4px; }
+    p { font-size: 14px; line-height: 1.5; color: #5f6368; }
+    .question-block {
+      margin-bottom: 24px;
+    }
+    .question-text {
+      font-size: 16px;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+    .options-group label {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .likert-scale {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .likert-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      font-size: 12px;
+      width: 18%;
+    }
+    .likert-option input {
+      margin-bottom: 8px;
+      transform: scale(1.2);
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #d9d9d9;
+      padding: 8px 0;
+      font-size: 14px;
+      outline: none;
+      background: transparent;
+    }
+    input[type="text"]:focus, input[type="number"]:focus {
+      border-bottom: 2px solid #673ab7;
+    }
+    .btn-submit {
+      background-color: #673ab7;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .btn-submit:hover { background-color: #5e35b1; }
+    .btn-submit:disabled { background-color: #ccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <form id="formKuis">
+      
+      <!-- HEADER -->
+      <div class="card">
+        <h1>KUESIONER PENELITIAN ILMIAH</h1>
+        <p><strong>Judul:</strong> Menciptakan Loyalitas Pelanggan Melalui Kualitas Produk dan Kualitas Layanan: Mediasi Kepuasan Pelanggan pada Gerai Indomaret Bengkong Kolam 11 Kota Batam.</p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <p><strong>Petunjuk Pengisian:</strong><br>
+        Silakan pilih salah satu jawaban yang paling sesuai dengan pengalaman Anda berbelanja di Indomaret Bengkong Kolam 11. Skala penilaian:</p>
+        <ul style="font-size: 14px; color: #5f6368;">
+          <li><strong>STS:</strong> Sangat Tidak Setuju (Skor 1)</li>
+          <li><strong>TS:</strong> Tidak Setuju (Skor 2)</li>
+          <li><strong>N:</strong> Netral / Ragu-ragu (Skor 3)</li>
+          <li><strong>S:</strong> Setuju (Skor 4)</li>
+          <li><strong>SS:</strong> Sangat Setuju (Skor 5)</li>
+        </ul>
+      </div>
+
+      <!-- BAGIAN A: DEMOGRAFI -->
+      <div class="card">
+        <h2>Bagian A: Karakteristik Responden (Data Demografi)</h2>
+        
+        <div class="question-block">
+          <div class="question-text">1. Apakah Anda pernah berbelanja di Indomaret Bengkong Kolam 11 minimal 2 kali?</div>
+          <div class="options-group">
+            <label><input type="radio" name="demo_1" value="Ya" required> Ya (Bisa melanjutkan pengisian)</label>
+            <label><input type="radio" name="demo_1" value="Tidak" required> Tidak (Berhenti di sini)</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">2. Jenis Kelamin:</div>
+          <div class="options-group">
+            <label><input type="radio" name="demo_2" value="Laki-laki" required> Laki-laki</label>
+            <label><input type="radio" name="demo_2" value="Perempuan" required> Perempuan</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">3. Usia Anda saat ini:</div>
+          <input type="number" name="demo_3" placeholder="Jawaban Anda (Contoh: 25)" required>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">4. Pekerjaan:</div>
+          <div class="options-group">
+            <label><input type="radio" name="demo_4" value="Pelajar/Mahasiswa" required> Pelajar/Mahasiswa</label>
+            <label><input type="radio" name="demo_4" value="Karyawan Swasta" required> Karyawan Swasta</label>
+            <label><input type="radio" name="demo_4" value="Wiraswasta" required> Wiraswasta</label>
+            <label><input type="radio" name="demo_4" value="Ibu Rumah Tangga" required> Ibu Rumah Tangga</label>
+            <label><input type="radio" name="demo_4" value="Lainnya" required> Lainnya</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- BAGIAN B: VARIABEL 1 -->
+      <div class="card">
+        <h2>Bagian B: Variabel 1 - Kualitas Produk (X1)</h2>
+        
+        <div class="question-block">
+          <div class="question-text">1. Produk makanan/minuman yang dijual di gerai ini selalu segar dan tidak kedaluwarsa.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q1" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q1" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q1" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q1" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q1" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">2. Variasi dan ketersediaan produk harian yang saya butuhkan di gerai ini tergolong lengkap.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q2" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q2" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q2" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q2" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q2" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">3. Kemasan produk fisik yang dipajang di rak dalam kondisi baik (tidak penyok/rusak).</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q3" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q3" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q3" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q3" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q3" value="5" required>SS</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- BAGIAN B: VARIABEL 2 -->
+      <div class="card">
+        <h2>Bagian B: Variabel 2 - Kualitas Layanan (X2)</h2>
+        
+        <div class="question-block">
+          <div class="question-text">4. Fasilitas gerai (AC dingin, ruangan bersih, pencahayaan terang) membuat saya nyaman.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q4" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q4" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q4" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q4" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q4" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">5. Proses transaksi di kasir dilayani dengan cepat, tepat, dan antrean teratur.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q5" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q5" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q5" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q5" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q5" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">6. Karyawan sigap dan tanggap membantu ketika saya kesulitan mencari letak barang.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q6" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q6" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q6" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q6" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q6" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">7. Karyawan memberikan informasi harga promo secara jujur dan sesuai dengan label harga.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q7" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q7" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q7" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q7" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q7" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">8. Karyawan menyapa, senyum, dan bersikap ramah selama melayani proses belanja.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q8" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q8" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q8" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q8" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q8" value="5" required>SS</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- BAGIAN B: VARIABEL 3 -->
+      <div class="card">
+        <h2>Bagian B: Variabel 3 - Kepuasan Pelanggan (Y)</h2>
+        
+        <div class="question-block">
+          <div class="question-text">9. Pengalaman berbelanja di gerai ini sudah sesuai dengan apa yang saya harapkan.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q9" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q9" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q9" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q9" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q9" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">10. Secara keseluruhan, saya merasa puas dengan produk dan layanan di gerai ini.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q10" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q10" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q10" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q10" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q10" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">11. Saya merasa keputusan saya memilih belanja di gerai ini sudah sangat tepat.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q11" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q11" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q11" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q11" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q11" value="5" required>SS</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- BAGIAN B: VARIABEL 4 -->
+      <div class="card">
+        <h2>Bagian B: Variabel 4 - Loyalitas Pelanggan (Z)</h2>
+        
+        <div class="question-block">
+          <div class="question-text">12. Saya akan terus kembali berbelanja di gerai ini untuk kebutuhan harian di masa depan.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q12" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q12" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q12" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q12" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q12" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">13. Saya tetap memilih gerai ini meskipun ada minimarket pesaing lain di sekitar Bengkong Kolam.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q13" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q13" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q13" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q13" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q13" value="5" required>SS</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-text">14. Saya bersedia merekomendasikan gerai Indomaret ini kepada keluarga, teman, atau tetangga.</div>
+          <div class="likert-scale">
+            <label class="likert-option"><input type="radio" name="q14" value="1" required>STS</label>
+            <label class="likert-option"><input type="radio" name="q14" value="2" required>TS</label>
+            <label class="likert-option"><input type="radio" name="q14" value="3" required>N</label>
+            <label class="likert-option"><input type="radio" name="q14" value="4" required>S</label>
+            <label class="likert-option"><input type="radio" name="q14" value="5" required>SS</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="background: transparent; box-shadow: none; padding: 0;">
+        <button type="submit" id="tombolSubmit" class="btn-submit">Kirim Kuesioner</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
