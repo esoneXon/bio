@@ -17,7 +17,7 @@
 
   <div class="container">
     <h2>Panel Admin Kuesioner</h2>
-    <p>Klik tombol di bawah ini untuk menarik semua data jawaban dari database dan mengunduhnya sebagai file CSV dengan Header Lengkap.</p>
+    <p>Klik tombol di bawah ini untuk menarik semua data jawaban dari database dan mengunduhnya sebagai file CSV dengan Header dan Keterangan Lengkap.</p>
     <button id="btnUnduh">Unduh Data (CSV)</button>
     <p id="statusText" style="margin-top: 15px; font-weight: bold; color: #007bff;"></p>
   </div>
@@ -43,7 +43,7 @@
     const btnUnduh = document.getElementById('btnUnduh');
     const statusText = document.getElementById('statusText');
 
-    // MAPPING HEADER: Mengubah ID di database menjadi pertanyaan panjang
+    // MAPPING HEADER: Pertanyaan
     const headerMapping = {
       "waktu_submit": "Waktu Submit",
       "demo_1": "1. Apakah Anda pernah berbelanja di Indomaret Bengkong Kolam 11 minimal 2 kali?",
@@ -64,6 +64,15 @@
       "q12": "12 (Z). Saya akan terus kembali berbelanja di gerai ini untuk kebutuhan harian di masa depan.",
       "q13": "13 (Z). Saya tetap memilih gerai ini meskipun ada minimarket pesaing lain di sekitar Bengkong Kolam.",
       "q14": "14 (Z). Saya bersedia merekomendasikan gerai Indomaret ini kepada keluarga, teman, atau tetangga."
+    };
+
+    // MAPPING JAWABAN: Menerjemahkan angka 1-5 menjadi teks keterangan
+    const skalaLikertMapping = {
+      "1": "Sangat Tidak Setuju (STS)",
+      "2": "Tidak Setuju (TS)",
+      "3": "Netral (N)",
+      "4": "Setuju (S)",
+      "5": "Sangat Setuju (SS)"
     };
 
     // Urutan kolom yang diinginkan di file Excel
@@ -103,7 +112,12 @@
         dataArray.forEach(row => {
           let rowData = urutanKolom.map(kunci => {
             let isiSel = row[kunci] === undefined || row[kunci] === null ? "" : row[kunci];
-            // Format nilai dengan tanda kutip ganda agar koma di dalam jawaban tidak merusak kolom Excel
+            
+            // Jika kolom yang sedang diproses adalah q1 sampai q14, terjemahkan angkanya menjadi keterangan teks
+            if (kunci.startsWith("q") && skalaLikertMapping[isiSel]) {
+              isiSel = skalaLikertMapping[isiSel];
+            }
+
             return `"${String(isiSel).replace(/"/g, '""').replace(/\n/g, " ")}"`;
           });
           csvContent += rowData.join(",") + "\n";
@@ -115,7 +129,7 @@
         const url = URL.createObjectURL(blob);
         
         link.setAttribute("href", url);
-        link.setAttribute("download", "Data_Kuesioner_Lengkap.csv");
+        link.setAttribute("download", "Data_Kuesioner_Teks.csv");
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
