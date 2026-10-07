@@ -1,0 +1,3197 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kuliahku — Student Task Manager</title>
+
+<meta name="description" content="Dashboard pribadi untuk mengatur mata kuliah, jadwal, tugas dan deadline.">
+
+<style>
+:root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --text:#172033;
+    --muted:#718096;
+    --primary:#5b5cf0;
+    --primary-dark:#4546d8;
+    --border:#e8ebf2;
+    --danger:#ef4444;
+    --warning:#f59e0b;
+    --success:#10b981;
+    --shadow:0 10px 30px rgba(20,30,60,.07);
+    --radius:18px;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+}
+
+button,
+input,
+select,
+textarea{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+    width:250px;
+    background:#fff;
+    border-right:1px solid var(--border);
+    padding:24px 16px;
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    z-index:100;
+    transition:.3s ease;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:5px 10px 28px;
+}
+
+.logo-icon{
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    background:linear-gradient(135deg,#696aff,#4748d9);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:21px;
+    box-shadow:0 8px 20px rgba(91,92,240,.25);
+}
+
+.logo-text{
+    font-size:19px;
+    font-weight:800;
+    letter-spacing:-.4px;
+}
+
+.logo-text span{
+    color:var(--primary);
+}
+
+.menu-label{
+    color:#a0a7b5;
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    padding:0 12px;
+    margin:12px 0 8px;
+}
+
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+.nav button{
+    border:0;
+    background:transparent;
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 13px;
+    border-radius:12px;
+    color:#667085;
+    text-align:left;
+    transition:.2s;
+}
+
+.nav button:hover{
+    background:#f5f6ff;
+    color:var(--primary);
+}
+
+.nav button.active{
+    background:#eeeeff;
+    color:var(--primary);
+    font-weight:700;
+}
+
+.nav-icon{
+    width:21px;
+    text-align:center;
+    font-size:17px;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+    margin-left:250px;
+    width:calc(100% - 250px);
+    min-height:100vh;
+}
+
+.topbar{
+    height:76px;
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 32px;
+    position:sticky;
+    top:0;
+    z-index:50;
+}
+
+.mobile-menu{
+    display:none;
+    border:0;
+    background:#f2f3f8;
+    width:40px;
+    height:40px;
+    border-radius:11px;
+    font-size:20px;
+}
+
+.page-title{
+    font-size:21px;
+    font-weight:800;
+    letter-spacing:-.5px;
+}
+
+.topbar-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.today{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#6d6ef8,#4142d1);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    font-weight:800;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content{
+    padding:30px;
+    max-width:1500px;
+    margin:auto;
+}
+
+.section{
+    display:none;
+}
+
+.section.active{
+    display:block;
+}
+
+.welcome{
+    margin-bottom:26px;
+}
+
+.welcome h1{
+    font-size:28px;
+    letter-spacing:-.8px;
+    margin-bottom:5px;
+}
+
+.welcome p{
+    color:var(--muted);
+    font-size:14px;
+}
+
+/* =========================
+   STAT CARDS
+========================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:24px;
+}
+
+.stat-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:var(--shadow);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+}
+
+.stat-title{
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:8px;
+}
+
+.stat-number{
+    font-size:27px;
+    font-weight:800;
+}
+
+.stat-icon{
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:19px;
+    background:#f0f1ff;
+}
+
+.stat-icon.green{
+    background:#eafbf5;
+}
+
+.stat-icon.orange{
+    background:#fff6e5;
+}
+
+.stat-icon.red{
+    background:#fff0f0;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.grid-2{
+    display:grid;
+    grid-template-columns:1.3fr .7fr;
+    gap:20px;
+    margin-bottom:24px;
+}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:21px;
+    box-shadow:var(--shadow);
+}
+
+.card-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:17px;
+}
+
+.card-title{
+    font-size:16px;
+    font-weight:800;
+}
+
+.card-subtitle{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:3px;
+}
+
+/* =========================
+   TASK
+========================= */
+
+.task-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.task-item{
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:13px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    transition:.2s;
+}
+
+.task-item:hover{
+    border-color:#d8d9fa;
+    transform:translateY(-1px);
+}
+
+.task-check{
+    width:22px;
+    height:22px;
+    border-radius:7px;
+    border:2px solid #d8dce7;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    cursor:pointer;
+    color:#fff;
+    font-size:12px;
+}
+
+.task-check.done{
+    background:var(--success);
+    border-color:var(--success);
+}
+
+.task-info{
+    flex:1;
+    min-width:0;
+}
+
+.task-name{
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:4px;
+}
+
+.task-name.done{
+    text-decoration:line-through;
+    color:#9aa1ad;
+}
+
+.task-meta{
+    font-size:11px;
+    color:var(--muted);
+}
+
+.task-actions{
+    display:flex;
+    gap:5px;
+}
+
+.icon-btn{
+    border:0;
+    background:#f5f6f9;
+    width:31px;
+    height:31px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#697386;
+}
+
+.icon-btn:hover{
+    background:#eceeff;
+    color:var(--primary);
+}
+
+.empty{
+    text-align:center;
+    padding:28px 10px;
+    color:var(--muted);
+    font-size:13px;
+}
+
+/* =========================
+   DEADLINE
+========================= */
+
+.deadline-list{
+    display:flex;
+    flex-direction:column;
+    gap:11px;
+}
+
+.deadline-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.date-box{
+    width:43px;
+    height:48px;
+    border-radius:11px;
+    background:#f2f3ff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:var(--primary);
+    flex-shrink:0;
+}
+
+.date-box strong{
+    font-size:15px;
+}
+
+.date-box span{
+    font-size:9px;
+    text-transform:uppercase;
+}
+
+.deadline-info{
+    flex:1;
+}
+
+.deadline-name{
+    font-size:12px;
+    font-weight:700;
+}
+
+.deadline-course{
+    font-size:10px;
+    color:var(--muted);
+    margin-top:3px;
+}
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress-wrap{
+    margin-top:14px;
+}
+
+.progress-head{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    margin-bottom:7px;
+}
+
+.progress-head span:last-child{
+    color:var(--primary);
+    font-weight:700;
+}
+
+.progress{
+    height:7px;
+    background:#eef0f5;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+    background:linear-gradient(90deg,#6b6cf6,#4e4fdc);
+    border-radius:20px;
+    transition:.5s;
+}
+
+/* =========================
+   COURSE CARDS
+========================= */
+
+.course-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+.course-card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:19px;
+    box-shadow:var(--shadow);
+    transition:.2s;
+}
+
+.course-card:hover{
+    transform:translateY(-3px);
+}
+
+.course-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:14px;
+}
+
+.course-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:#eeeeff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:19px;
+}
+
+.course-code{
+    font-size:10px;
+    color:var(--muted);
+    background:#f5f6f9;
+    padding:5px 8px;
+    border-radius:7px;
+}
+
+.course-name{
+    font-size:14px;
+    font-weight:800;
+    line-height:1.4;
+    min-height:40px;
+}
+
+.course-meta{
+    color:var(--muted);
+    font-size:11px;
+    margin-top:7px;
+    line-height:1.6;
+}
+
+.course-progress{
+    margin-top:14px;
+}
+
+/* =========================
+   SCHEDULE
+========================= */
+
+.day-section{
+    margin-bottom:23px;
+}
+
+.day-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:11px;
+}
+
+.day-title h3{
+    font-size:15px;
+}
+
+.day-count{
+    font-size:10px;
+    background:#eeeeff;
+    color:var(--primary);
+    padding:4px 7px;
+    border-radius:7px;
+    font-weight:700;
+}
+
+.schedule-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.schedule-item{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:13px 15px;
+    display:grid;
+    grid-template-columns:130px 70px 1fr 55px 150px 180px;
+    gap:12px;
+    align-items:center;
+}
+
+.schedule-time{
+    font-weight:800;
+    font-size:12px;
+}
+
+.schedule-class{
+    color:var(--primary);
+    font-weight:800;
+    font-size:11px;
+}
+
+.schedule-name{
+    font-size:12px;
+    font-weight:700;
+}
+
+.schedule-sks{
+    font-size:11px;
+    color:var(--muted);
+}
+
+.schedule-room{
+    font-size:11px;
+    color:var(--muted);
+}
+
+.schedule-lecturer{
+    font-size:11px;
+    color:var(--muted);
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+.search{
+    flex:1;
+    min-width:200px;
+    position:relative;
+}
+
+.search input{
+    width:100%;
+    border:1px solid var(--border);
+    background:#fff;
+    border-radius:12px;
+    padding:11px 13px 11px 38px;
+    outline:none;
+}
+
+.search input:focus{
+    border-color:#b9baff;
+    box-shadow:0 0 0 3px rgba(91,92,240,.08);
+}
+
+.search span{
+    position:absolute;
+    left:13px;
+    top:10px;
+    color:#9aa1ad;
+}
+
+.select{
+    border:1px solid var(--border);
+    background:#fff;
+    border-radius:12px;
+    padding:0 12px;
+    min-width:160px;
+    outline:none;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+    border:0;
+    border-radius:11px;
+    padding:10px 15px;
+    font-size:12px;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    transition:.2s;
+}
+
+.btn-primary{
+    background:var(--primary);
+    color:#fff;
+}
+
+.btn-primary:hover{
+    background:var(--primary-dark);
+    transform:translateY(-1px);
+}
+
+.btn-secondary{
+    background:#f1f2f7;
+    color:#5e6677;
+}
+
+.btn-danger{
+    background:#fff0f0;
+    color:var(--danger);
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.45);
+    backdrop-filter:blur(5px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:500;
+}
+
+.modal-overlay.show{
+    display:flex;
+}
+
+.modal{
+    width:100%;
+    max-width:570px;
+    background:#fff;
+    border-radius:20px;
+    padding:24px;
+    box-shadow:0 25px 70px rgba(0,0,0,.2);
+    max-height:90vh;
+    overflow:auto;
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.modal-title{
+    font-size:19px;
+    font-weight:800;
+}
+
+.close{
+    border:0;
+    background:#f2f3f7;
+    width:34px;
+    height:34px;
+    border-radius:9px;
+    font-size:17px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.form-group.full{
+    grid-column:1/-1;
+}
+
+.form-group label{
+    font-size:11px;
+    font-weight:700;
+    color:#667085;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 11px;
+    outline:none;
+    background:#fff;
+}
+
+.form-group textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+    border-color:#b8b9fb;
+    box-shadow:0 0 0 3px rgba(91,92,240,.08);
+}
+
+.modal-footer{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:20px;
+}
+
+/* =========================
+   CALENDAR
+========================= */
+
+.calendar-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:17px;
+}
+
+.calendar-title{
+    font-weight:800;
+}
+
+.calendar-nav{
+    display:flex;
+    gap:6px;
+}
+
+.calendar-nav button{
+    border:0;
+    background:#f1f2f7;
+    width:32px;
+    height:32px;
+    border-radius:9px;
+}
+
+.calendar-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+}
+
+.calendar-weekday{
+    text-align:center;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:700;
+    padding:6px;
+}
+
+.calendar-day{
+    min-height:75px;
+    background:#fafbfc;
+    border:1px solid #f0f1f5;
+    border-radius:10px;
+    padding:7px;
+    position:relative;
+}
+
+.calendar-day.other{
+    opacity:.35;
+}
+
+.calendar-day.today{
+    border:2px solid var(--primary);
+}
+
+.calendar-number{
+    font-size:11px;
+    font-weight:700;
+}
+
+.calendar-task{
+    margin-top:5px;
+    font-size:8px;
+    padding:3px 4px;
+    background:#eeeeff;
+    color:var(--primary);
+    border-radius:4px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* =========================
+   EMPTY / TABLE
+========================= */
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+.task-table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:750px;
+}
+
+.task-table th{
+    text-align:left;
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    padding:11px;
+    border-bottom:1px solid var(--border);
+}
+
+.task-table td{
+    padding:13px 11px;
+    border-bottom:1px solid #f0f1f5;
+    font-size:12px;
+}
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    border-radius:7px;
+    padding:4px 7px;
+    font-size:9px;
+    font-weight:700;
+}
+
+.badge.green{
+    background:#eafbf5;
+    color:#059669;
+}
+
+.badge.yellow{
+    background:#fff7e7;
+    color:#d97706;
+}
+
+.badge.red{
+    background:#fff0f0;
+    color:#dc2626;
+}
+
+.badge.gray{
+    background:#f0f1f5;
+    color:#6b7280;
+}
+
+.badge.blue{
+    background:#eeeeff;
+    color:#4f46e5;
+}
+
+/* =========================
+   OVERLAY MOBILE
+========================= */
+
+.sidebar-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.3);
+    z-index:90;
+}
+
+.sidebar-overlay.show{
+    display:block;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1100px){
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .grid-2{
+        grid-template-columns:1fr;
+    }
+
+    .course-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .schedule-item{
+        grid-template-columns:120px 65px 1fr;
+    }
+
+    .schedule-sks,
+    .schedule-room,
+    .schedule-lecturer{
+        display:none;
+    }
+}
+
+@media(max-width:800px){
+    .sidebar{
+        transform:translateX(-100%);
+        box-shadow:10px 0 30px rgba(0,0,0,.1);
+    }
+
+    .sidebar.open{
+        transform:translateX(0);
+    }
+
+    .main{
+        margin-left:0;
+        width:100%;
+    }
+
+    .mobile-menu{
+        display:block;
+    }
+
+    .topbar{
+        padding:0 17px;
+    }
+
+    .today{
+        display:none;
+    }
+
+    .content{
+        padding:20px 15px;
+    }
+
+    .course-grid{
+        grid-template-columns:1fr;
+    }
+
+    .stats{
+        gap:10px;
+    }
+
+    .stat-card{
+        padding:15px;
+    }
+
+    .stat-number{
+        font-size:23px;
+    }
+}
+
+@media(max-width:560px){
+    .stats{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .welcome h1{
+        font-size:23px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .form-group.full{
+        grid-column:auto;
+    }
+
+    .schedule-item{
+        grid-template-columns:1fr;
+        gap:6px;
+    }
+
+    .schedule-class{
+        display:inline-block;
+    }
+
+    .calendar-day{
+        min-height:55px;
+    }
+
+    .calendar-task{
+        display:none;
+    }
+
+    .calendar-weekday{
+        font-size:8px;
+    }
+
+    .page-title{
+        font-size:17px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">🎓</div>
+            <div class="logo-text">Kuliah<span>ku</span></div>
+        </div>
+
+        <div class="menu-label">Menu Utama</div>
+
+        <nav class="nav">
+
+            <button class="active" data-page="dashboard">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </button>
+
+            <button data-page="courses">
+                <span class="nav-icon">📚</span>
+                Mata Kuliah
+            </button>
+
+            <button data-page="tasks">
+                <span class="nav-icon">📝</span>
+                Tugas
+            </button>
+
+            <button data-page="schedule">
+                <span class="nav-icon">📅</span>
+                Jadwal
+            </button>
+
+            <button data-page="calendar">
+                <span class="nav-icon">🗓️</span>
+                Kalender
+            </button>
+
+            <button data-page="progress">
+                <span class="nav-icon">📊</span>
+                Progress
+            </button>
+
+        </nav>
+
+        <div class="menu-label" style="margin-top:25px;">Sistem</div>
+
+        <nav class="nav">
+            <button onclick="exportData()">
+                <span class="nav-icon">💾</span>
+                Backup Data
+            </button>
+
+            <button onclick="resetTasks()">
+                <span class="nav-icon">🗑️</span>
+                Reset Tugas
+            </button>
+        </nav>
+
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <header class="topbar">
+
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="mobile-menu" id="mobileMenu">☰</button>
+                <div class="page-title" id="pageTitle">Dashboard</div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="today" id="todayText"></div>
+                <div class="avatar">S</div>
+            </div>
+
+        </header>
+
+        <div class="content">
+
+            <!-- ================= DASHBOARD ================= -->
+
+            <section class="section active" id="page-dashboard">
+
+                <div class="welcome">
+                    <h1>Halo, Selamat Datang 👋</h1>
+                    <p>Kelola kuliah, tugas, jadwal dan deadline kamu dari satu tempat.</p>
+                </div>
+
+                <div class="stats">
+
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-title">Mata Kuliah</div>
+                            <div class="stat-number" id="statCourses">0</div>
+                        </div>
+                        <div class="stat-icon">📚</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-title">Total Tugas</div>
+                            <div class="stat-number" id="statTasks">0</div>
+                        </div>
+                        <div class="stat-icon orange">📝</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-title">Sedang Dikerjakan</div>
+                            <div class="stat-number" id="statPending">0</div>
+                        </div>
+                        <div class="stat-icon">⏳</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-title">Selesai</div>
+                            <div class="stat-number" id="statDone">0</div>
+                        </div>
+                        <div class="stat-icon green">✓</div>
+                    </div>
+
+                </div>
+
+                <div class="grid-2">
+
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Tugas Terbaru</div>
+                                <div class="card-subtitle">Tugas yang perlu kamu perhatikan</div>
+                            </div>
+
+                            <button class="btn btn-primary" onclick="openTaskModal()">
+                                ＋ Tugas
+                            </button>
+                        </div>
+
+                        <div class="task-list" id="dashboardTasks"></div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Deadline Terdekat</div>
+                                <div class="card-subtitle">Jangan sampai terlewat</div>
+                            </div>
+                        </div>
+
+                        <div class="deadline-list" id="deadlineList"></div>
+
+                    </div>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Progress Kuliah</div>
+                            <div class="card-subtitle">Progress berdasarkan tugas</div>
+                        </div>
+
+                        <strong id="overallPercent">0%</strong>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar" id="overallBar" style="width:0%"></div>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= COURSES ================= -->
+
+            <section class="section" id="page-courses">
+
+                <div class="welcome">
+                    <h1>Mata Kuliah</h1>
+                    <p>Daftar mata kuliah yang kamu ambil.</p>
+                </div>
+
+                <div class="toolbar">
+
+                    <div class="search">
+                        <span>🔍</span>
+                        <input
+                            type="text"
+                            id="courseSearch"
+                            placeholder="Cari mata kuliah..."
+                        >
+                    </div>
+
+                </div>
+
+                <div class="course-grid" id="courseGrid"></div>
+
+            </section>
+
+
+            <!-- ================= TASKS ================= -->
+
+            <section class="section" id="page-tasks">
+
+                <div class="welcome">
+                    <h1>Tugas</h1>
+                    <p>Kelola semua tugas dan deadline kamu.</p>
+                </div>
+
+                <div class="toolbar">
+
+                    <div class="search">
+                        <span>🔍</span>
+                        <input
+                            type="text"
+                            id="taskSearch"
+                            placeholder="Cari tugas..."
+                        >
+                    </div>
+
+                    <select class="select" id="taskStatusFilter">
+                        <option value="all">Semua Status</option>
+                        <option value="pending">Belum Selesai</option>
+                        <option value="progress">Dikerjakan</option>
+                        <option value="done">Selesai</option>
+                    </select>
+
+                    <select class="select" id="taskCourseFilter">
+                        <option value="all">Semua Mata Kuliah</option>
+                    </select>
+
+                    <button class="btn btn-primary" onclick="openTaskModal()">
+                        ＋ Tambah Tugas
+                    </button>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="table-wrap">
+
+                        <table class="task-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Tugas</th>
+                                    <th>Mata Kuliah</th>
+                                    <th>Deadline</th>
+                                    <th>Status</th>
+                                    <th>Prioritas</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="taskTableBody"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= SCHEDULE ================= -->
+
+            <section class="section" id="page-schedule">
+
+                <div class="welcome">
+                    <h1>Jadwal Kuliah</h1>
+                    <p>Jadwal perkuliahan mingguan kamu.</p>
+                </div>
+
+                <div id="scheduleContainer"></div>
+
+            </section>
+
+
+            <!-- ================= CALENDAR ================= -->
+
+            <section class="section" id="page-calendar">
+
+                <div class="welcome">
+                    <h1>Kalender</h1>
+                    <p>Lihat deadline tugas berdasarkan tanggal.</p>
+                </div>
+
+                <div class="card">
+
+                    <div class="calendar-header">
+
+                        <div class="calendar-title" id="calendarTitle"></div>
+
+                        <div class="calendar-nav">
+                            <button onclick="changeMonth(-1)">‹</button>
+                            <button onclick="goToday()">●</button>
+                            <button onclick="changeMonth(1)">›</button>
+                        </div>
+
+                    </div>
+
+                    <div class="calendar-grid" id="calendarGrid"></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= PROGRESS ================= -->
+
+            <section class="section" id="page-progress">
+
+                <div class="welcome">
+                    <h1>Progress</h1>
+                    <p>Perkembangan tugas setiap mata kuliah.</p>
+                </div>
+
+                <div class="course-grid" id="progressGrid"></div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- ================= MODAL TASK ================= -->
+
+<div class="modal-overlay" id="taskModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div class="modal-title" id="modalTitle">
+                Tambah Tugas
+            </div>
+
+            <button class="close" onclick="closeTaskModal()">×</button>
+
+        </div>
+
+        <form id="taskForm">
+
+            <input type="hidden" id="taskId">
+
+            <div class="form-grid">
+
+                <div class="form-group full">
+                    <label>Nama Tugas</label>
+                    <input
+                        type="text"
+                        id="taskName"
+                        placeholder="Contoh: Membuat laporan praktikum"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Mata Kuliah</label>
+                    <select id="taskCourse" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Deadline</label>
+                    <input type="date" id="taskDeadline" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="taskStatus">
+                        <option value="pending">Belum Mulai</option>
+                        <option value="progress">Sedang Dikerjakan</option>
+                        <option value="done">Selesai</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Prioritas</label>
+                    <select id="taskPriority">
+                        <option value="low">Rendah</option>
+                        <option value="normal">Normal</option>
+                        <option value="high">Tinggi</option>
+                    </select>
+                </div>
+
+                <div class="form-group full">
+                    <label>Deskripsi / Catatan</label>
+                    <textarea
+                        id="taskDescription"
+                        placeholder="Tambahkan catatan tugas..."
+                    ></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="closeTaskModal()"
+                >
+                    Batal
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    Simpan Tugas
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DATA MATA KULIAH
+========================================================= */
+
+const scheduleData = [
+
+    {
+        day:"Monday",
+        time:"08:00 - 09:40",
+        classCode:"1TKRA",
+        name:"Bahasa Inggris Akademik",
+        code:"CEN115108",
+        sks:2,
+        room:"Gedung A314",
+        lecturer:"Azhari"
+    },
+
+    {
+        day:"Monday",
+        time:"10:40 - 12:20",
+        classCode:"1GRID",
+        name:"Bahasa Indonesia",
+        code:"MIT00013D",
+        sks:2,
+        room:"Gedung A409",
+        lecturer:"Rina Sartika"
+    },
+
+    {
+        day:"Tuesday",
+        time:"08:00 - 10:30",
+        classCode:"1GRFD",
+        name:"Fisika Dasar 1",
+        code:"CEN104101",
+        sks:3,
+        room:"Gedung A410",
+        lecturer:"Feri Iskandar"
+    },
+
+    {
+        day:"Tuesday",
+        time:"10:40 - 12:20",
+        classCode:"1TKRA",
+        name:"Pengantar Teknik Komputer",
+        code:"CEN101101",
+        sks:2,
+        room:"Gedung B3-02",
+        lecturer:"Luki Hernando"
+    },
+
+    {
+        day:"Wednesday",
+        time:"08:00 - 09:40",
+        classCode:"1TKRA",
+        name:"Pancasila",
+        code:"MIT00011D",
+        sks:2,
+        room:"Gedung A4-12",
+        lecturer:"Hazimah"
+    },
+
+    {
+        day:"Wednesday",
+        time:"10:00 - 12:30",
+        classCode:"1TKRA",
+        name:"Kalkulus 1",
+        code:"CEN102101",
+        sks:3,
+        room:"Gedung B3-14 B",
+        lecturer:"Faradiba Jabnabillah"
+    },
+
+    {
+        day:"Thursday",
+        time:"08:00 - 09:40",
+        classCode:"1TKRA",
+        name:"Kimia Dasar",
+        code:"CEN104102",
+        sks:2,
+        room:"Gedung A4-13",
+        lecturer:"Hazimah"
+    },
+
+    {
+        day:"Thursday",
+        time:"10:00 - 11:40",
+        classCode:"1TKRA",
+        name:"Pengantar Rekayasa dan Desain",
+        code:"MFN00012D",
+        sks:2,
+        room:"Gedung A4-13",
+        lecturer:"Zainul Munir"
+    },
+
+    {
+        day:"Friday",
+        time:"08:00 - 09:40",
+        classCode:"1GRIS",
+        name:"Pendidikan Agama",
+        code:"MIT00014D",
+        sks:2,
+        room:"Online Ms Teams",
+        lecturer:"Muhammad Saidy"
+    },
+
+    {
+        day:"Friday",
+        time:"10:00 - 11:40",
+        classCode:"1GRAK",
+        name:"Pendidikan Agama",
+        code:"MIT00014D",
+        sks:2,
+        room:"Online Ms Teams",
+        lecturer:"Yudhy Sanjaya"
+    },
+
+    {
+        day:"Friday",
+        time:"18:00 - 19:40",
+        classCode:"1GRPB",
+        name:"Pendidikan Agama",
+        code:"MIT00014D",
+        sks:2,
+        room:"Online Ms Teams",
+        lecturer:"Langlang Labaela"
+    },
+
+    {
+        day:"Friday",
+        time:"10:00 - 11:40",
+        classCode:"1GRKT",
+        name:"Pendidikan Agama",
+        code:"MIT00014D",
+        sks:2,
+        room:"Online Ms Teams",
+        lecturer:"Laurensius Dihe Sanga"
+    }
+
+];
+
+
+/* =========================================================
+   UNIQUE COURSES
+========================================================= */
+
+const courses = [];
+
+scheduleData.forEach(item => {
+
+    const exists = courses.find(
+        c => c.code === item.code && c.name === item.name
+    );
+
+    if(!exists){
+        courses.push({
+            id:item.code,
+            name:item.name,
+            code:item.code,
+            sks:item.sks,
+            classes:scheduleData.filter(
+                x => x.code === item.code && x.name === item.name
+            )
+        });
+    }
+
+});
+
+
+/* =========================================================
+   TASK STORAGE
+========================================================= */
+
+let tasks = JSON.parse(
+    localStorage.getItem("kuliahku_tasks") || "[]"
+);
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const pageTitle = document.getElementById("pageTitle");
+
+const pageNames = {
+    dashboard:"Dashboard",
+    courses:"Mata Kuliah",
+    tasks:"Tugas",
+    schedule:"Jadwal Kuliah",
+    calendar:"Kalender",
+    progress:"Progress"
+};
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+document.querySelectorAll(".nav button[data-page]").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        const page = btn.dataset.page;
+
+        showPage(page);
+
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebarOverlay").classList.remove("show");
+
+    });
+
+});
+
+
+function showPage(page){
+
+    document.querySelectorAll(".section").forEach(section => {
+        section.classList.remove("active");
+    });
+
+    const target = document.getElementById("page-" + page);
+
+    if(target){
+        target.classList.add("active");
+    }
+
+    document.querySelectorAll(".nav button[data-page]").forEach(btn => {
+        btn.classList.toggle(
+            "active",
+            btn.dataset.page === page
+        );
+    });
+
+    pageTitle.textContent = pageNames[page] || "Kuliahku";
+
+    if(page === "dashboard"){
+        renderDashboard();
+    }
+
+    if(page === "courses"){
+        renderCourses();
+    }
+
+    if(page === "tasks"){
+        renderTasks();
+    }
+
+    if(page === "schedule"){
+        renderSchedule();
+    }
+
+    if(page === "calendar"){
+        renderCalendar();
+    }
+
+    if(page === "progress"){
+        renderProgress();
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+document.getElementById("mobileMenu").addEventListener("click", () => {
+
+    document.getElementById("sidebar").classList.add("open");
+    document.getElementById("sidebarOverlay").classList.add("show");
+
+});
+
+document.getElementById("sidebarOverlay").addEventListener("click", () => {
+
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("sidebarOverlay").classList.remove("show");
+
+});
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+function updateToday(){
+
+    const now = new Date();
+
+    const formatter = new Intl.DateTimeFormat(
+        "id-ID",
+        {
+            weekday:"long",
+            day:"numeric",
+            month:"long",
+            year:"numeric"
+        }
+    );
+
+    document.getElementById("todayText").textContent =
+        formatter.format(now);
+
+}
+
+updateToday();
+
+
+/* =========================================================
+   TASK MODAL
+========================================================= */
+
+function populateCourseSelects(){
+
+    const taskCourse = document.getElementById("taskCourse");
+    const filter = document.getElementById("taskCourseFilter");
+
+    taskCourse.innerHTML = "";
+
+    courses.forEach(course => {
+
+        const option = document.createElement("option");
+
+        option.value = course.code;
+        option.textContent =
+            course.name + " (" + course.code + ")";
+
+        taskCourse.appendChild(option);
+
+    });
+
+    filter.innerHTML =
+        '<option value="all">Semua Mata Kuliah</option>';
+
+    courses.forEach(course => {
+
+        const option = document.createElement("option");
+
+        option.value = course.code;
+        option.textContent = course.name;
+
+        filter.appendChild(option);
+
+    });
+
+}
+
+
+function openTaskModal(id = null){
+
+    populateCourseSelects();
+
+    document.getElementById("taskModal").classList.add("show");
+
+    if(id){
+
+        const task = tasks.find(t => t.id === id);
+
+        if(!task) return;
+
+        document.getElementById("modalTitle").textContent =
+            "Edit Tugas";
+
+        document.getElementById("taskId").value = task.id;
+        document.getElementById("taskName").value = task.name;
+        document.getElementById("taskCourse").value = task.course;
+        document.getElementById("taskDeadline").value = task.deadline;
+        document.getElementById("taskStatus").value = task.status;
+        document.getElementById("taskPriority").value = task.priority;
+        document.getElementById("taskDescription").value =
+            task.description || "";
+
+    }else{
+
+        document.getElementById("modalTitle").textContent =
+            "Tambah Tugas";
+
+        document.getElementById("taskForm").reset();
+
+        document.getElementById("taskId").value = "";
+
+        const tomorrow = new Date();
+
+        tomorrow.setDate(
+            tomorrow.getDate() + 1
+        );
+
+        document.getElementById("taskDeadline").value =
+            formatInputDate(tomorrow);
+
+    }
+
+}
+
+
+function closeTaskModal(){
+
+    document.getElementById("taskModal").classList.remove("show");
+
+}
+
+
+document.getElementById("taskModal").addEventListener("click", e => {
+
+    if(e.target.id === "taskModal"){
+        closeTaskModal();
+    }
+
+});
+
+
+/* =========================================================
+   SAVE TASK
+========================================================= */
+
+document.getElementById("taskForm").addEventListener(
+    "submit",
+    e => {
+
+        e.preventDefault();
+
+        const id =
+            document.getElementById("taskId").value;
+
+        const data = {
+
+            id: id || Date.now().toString(),
+
+            name:
+                document.getElementById("taskName").value.trim(),
+
+            course:
+                document.getElementById("taskCourse").value,
+
+            deadline:
+                document.getElementById("taskDeadline").value,
+
+            status:
+                document.getElementById("taskStatus").value,
+
+            priority:
+                document.getElementById("taskPriority").value,
+
+            description:
+                document.getElementById("taskDescription").value.trim(),
+
+            createdAt:
+                new Date().toISOString()
+
+        };
+
+
+        if(id){
+
+            const index = tasks.findIndex(
+                t => t.id === id
+            );
+
+            if(index !== -1){
+                tasks[index] = {
+                    ...tasks[index],
+                    ...data
+                };
+            }
+
+        }else{
+
+            tasks.push(data);
+
+        }
+
+
+        saveTasks();
+
+        closeTaskModal();
+
+        renderAll();
+
+    }
+);
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+function saveTasks(){
+
+    localStorage.setItem(
+        "kuliahku_tasks",
+        JSON.stringify(tasks)
+    );
+
+}
+
+
+/* =========================================================
+   TASK ACTIONS
+========================================================= */
+
+function toggleTask(id){
+
+    const task = tasks.find(
+        t => t.id === id
+    );
+
+    if(!task) return;
+
+    if(task.status === "done"){
+        task.status = "pending";
+    }else{
+        task.status = "done";
+    }
+
+    saveTasks();
+    renderAll();
+
+}
+
+
+function deleteTask(id){
+
+    if(!confirm("Hapus tugas ini?")){
+        return;
+    }
+
+    tasks = tasks.filter(
+        t => t.id !== id
+    );
+
+    saveTasks();
+
+    renderAll();
+
+}
+
+
+function editTask(id){
+
+    openTaskModal(id);
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function renderDashboard(){
+
+    document.getElementById("statCourses").textContent =
+        courses.length;
+
+    document.getElementById("statTasks").textContent =
+        tasks.length;
+
+    const pending =
+        tasks.filter(
+            t => t.status !== "done"
+        ).length;
+
+    const done =
+        tasks.filter(
+            t => t.status === "done"
+        ).length;
+
+    document.getElementById("statPending").textContent =
+        pending;
+
+    document.getElementById("statDone").textContent =
+        done;
+
+
+    const percent =
+        tasks.length === 0
+            ? 0
+            : Math.round(
+                done / tasks.length * 100
+            );
+
+    document.getElementById("overallPercent").textContent =
+        percent + "%";
+
+    document.getElementById("overallBar").style.width =
+        percent + "%";
+
+
+    renderDashboardTasks();
+    renderDeadlines();
+
+}
+
+
+function renderDashboardTasks(){
+
+    const container =
+        document.getElementById("dashboardTasks");
+
+    let data = [...tasks];
+
+    data.sort(
+        (a,b) =>
+            new Date(a.deadline) -
+            new Date(b.deadline)
+    );
+
+    data = data.slice(0,5);
+
+    if(!data.length){
+
+        container.innerHTML =
+            '<div class="empty">Belum ada tugas 🎉</div>';
+
+        return;
+
+    }
+
+    container.innerHTML =
+        data.map(taskHTML).join("");
+
+}
+
+
+function taskHTML(task){
+
+    const course = courses.find(
+        c => c.code === task.course
+    );
+
+    const courseName =
+        course ? course.name : task.course;
+
+    return `
+        <div class="task-item">
+
+            <div
+                class="task-check ${task.status === "done" ? "done" : ""}"
+                onclick="toggleTask('${task.id}')"
+            >
+                ${task.status === "done" ? "✓" : ""}
+            </div>
+
+            <div class="task-info">
+
+                <div class="task-name ${task.status === "done" ? "done" : ""}">
+                    ${escapeHTML(task.name)}
+                </div>
+
+                <div class="task-meta">
+                    ${escapeHTML(courseName)}
+                    · ${formatDate(task.deadline)}
+                </div>
+
+            </div>
+
+            <div class="task-actions">
+
+                <button
+                    class="icon-btn"
+                    onclick="editTask('${task.id}')"
+                    title="Edit"
+                >
+                    ✏️
+                </button>
+
+                <button
+                    class="icon-btn"
+                    onclick="deleteTask('${task.id}')"
+                    title="Hapus"
+                >
+                    🗑️
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+/* =========================================================
+   DEADLINES
+========================================================= */
+
+function renderDeadlines(){
+
+    const container =
+        document.getElementById("deadlineList");
+
+    const data =
+        tasks
+            .filter(t => t.status !== "done")
+            .sort(
+                (a,b) =>
+                    new Date(a.deadline) -
+                    new Date(b.deadline)
+            )
+            .slice(0,5);
+
+    if(!data.length){
+
+        container.innerHTML =
+            '<div class="empty">Tidak ada deadline 🎉</div>';
+
+        return;
+
+    }
+
+    container.innerHTML =
+        data.map(task => {
+
+            const date =
+                new Date(task.deadline + "T00:00:00");
+
+            const course =
+                courses.find(
+                    c => c.code === task.course
+                );
+
+            return `
+                <div class="deadline-item">
+
+                    <div class="date-box">
+
+                        <strong>
+                            ${date.getDate()}
+                        </strong>
+
+                        <span>
+                            ${date.toLocaleDateString(
+                                "id-ID",
+                                {month:"short"}
+                            )}
+                        </span>
+
+                    </div>
+
+                    <div class="deadline-info">
+
+                        <div class="deadline-name">
+                            ${escapeHTML(task.name)}
+                        </div>
+
+                        <div class="deadline-course">
+                            ${course ? escapeHTML(course.name) : ""}
+                        </div>
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+
+}
+
+
+/* =========================================================
+   COURSES
+========================================================= */
+
+function renderCourses(){
+
+    const container =
+        document.getElementById("courseGrid");
+
+    const search =
+        document.getElementById("courseSearch")
+            .value
+            .toLowerCase();
+
+    const data =
+        courses.filter(course =>
+            course.name.toLowerCase().includes(search) ||
+            course.code.toLowerCase().includes(search)
+        );
+
+    if(!data.length){
+
+        container.innerHTML =
+            '<div class="empty">Mata kuliah tidak ditemukan.</div>';
+
+        return;
+
+    }
+
+    container.innerHTML =
+        data.map(course => {
+
+            const courseTasks =
+                tasks.filter(
+                    t => t.course === course.code
+                );
+
+            const done =
+                courseTasks.filter(
+                    t => t.status === "done"
+                ).length;
+
+            const percent =
+                courseTasks.length
+                    ? Math.round(
+                        done /
+                        courseTasks.length *
+                        100
+                    )
+                    : 0;
+
+            return `
+
+                <div class="course-card">
+
+                    <div class="course-top">
+
+                        <div class="course-icon">
+                            📚
+                        </div>
+
+                        <div class="course-code">
+                            ${course.code}
+                        </div>
+
+                    </div>
+
+                    <div class="course-name">
+                        ${escapeHTML(course.name)}
+                    </div>
+
+                    <div class="course-meta">
+                        ${course.sks} SKS
+                        · ${course.classes.length} jadwal
+                    </div>
+
+                    <div class="course-progress">
+
+                        <div class="progress-head">
+                            <span>
+                                Progress tugas
+                            </span>
+
+                            <span>
+                                ${percent}%
+                            </span>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar"
+                                style="width:${percent}%"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+document.getElementById("courseSearch")
+    .addEventListener(
+        "input",
+        renderCourses
+    );
+
+
+/* =========================================================
+   TASK PAGE
+========================================================= */
+
+function renderTasks(){
+
+    const tbody =
+        document.getElementById("taskTableBody");
+
+    const search =
+        document.getElementById("taskSearch")
+            .value
+            .toLowerCase();
+
+    const status =
+        document.getElementById("taskStatusFilter")
+            .value;
+
+    const course =
+        document.getElementById("taskCourseFilter")
+            .value;
+
+
+    let data = tasks.filter(task => {
+
+        const matchesSearch =
+            task.name
+                .toLowerCase()
+                .includes(search);
+
+        const matchesStatus =
+            status === "all" ||
+            task.status === status;
+
+        const matchesCourse =
+            course === "all" ||
+            task.course === course;
+
+        return (
+            matchesSearch &&
+            matchesStatus &&
+            matchesCourse
+        );
+
+    });
+
+
+    data.sort(
+        (a,b) =>
+            new Date(a.deadline) -
+            new Date(b.deadline)
+    );
+
+
+    if(!data.length){
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6">
+                    <div class="empty">
+                        Belum ada tugas.
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        data.map(task => {
+
+            const courseData =
+                courses.find(
+                    c => c.code === task.course
+                );
+
+            return `
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${escapeHTML(task.name)}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${courseData
+                            ? escapeHTML(courseData.name)
+                            : task.course}
+                    </td>
+
+                    <td>
+                        ${formatDate(task.deadline)}
+                    </td>
+
+                    <td>
+                        ${statusBadge(task.status)}
+                    </td>
+
+                    <td>
+                        ${priorityBadge(task.priority)}
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="icon-btn"
+                            onclick="editTask('${task.id}')"
+                        >
+                            ✏️
+                        </button>
+
+                        <button
+                            class="icon-btn"
+                            onclick="deleteTask('${task.id}')"
+                        >
+                            🗑️
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }).join("");
+
+}
+
+
+function statusBadge(status){
+
+    const map = {
+
+        pending:
+            ['Belum Mulai','gray'],
+
+        progress:
+            ['Dikerjakan','yellow'],
+
+        done:
+            ['Selesai','green']
+
+    };
+
+    const item =
+        map[status] ||
+        ['Unknown','gray'];
+
+    return `
+        <span class="badge ${item[1]}">
+            ${item[0]}
+        </span>
+    `;
+
+}
+
+
+function priorityBadge(priority){
+
+    const map = {
+
+        low:
+            ['Rendah','gray'],
+
+        normal:
+            ['Normal','blue'],
+
+        high:
+            ['Tinggi','red']
+
+    };
+
+    const item =
+        map[priority] ||
+        ['Normal','gray'];
+
+    return `
+        <span class="badge ${item[1]}">
+            ${item[0]}
+        </span>
+    `;
+
+}
+
+
+document.getElementById("taskSearch")
+    .addEventListener(
+        "input",
+        renderTasks
+    );
+
+
+document.getElementById("taskStatusFilter")
+    .addEventListener(
+        "change",
+        renderTasks
+    );
+
+
+document.getElementById("taskCourseFilter")
+    .addEventListener(
+        "change",
+        renderTasks
+    );
+
+
+/* =========================================================
+   SCHEDULE
+========================================================= */
+
+const dayOrder = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+];
+
+const dayNames = {
+
+    Monday:"Senin",
+    Tuesday:"Selasa",
+    Wednesday:"Rabu",
+    Thursday:"Kamis",
+    Friday:"Jumat",
+    Saturday:"Sabtu",
+    Sunday:"Minggu"
+
+};
+
+
+function renderSchedule(){
+
+    const container =
+        document.getElementById("scheduleContainer");
+
+    container.innerHTML = "";
+
+    dayOrder.forEach(day => {
+
+        const items =
+            scheduleData.filter(
+                x => x.day === day
+            );
+
+        if(!items.length) return;
+
+        items.sort(
+            (a,b) =>
+                a.time.localeCompare(b.time)
+        );
+
+        const section =
+            document.createElement("div");
+
+        section.className =
+            "day-section";
+
+        section.innerHTML = `
+
+            <div class="day-title">
+
+                <h3>
+                    ${dayNames[day]}
+                </h3>
+
+                <span class="day-count">
+                    ${items.length} kelas
+                </span>
+
+            </div>
+
+            <div class="schedule-list">
+
+                ${items.map(item => `
+
+                    <div class="schedule-item">
+
+                        <div class="schedule-time">
+                            ${item.time}
+                        </div>
+
+                        <div class="schedule-class">
+                            ${item.classCode}
+                        </div>
+
+                        <div class="schedule-name">
+                            ${escapeHTML(item.name)}
+                            <div
+                                style="
+                                    font-size:10px;
+                                    color:#9aa1ad;
+                                    margin-top:3px;
+                                "
+                            >
+                                ${item.code}
+                            </div>
+                        </div>
+
+                        <div class="schedule-sks">
+                            ${item.sks} SKS
+                        </div>
+
+                        <div class="schedule-room">
+                            📍 ${escapeHTML(item.room)}
+                        </div>
+
+                        <div class="schedule-lecturer">
+                            👤 ${escapeHTML(item.lecturer)}
+                        </div>
+
+                    </div>
+
+                `).join("")}
+
+            </div>
+
+        `;
+
+        container.appendChild(section);
+
+    });
+
+}
+
+
+/* =========================================================
+   CALENDAR
+========================================================= */
+
+let calendarDate = new Date();
+
+
+function renderCalendar(){
+
+    const year =
+        calendarDate.getFullYear();
+
+    const month =
+        calendarDate.getMonth();
+
+    const title =
+        calendarDate.toLocaleDateString(
+            "id-ID",
+            {
+                month:"long",
+                year:"numeric"
+            }
+        );
+
+    document.getElementById("calendarTitle")
+        .textContent = title;
+
+
+    const grid =
+        document.getElementById("calendarGrid");
+
+    grid.innerHTML = "";
+
+
+    const weekdays = [
+        "Min",
+        "Sen",
+        "Sel",
+        "Rab",
+        "Kam",
+        "Jum",
+        "Sab"
+    ];
+
+
+    weekdays.forEach(day => {
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "calendar-weekday";
+
+        el.textContent = day;
+
+        grid.appendChild(el);
+
+    });
+
+
+    const firstDay =
+        new Date(year,month,1).getDay();
+
+    const daysInMonth =
+        new Date(year,month + 1,0).getDate();
+
+    const previousDays =
+        new Date(year,month,0).getDate();
+
+
+    for(let i = firstDay - 1; i >= 0; i--){
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "calendar-day other";
+
+        el.innerHTML = `
+            <div class="calendar-number">
+                ${previousDays - i}
+            </div>
+        `;
+
+        grid.appendChild(el);
+
+    }
+
+
+    for(let day = 1; day <= daysInMonth; day++){
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "calendar-day";
+
+        const dateString =
+            `${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+
+        const now =
+            new Date();
+
+        if(
+            day === now.getDate() &&
+            month === now.getMonth() &&
+            year === now.getFullYear()
+        ){
+            el.classList.add("today");
+        }
+
+
+        const dayTasks =
+            tasks.filter(
+                t => t.deadline === dateString
+            );
+
+
+        el.innerHTML = `
+
+            <div class="calendar-number">
+                ${day}
+            </div>
+
+            ${dayTasks
+                .slice(0,3)
+                .map(t => `
+                    <div class="calendar-task">
+                        ${escapeHTML(t.name)}
+                    </div>
+                `)
+                .join("")
+            }
+
+        `;
+
+        grid.appendChild(el);
+
+    }
+
+
+    const totalCells =
+        firstDay + daysInMonth;
+
+    const remaining =
+        Math.ceil(totalCells / 7) * 7 -
+        totalCells;
+
+
+    for(let i = 1; i <= remaining; i++){
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "calendar-day other";
+
+        el.innerHTML = `
+            <div class="calendar-number">
+                ${i}
+            </div>
+        `;
+
+        grid.appendChild(el);
+
+    }
+
+}
+
+
+function changeMonth(amount){
+
+    calendarDate.setMonth(
+        calendarDate.getMonth() + amount
+    );
+
+    renderCalendar();
+
+}
+
+
+function goToday(){
+
+    calendarDate = new Date();
+
+    renderCalendar();
+
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+function renderProgress(){
+
+    const container =
+        document.getElementById("progressGrid");
+
+    container.innerHTML =
+        courses.map(course => {
+
+            const courseTasks =
+                tasks.filter(
+                    t => t.course === course.code
+                );
+
+            const done =
+                courseTasks.filter(
+                    t => t.status === "done"
+                ).length;
+
+            const total =
+                courseTasks.length;
+
+            const percent =
+                total
+                    ? Math.round(done / total * 100)
+                    : 0;
+
+
+            return `
+
+                <div class="course-card">
+
+                    <div class="course-top">
+
+                        <div class="course-icon">
+                            📖
+                        </div>
+
+                        <div class="course-code">
+                            ${course.code}
+                        </div>
+
+                    </div>
+
+                    <div class="course-name">
+                        ${escapeHTML(course.name)}
+                    </div>
+
+                    <div class="course-meta">
+                        ${done} dari ${total} tugas selesai
+                    </div>
+
+                    <div class="course-progress">
+
+                        <div class="progress-head">
+                            <span>Progress</span>
+                            <span>${percent}%</span>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar"
+                                style="width:${percent}%"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* =========================================================
+   BACKUP
+========================================================= */
+
+function exportData(){
+
+    const data = {
+
+        exportedAt:
+            new Date().toISOString(),
+
+        schedule:
+            scheduleData,
+
+        tasks:
+            tasks
+
+    };
+
+
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:"application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const a =
+        document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+        "kuliahku-backup.json";
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetTasks(){
+
+    if(
+        !confirm(
+            "Hapus SEMUA tugas yang tersimpan?"
+        )
+    ){
+        return;
+    }
+
+    tasks = [];
+
+    saveTasks();
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function formatInputDate(date){
+
+    return [
+        date.getFullYear(),
+        String(date.getMonth()+1).padStart(2,"0"),
+        String(date.getDate()).padStart(2,"0")
+    ].join("-");
+
+}
+
+
+function formatDate(value){
+
+    if(!value) return "-";
+
+    const date =
+        new Date(value + "T00:00:00");
+
+    return date.toLocaleDateString(
+        "id-ID",
+        {
+            day:"numeric",
+            month:"short",
+            year:"numeric"
+        }
+    );
+
+}
+
+
+function escapeHTML(value){
+
+    return String(value || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================================================
+   RENDER ALL
+========================================================= */
+
+function renderAll(){
+
+    populateCourseSelects();
+
+    renderDashboard();
+    renderCourses();
+    renderTasks();
+    renderSchedule();
+    renderCalendar();
+    renderProgress();
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+renderAll();
+
+</script>
+
+</body>
+</html>
+```
