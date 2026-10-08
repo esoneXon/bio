@@ -23,7 +23,8 @@ const firebaseConfig = {
   projectId: "tanyaaja-17b48",
   storageBucket: "tanyaaja-17b48.appspot.com",
   messagingSenderId: "416065878381",
-  appId: "1:416065878381:web:8672bd86cccce067694264"
+  appId: "1:416065878381:web:8672bd86cccce067694264",
+  measurementId: "G-DSZ87SCW64"
 };
 
 const app = initializeApp(firebaseConfig);
