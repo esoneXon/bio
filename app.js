@@ -1,6 +1,20 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"; // IMPORT AUTH
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  getDocs, 
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { 
+  getAuth, 
+  signInWithRedirect, 
+  GoogleAuthProvider, 
+  getRedirectResult, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCWErOEhDXiCyOYh3bggDRLMF7w4xImiKg",
@@ -66,7 +80,7 @@ function tampilkanScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 }
 
-// FITUR SUARA KLIK
+// Efek Suara Klik (Web Audio API)
 function playClickSound() {
   try {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -84,7 +98,7 @@ function playClickSound() {
   } catch (e) {}
 }
 
-// CEK APAKAH AKUN SUDAH MENGISI KUIS
+// Cek Pengisian per Akun (1x Respon)
 async function checkAccountRestriction(uid) {
   try {
     const q = query(collection(db, "jawaban_responden"), where("user_uid", "==", uid));
@@ -96,7 +110,13 @@ async function checkAccountRestriction(uid) {
   }
 }
 
-// LISTENER STATUS LOGIN FIREBASE
+// Tangkap Error Hasil Redirect Login
+getRedirectResult(auth).catch((error) => {
+  console.error("Error redirect login:", error);
+  alert("Gagal login dengan Google. Pastikan domain tempat kuis dibuka sudah didaftarkan di Authorized Domains Firebase.");
+});
+
+// Listener Status Auth Firebase
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
@@ -107,7 +127,6 @@ onAuthStateChanged(auth, async (user) => {
       tampilkanScreen('screen-blocked');
       isSubmitted = true;
     } else {
-      // Ambil nama depan saja untuk disapa
       const firstName = user.displayName ? user.displayName.split(" ")[0] : "";
       document.getElementById('user-display-name').innerText = firstName;
       tampilkanScreen('screen-intro');
@@ -117,22 +136,21 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// LOGIN GOOGLE BUTTON
-btnLoginGoogle.addEventListener('click', async () => {
+// Tombol Login Google
+btnLoginGoogle.addEventListener('click', () => {
   btnLoginGoogle.disabled = true;
   btnLoginGoogle.innerText = "Memproses...";
   try {
-    await signInWithPopup(auth, provider);
-    // UI akan dihandle otomatis oleh onAuthStateChanged
+    signInWithRedirect(auth, provider);
   } catch (error) {
     console.error("Login gagal", error);
-    alert("Login dibatalkan atau terjadi kesalahan.");
+    alert("Terjadi kesalahan saat memulai login.");
     btnLoginGoogle.disabled = false;
     btnLoginGoogle.innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo"> Lanjutkan dengan Google`;
   }
 });
 
-// MENGIRIM / LANJUT SOAL
+// Logika Navigasi Lanjut Soal / Submit
 async function handleNextStep() {
   if (currentStep === 0 && answersData['demo_1'] === 'Tidak') {
     selesaikanKuis();
@@ -149,7 +167,6 @@ async function handleNextStep() {
     btnNext.style.display = 'block';
     
     try {
-      // Simpan data kuis beserta data Akun Google
       answersData.user_uid = currentUser.uid;
       answersData.user_email = currentUser.email;
       answersData.user_name = currentUser.displayName;
@@ -169,10 +186,10 @@ async function handleNextStep() {
 function selesaikanKuis() {
   isSubmitted = true;
   tampilkanScreen('screen-outro');
-  history.pushState(null, null, window.location.pathname); // Kunci tombol back
+  history.pushState(null, null, window.location.pathname);
 }
 
-// RENDER PERTANYAAN (AUTO NEXT & SUARA)
+// Render Pertanyaan Kuis
 function renderQuestion() {
   const q = questions[currentStep];
   questionText.innerText = q.text;
@@ -211,7 +228,8 @@ function renderQuestion() {
         btn.classList.add('selected');
         answersData[q.id] = opt;
 
-        setTimeout(() => { handleNextStep(); }, 200); // Auto next
+        // Auto-next setelah 200ms
+        setTimeout(() => { handleNextStep(); }, 200);
       };
 
       inputArea.appendChild(btn);
@@ -238,7 +256,7 @@ function renderQuestion() {
   }
 }
 
-// EVENT LISTENERS UMUM
+// Event Listeners Navigasi & Keyboard
 btnMulai.addEventListener('click', () => {
   playClickSound();
   currentStep = 0;
@@ -262,15 +280,14 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-window.addEventListener('popstate', (event) => {
-  // Cegah user balik ke form setelah submit / diblokir
+window.addEventListener('popstate', () => {
   if (isSubmitted || !currentUser || document.getElementById('screen-blocked').classList.contains('active')) {
     window.location.replace("about:blank");
     return;
   }
 
-  if (event.state && event.state.step !== undefined) {
-    currentStep = event.state.step;
+  if (history.state && history.state.step !== undefined) {
+    currentStep = history.state.step;
     tampilkanScreen('screen-quiz');
     renderQuestion();
   } else {
