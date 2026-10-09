@@ -16,6 +16,7 @@
       --primary-dark: #0284C7;
       --accent-yellow: #FFD84D;
       --border-color: #E2E8F0;
+      --danger: #db4437;
     }
 
     * {
@@ -32,6 +33,45 @@
       min-height: 100vh;
       width: 100%;
     }
+
+    /* Screen Sections */
+    #loginSection {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100vh;
+      background: var(--bg-main);
+      text-align: center;
+      padding: 20px;
+    }
+
+    #loginSection h1 { margin-bottom: 15px; color: var(--text-dark); }
+    #loginSection p { color: var(--text-muted); margin-bottom: 30px; max-width: 400px; }
+    
+    .btn-google {
+      background-color: white;
+      color: #757575;
+      border: 1px solid #ddd;
+      border-radius: 30px;
+      padding: 16px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+    .btn-google:hover { background-color: #f9f9f9; }
+    .btn-google:active { transform: scale(0.98); }
+    .btn-google img { width: 24px; height: 24px; }
+
+    #dashboardSection { display: none; width: 100%; }
+    .dashboard-wrapper { display: flex; width: 100%; min-height: 100vh; }
 
     /* Sidebar Layout Responsif */
     .sidebar {
@@ -54,596 +94,362 @@
       align-items: center;
       gap: 10px;
     }
+    .brand span { background-color: var(--accent-yellow); padding: 4px 10px; border-radius: 8px; }
 
-    .brand span {
-      background-color: var(--accent-yellow);
-      padding: 4px 10px;
-      border-radius: 8px;
-    }
-
-    .nav-menu {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
+    .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
     .nav-item a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-      border-radius: 12px;
-      transition: all 0.2s;
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      color: var(--text-muted); text-decoration: none; font-weight: 500;
+      font-size: 14px; border-radius: 12px; transition: all 0.2s;
+    }
+    .nav-item.active a, .nav-item a:hover {
+      background-color: #F0F9FF; color: var(--primary-dark); font-weight: 600;
     }
 
-    .nav-item.active a, .nav-item a:hover {
-      background-color: #F0F9FF;
-      color: var(--primary-dark);
-      font-weight: 600;
+    .user-profile {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .btn-logout {
+      width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 8px;
+      background: var(--danger); color: white; font-weight: bold; cursor: pointer;
     }
 
     /* Main Content Area */
-    .main-content {
-      flex-grow: 1;
-      padding: 24px;
-      overflow-y: auto;
-      width: 100%;
-    }
+    .main-content { flex-grow: 1; padding: 24px; overflow-y: auto; width: 100%; }
 
     /* Top Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; }
     .stat-card {
-      background: var(--card-bg);
-      padding: 18px 20px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border: 1px solid var(--border-color);
+      background: var(--card-bg); padding: 18px 20px; border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center;
+      gap: 16px; border: 1px solid var(--border-color);
     }
-
     .stat-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
-      background-color: #E0F2FE;
-      color: var(--primary-dark);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 20px;
-      flex-shrink: 0;
+      width: 46px; height: 46px; border-radius: 12px; background-color: #E0F2FE;
+      color: var(--primary-dark); display: flex; justify-content: center;
+      align-items: center; font-size: 20px; flex-shrink: 0;
     }
-
-    .stat-info h3 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-dark);
-    }
-
-    .stat-info p {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
+    .stat-info h3 { font-size: 20px; font-weight: 700; color: var(--text-dark); }
+    .stat-info p { font-size: 12px; color: var(--text-muted); }
 
     /* Tab Switcher Utama */
-    .tab-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 10px;
-      overflow-x: auto;
-    }
-
+    .tab-bar { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; overflow-x: auto; }
     .tab-btn {
-      background: none;
-      border: none;
-      padding: 10px 18px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-radius: 10px;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: none; border: none; padding: 10px 18px; font-size: 13px; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; border-radius: 10px; transition: all 0.2s ease;
+      white-space: nowrap; display: flex; align-items: center; gap: 8px;
     }
-
-    .tab-btn:hover {
-      background-color: #E2E8F0;
-      color: var(--text-dark);
-    }
-
-    .tab-btn.active {
-      background-color: var(--text-dark);
-      color: white;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
+    .tab-btn:hover { background-color: #E2E8F0; color: var(--text-dark); }
+    .tab-btn.active { background-color: var(--text-dark); color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     /* Grid Layout Grafik & Tabel */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 20px;
-      align-items: start;
-    }
+    .dashboard-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start; }
+    .card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; flex-direction: column; width: 100%; }
+    .card-header { margin-bottom: 16px; }
+    .card-title { font-size: 16px; font-weight: 700; color: var(--text-dark); line-height: 1.4; }
 
-    .card {
-      background: var(--card-bg);
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-      border: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-    }
-
-    .card-header {
-      margin-bottom: 16px;
-    }
-
-    .card-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-dark);
-      line-height: 1.4;
-    }
-
-    /* LAYOUT KHUSUS GRAFIK DENGAN SIDE-TAB DI KIRI GRAFIK */
-    .chart-layout-wrapper {
-      display: flex;
-      gap: 16px;
-      align-items: stretch;
-      width: 100%;
-    }
-
-    /* Tab List Pertanyaan di Samping Kiri Grafik */
+    /* Layout Grafik */
+    .chart-layout-wrapper { display: flex; gap: 16px; align-items: stretch; width: 100%; }
     .q-sidebar-tabs {
-      width: 130px;
-      max-height: 380px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding-right: 8px;
-      flex-shrink: 0;
-      border-right: 1px solid var(--border-color);
+      width: 130px; max-height: 380px; overflow-y: auto; display: flex;
+      flex-direction: column; gap: 6px; padding-right: 8px; flex-shrink: 0; border-right: 1px solid var(--border-color);
     }
-
     .q-tab-item {
-      padding: 8px 10px;
-      border-radius: 8px;
-      background-color: #F8FAFC;
-      border: 1px solid var(--border-color);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      padding: 8px 10px; border-radius: 8px; background-color: #F8FAFC;
+      border: 1px solid var(--border-color); font-size: 12px; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; text-align: left; transition: all 0.2s ease;
     }
-
-    .q-tab-item:hover {
-      background-color: #E2E8F0;
-      color: var(--text-dark);
-    }
-
-    .q-tab-item.active {
-      background-color: var(--primary-dark);
-      color: white;
-      border-color: var(--primary-dark);
-    }
-
-    .chart-container {
-      position: relative;
-      height: 380px;
-      flex-grow: 1;
-      width: 100%;
-      min-width: 0;
-    }
+    .q-tab-item:hover { background-color: #E2E8F0; color: var(--text-dark); }
+    .q-tab-item.active { background-color: var(--primary-dark); color: white; border-color: var(--primary-dark); }
+    .chart-container { position: relative; height: 380px; flex-grow: 1; width: 100%; min-width: 0; }
 
     /* Scrollable Container Untuk Tabel */
-    .table-container {
-      max-height: 380px;
-      overflow-y: auto;
-      overflow-x: auto;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      white-space: nowrap;
-    }
-
-    th {
-      padding: 10px 12px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      border-bottom: 2px solid var(--border-color);
-      background-color: #FAFAFA;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    td {
-      padding: 10px 12px;
-      font-size: 12px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    tr.question-row {
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    tr.question-row:hover {
-      background-color: #F8FAFC;
-    }
-
-    tr.question-row.active {
-      background-color: #EFF6FF;
-    }
-
-    tr.question-row.active td {
-      font-weight: 600;
-      color: var(--primary-dark);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 600;
-    }
-
+    .table-container { max-height: 380px; overflow-y: auto; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
+    table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+    th { padding: 10px 12px; font-size: 11px; font-weight: 600; color: var(--text-muted); border-bottom: 2px solid var(--border-color); background-color: #FAFAFA; position: sticky; top: 0; z-index: 10; }
+    td { padding: 10px 12px; font-size: 12px; border-bottom: 1px solid var(--border-color); }
+    
+    tr.question-row { cursor: pointer; transition: background-color 0.2s; }
+    tr.question-row:hover { background-color: #F8FAFC; }
+    tr.question-row.active { background-color: #EFF6FF; }
+    tr.question-row.active td { font-weight: 600; color: var(--primary-dark); }
+    
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 20px; font-size: 10px; font-weight: 600; }
     .badge-demo { background: #FEF3C7; color: #D97706; }
     .badge-likert { background: #E0F2FE; color: #0369A1; }
 
     /* Custom Scrollbar */
-    .q-sidebar-tabs::-webkit-scrollbar,
-    .table-container::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    .q-sidebar-tabs::-webkit-scrollbar-thumb,
-    .table-container::-webkit-scrollbar-thumb {
-      background: #CBD5E1;
-      border-radius: 10px;
-    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
 
-    /* MEDIA QUERIES UNTUK TAMPILAN RESPONSIF (HP & TABLET) */
-    @media (max-width: 1024px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
+    /* MEDIA QUERIES UNTUK HP & TABLET */
+    @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
     @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-      .sidebar {
-        width: 100%;
-        padding: 16px 20px;
-        gap: 16px;
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .nav-menu {
-        flex-direction: row;
-      }
-      .main-content {
-        padding: 16px;
-      }
-      /* Mengubah Side-Tab Kiri Grafik Menjadi Horizontal Scroll di HP */
-      .chart-layout-wrapper {
-        flex-direction: column;
-      }
-      .q-sidebar-tabs {
-        width: 100%;
-        max-height: none;
-        flex-direction: row;
-        overflow-x: auto;
-        overflow-y: hidden;
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-        padding-right: 0;
-        padding-bottom: 8px;
-      }
-      .q-tab-item {
-        flex-shrink: 0;
-      }
-      .chart-container {
-        height: 300px;
-      }
+      .dashboard-wrapper { flex-direction: column; }
+      .sidebar { width: 100%; padding: 16px 20px; gap: 16px; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; justify-content: space-between; align-items: center; }
+      .nav-menu { flex-direction: row; }
+      .user-profile { margin-top: 0; padding-top: 0; border: none; }
+      .btn-logout { width: auto; padding: 6px 12px; margin-top: 0; }
+      .chart-layout-wrapper { flex-direction: column; }
+      .q-sidebar-tabs { width: 100%; max-height: none; flex-direction: row; overflow-x: auto; overflow-y: hidden; border-right: none; padding-bottom: 8px; }
+      .q-tab-item { flex-shrink: 0; }
+      .chart-container { height: 300px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar Navigasi -->
-  <aside class="sidebar">
-    <div class="brand">
-      <span>IDM</span> Analytics
-    </div>
-    <ul class="nav-menu">
-      <li class="nav-item active"><a href="#">📊 Dashboard</a></li>
-    </ul>
-  </aside>
+  <!-- LOGIN SECTION (Wajib untuk akses Firestore Database) -->
+  <div id="loginSection">
+    <h1>🔐 Admin Login</h1>
+    <p>Silakan login menggunakan akun Google Anda untuk mengakses data dan grafik kuesioner.</p>
+    <button class="btn-google" id="btnLoginGoogle">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+      Login sebagai Admin
+    </button>
+  </div>
 
-  <!-- Konten Utama -->
-  <main class="main-content">
-    
-    <!-- Kartu Statistik Atas -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div class="stat-info">
-          <h3 id="stat-total-responden">0</h3>
-          <p>Total Responden</p>
+  <!-- DASHBOARD SECTION -->
+  <div id="dashboardSection">
+    <div class="dashboard-wrapper">
+      
+      <!-- Sidebar Navigasi -->
+      <aside class="sidebar">
+        <div class="brand">
+          <span>IDM</span> Analytics
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">❓</div>
-        <div class="stat-info">
-          <h3>18</h3>
-          <p>Total Pertanyaan</p>
+        <ul class="nav-menu">
+          <li class="nav-item active"><a href="#">📊 Dashboard</a></li>
+        </ul>
+        <div class="user-profile">
+          Login sebagai: <br> <b id="adminEmailDisplay">-</b>
+          <button class="btn-logout" id="btnLogout">Logout</button>
         </div>
-      </div>
-    </div>
+      </aside>
 
-    <!-- TAB NAVIGASI UTAMA -->
-    <div class="tab-bar">
-      <button class="tab-btn active" id="tab-btn-chart" onclick="switchTab('chart')">
-        📊 Grafik & Pertanyaan
-      </button>
-      <button class="tab-btn" id="tab-btn-table" onclick="switchTab('table')">
-        📋 Tabel Jawaban Per Responden
-      </button>
-    </div>
-
-    <!-- TAB 1: GRAFIK DENGAN TAB LIST PERTANYAAN DI SISI KIRI -->
-    <div id="view-chart" class="tab-content active">
-      <div class="dashboard-grid">
+      <!-- Konten Utama -->
+      <main class="main-content">
         
-        <!-- KARTU GRAFIK (Dilengkapi Tab Pertanyaan di Kiri) -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title" id="current-chart-title">Visualisasi Jawaban</h2>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="current-chart-subtitle">
-              Pilih ID pertanyaan di sebelah kiri grafik untuk berpindah secara cepat.
-            </p>
-          </div>
-          
-          <div class="chart-layout-wrapper">
-            <!-- TAB LIST PERTANYAAN (DI SEBELAH KIRI GRAFIK) -->
-            <div class="q-sidebar-tabs" id="q-sidebar-list">
-              <!-- Item Tab Dimuat Secara Dinamis via JS -->
+        <!-- Kartu Statistik Atas -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+              <h3 id="stat-total-responden">0</h3>
+              <p>Total Responden</p>
             </div>
-
-            <!-- AREA GRAFIK -->
-            <div class="chart-container">
-              <canvas id="analyticsChart"></canvas>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">❓</div>
+            <div class="stat-info">
+              <h3>19</h3>
+              <p>Total Pertanyaan</p>
             </div>
           </div>
         </div>
 
-        <!-- KARTU DAFTAR PERTANYAAN LENGKAP -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Daftar Pertanyaan</h2>
+        <!-- TAB NAVIGASI UTAMA -->
+        <div class="tab-bar">
+          <button class="tab-btn active" id="tab-btn-chart" onclick="switchTab('chart')">
+            📊 Grafik & Pertanyaan
+          </button>
+          <button class="tab-btn" id="tab-btn-table" onclick="switchTab('table')">
+            📋 Tabel Detail Jawaban
+          </button>
+        </div>
+
+        <!-- TAB 1: GRAFIK & LIST PERTANYAAN -->
+        <div id="view-chart" class="tab-content active">
+          <div class="dashboard-grid">
+            
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title" id="current-chart-title">Visualisasi Jawaban</h2>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                  Pilih ID pertanyaan di sebelah kiri grafik untuk berpindah secara cepat.
+                </p>
+              </div>
+              <div class="chart-layout-wrapper">
+                <div class="q-sidebar-tabs" id="q-sidebar-list"></div>
+                <div class="chart-container">
+                  <canvas id="analyticsChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><h2 class="card-title">Daftar Pertanyaan</h2></div>
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr><th>ID</th><th>Tipe</th><th>Pertanyaan</th></tr>
+                  </thead>
+                  <tbody id="questions-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Tipe</th>
-                  <th>Pertanyaan</th>
-                </tr>
-              </thead>
-              <tbody id="questions-table-body">
-                <!-- Dimuat via JS -->
-              </tbody>
-            </table>
+        </div>
+
+        <!-- TAB 2: TABEL RESPONDEN -->
+        <div id="view-table" class="tab-content">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">Data Detail Jawaban Responden</h2></div>
+            <div class="table-container" style="max-height: 520px;">
+              <table>
+                <thead>
+                  <tr id="respondent-table-header">
+                    <th># Responden</th>
+                    <th>Waktu Submit</th>
+                    <th>Nama</th>
+                    <th>Email Google</th>
+                    <th>Belanja 2x?</th>
+                    <th>Gender</th>
+                    <th>Usia</th>
+                    <th>Pekerjaan</th>
+                    <th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Q5</th>
+                    <th>Q6</th><th>Q7</th><th>Q8</th><th>Q9</th><th>Q10</th>
+                    <th>Q11</th><th>Q12</th><th>Q13</th><th>Q14</th>
+                  </tr>
+                </thead>
+                <tbody id="respondent-table-body"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-      </div>
+      </main>
     </div>
+  </div>
 
-    <!-- TAB 2: TABEL RESPONDEN -->
-    <div id="view-table" class="tab-content">
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Data Detail Jawaban Responden</h2>
-        </div>
-        <div class="table-container" style="max-height: 520px;">
-          <table>
-            <thead>
-              <tr id="respondent-table-header">
-                <th># Responden</th>
-                <th>Waktu Submit</th>
-                <th>Belanja 2x?</th>
-                <th>Gender</th>
-                <th>Usia</th>
-                <th>Pekerjaan</th>
-                <th>Q1</th>
-                <th>Q2</th>
-                <th>Q3</th>
-                <th>Q4</th>
-                <th>Q5</th>
-                <th>Q6</th>
-                <th>Q7</th>
-                <th>Q8</th>
-                <th>Q9</th>
-                <th>Q10</th>
-                <th>Q11</th>
-                <th>Q12</th>
-                <th>Q13</th>
-                <th>Q14</th>
-              </tr>
-            </thead>
-            <tbody id="respondent-table-body">
-              <!-- Detail Responden Dimuat via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- Script Firebase & Dynamic Logic -->
+  <!-- Script Firebase & Chart.js -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+    // Kofigurasi Firebase Baru
     const firebaseConfig = {
-      apiKey: "AIzaSyCWErOEhDXiCyOYh3bggDRLMF7w4xImiKg",
-      authDomain: "tanyaaja-17b48.firebaseapp.com",
-      databaseURL: "https://tanyaaja-17b48.firebaseio.com",
-      projectId: "tanyaaja-17b48",
-      storageBucket: "tanyaaja-17b48.appspot.com",
-      messagingSenderId: "416065878381",
-      appId: "1:416065878381:web:8672bd86cccce067694264"
+      apiKey: "AIzaSyDG5v8O1XEAybZ-jeIBiZbEdW94n3KUX3w",
+      authDomain: "kuisidm.firebaseapp.com",
+      projectId: "kuisidm",
+      storageBucket: "kuisidm.firebasestorage.app",
+      messagingSenderId: "596850482999",
+      appId: "1:596850482999:web:173879f737a39013ea04b2",
+      measurementId: "G-XW7KMCN52S"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
     const optionsLikert = ["Sangat Tidak Setuju (STS)", "Tidak Setuju (TS)", "Netral (N)", "Setuju (S)", "Sangat Setuju (SS)"];
     
+    // Pertanyaan yang diupdate (Ada nama)
     const questions = [
+      { id: 'demo_nama', text: 'Siapa nama lengkap Anda?', type: 'text', category: 'Demografi' },
       { id: 'demo_1', text: 'Apakah Anda pernah berbelanja di Indomaret Bengkong Kolam 11 minimal 2 kali?', type: 'choice', options: ['Ya', 'Tidak'], category: 'Demografi' },
       { id: 'demo_2', text: 'Jenis Kelamin Anda?', type: 'choice', options: ['Laki-laki', 'Perempuan'], category: 'Demografi' },
-      { id: 'demo_3', text: 'Berapa usia Anda saat ini?', type: 'number', placeholder: 'Ketik usia Anda', category: 'Demografi' },
+      { id: 'demo_3', text: 'Berapa usia Anda saat ini?', type: 'number', category: 'Demografi' },
       { id: 'demo_4', text: 'Apa pekerjaan Anda saat ini?', type: 'choice', options: ['Pelajar/Mahasiswa', 'Karyawan Swasta', 'Wiraswasta', 'Ibu Rumah Tangga', 'Lainnya'], category: 'Demografi' },
-      { id: 'q1', text: 'Produk makanan/minuman selalu segar dan tidak kedaluwarsa.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q2', text: 'Variasi dan ketersediaan produk harian tergolong lengkap.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q3', text: 'Kemasan produk fisik yang dipajang dalam kondisi baik.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q4', text: 'Fasilitas gerai (AC, bersih, terang) membuat nyaman.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q5', text: 'Proses transaksi di kasir cepat, tepat, dan teratur.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q6', text: 'Karyawan sigap membantu mencari barang.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q7', text: 'Karyawan memberikan informasi harga promo secara jujur.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q8', text: 'Karyawan menyapa, senyum, dan bersikap ramah.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q9', text: 'Pengalaman berbelanja sesuai dengan harapan.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q10', text: 'Secara keseluruhan, puas dengan produk dan layanan.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q11', text: 'Keputusan memilih belanja di gerai ini sudah tepat.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q12', text: 'Akan terus kembali berbelanja di masa depan.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q13', text: 'Tetap memilih gerai ini meskipun ada minimarket pesaing.', type: 'choice', options: optionsLikert, category: 'Likert' },
-      { id: 'q14', text: 'Bersedia merekomendasikan gerai ini kepada keluarga/teman.', type: 'choice', options: optionsLikert, category: 'Likert' }
+      { id: 'q1', text: 'Produk makanan/minuman selalu segar.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q2', text: 'Variasi dan ketersediaan produk lengkap.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q3', text: 'Kemasan produk fisik dalam kondisi baik.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q4', text: 'Fasilitas gerai membuat nyaman.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q5', text: 'Proses transaksi cepat dan teratur.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q6', text: 'Karyawan sigap membantu.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q7', text: 'Karyawan memberikan informasi harga jujur.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q8', text: 'Karyawan menyapa ramah.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q9', text: 'Pengalaman berbelanja sesuai harapan.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q10', text: 'Puas dengan produk dan layanan.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q11', text: 'Keputusan belanja di sini tepat.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q12', text: 'Akan terus kembali berbelanja.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q13', text: 'Tetap memilih gerai ini.', type: 'choice', options: optionsLikert, category: 'Likert' },
+      { id: 'q14', text: 'Bersedia merekomendasikan.', type: 'choice', options: optionsLikert, category: 'Likert' }
     ];
 
     let respondentsData = [];
     let myChart = null;
 
+    // LOGIN & LOGOUT HANDLERS
+    const loginSection = document.getElementById('loginSection');
+    const dashboardSection = document.getElementById('dashboardSection');
+    const adminEmailDisplay = document.getElementById('adminEmailDisplay');
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginSection.style.display = 'none';
+        dashboardSection.style.display = 'block';
+        adminEmailDisplay.innerText = user.email;
+        if (!myChart) initChart();
+        fetchData();
+      } else {
+        loginSection.style.display = 'flex';
+        dashboardSection.style.display = 'none';
+      }
+    });
+
+    document.getElementById('btnLoginGoogle').addEventListener('click', async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) { alert("Gagal login."); }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
+
     window.switchTab = function(tabName) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-      if (tabName === 'chart') {
-        document.getElementById('tab-btn-chart').classList.add('active');
-        document.getElementById('view-chart').classList.add('active');
-      } else if (tabName === 'table') {
-        document.getElementById('tab-btn-table').classList.add('active');
-        document.getElementById('view-table').classList.add('active');
-      }
+      document.getElementById('tab-btn-' + tabName).classList.add('active');
+      document.getElementById('view-' + tabName).classList.add('active');
     };
 
     function initChart() {
       const ctx = document.getElementById('analyticsChart').getContext('2d');
       myChart = new Chart(ctx, {
         type: 'bar',
-        data: {
-          labels: [],
-          datasets: [{
-            label: 'Jumlah Responden',
-            data: [],
-            backgroundColor: ['#4CB5F9', '#FFD84D', '#34D399', '#F87171', '#A78BFA', '#FBBF24'],
-            borderRadius: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-        }
+        data: { labels: [], datasets: [{ label: 'Jumlah Responden', data: [], backgroundColor: ['#4CB5F9', '#FFD84D', '#34D399', '#F87171', '#A78BFA', '#FBBF24'], borderRadius: 8 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
       });
     }
 
     async function fetchData() {
       try {
-        const querySnapshot = await getDocs(collection(db, "jawaban_responden"));
+        const qData = query(collection(db, "jawaban_responden"), orderBy("waktu_submit", "asc"));
+        const querySnapshot = await getDocs(qData);
         respondentsData = [];
-        querySnapshot.forEach((doc) => {
-          respondentsData.push(doc.data());
-        });
+        querySnapshot.forEach((doc) => respondentsData.push(doc.data()));
 
         document.getElementById('stat-total-responden').innerText = respondentsData.length;
         renderQuestionSidebarTabs();
         renderQuestionsTable();
         renderRespondentDetailsTable();
         
-        if (questions.length > 0) {
-          updateChart(questions[0].id);
-        }
+        if (questions.length > 0) updateChart(questions[0].id);
       } catch (error) {
         console.error("Gagal mengambil data Firestore:", error);
       }
     }
 
-    // Render Tab List Pertanyaan di Samping Kiri Grafik
     function renderQuestionSidebarTabs() {
       const container = document.getElementById('q-sidebar-list');
       container.innerHTML = '';
-
       questions.forEach((q, index) => {
+        // Jangan render grafik untuk isian teks (nama)
+        if (q.type === 'text') return;
         const btn = document.createElement('button');
-        btn.className = 'q-tab-item' + (index === 0 ? ' active' : '');
+        btn.className = 'q-tab-item' + (index === 1 ? ' active' : '');
         btn.setAttribute('data-id', q.id);
         btn.innerText = q.id;
-
-        btn.addEventListener('click', () => {
-          updateChart(q.id);
-        });
-
+        btn.addEventListener('click', () => updateChart(q.id));
         container.appendChild(btn);
       });
     }
@@ -651,24 +457,15 @@
     function renderQuestionsTable() {
       const tbody = document.getElementById('questions-table-body');
       tbody.innerHTML = '';
-
       questions.forEach((q, index) => {
         const tr = document.createElement('tr');
-        tr.className = 'question-row' + (index === 0 ? ' active' : '');
+        tr.className = 'question-row' + (index === 1 ? ' active' : '');
         tr.setAttribute('data-id', q.id);
-
         const badgeClass = q.category === 'Demografi' ? 'badge-demo' : 'badge-likert';
-
-        tr.innerHTML = `
-          <td><b>${q.id}</b></td>
-          <td><span class="badge ${badgeClass}">${q.category}</span></td>
-          <td>${q.text}</td>
-        `;
-
-        tr.addEventListener('click', () => {
-          updateChart(q.id);
-        });
-
+        tr.innerHTML = `<td><b>${q.id}</b></td><td><span class="badge ${badgeClass}">${q.category}</span></td><td>${q.text}</td>`;
+        if (q.type !== 'text') {
+          tr.addEventListener('click', () => updateChart(q.id));
+        }
         tbody.appendChild(tr);
       });
     }
@@ -676,9 +473,8 @@
     function renderRespondentDetailsTable() {
       const tbody = document.getElementById('respondent-table-body');
       tbody.innerHTML = '';
-
       if (respondentsData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 20px; color: var(--text-muted);">Belum ada data responden.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="22" style="text-align:center; padding:20px;">Belum ada data responden.</td></tr>`;
         return;
       }
 
@@ -688,85 +484,53 @@
         if (resp.waktu_submit && resp.waktu_submit.toDate) {
           waktu = resp.waktu_submit.toDate().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
         }
-
         tr.innerHTML = `
           <td><b>Responden #${index + 1}</b></td>
           <td>${waktu}</td>
-          <td>${resp.demo_1 || '-'}</td>
-          <td>${resp.demo_2 || '-'}</td>
-          <td>${resp.demo_3 || '-'}</td>
-          <td>${resp.demo_4 || '-'}</td>
-          <td>${resp.q1 || '-'}</td>
-          <td>${resp.q2 || '-'}</td>
-          <td>${resp.q3 || '-'}</td>
-          <td>${resp.q4 || '-'}</td>
-          <td>${resp.q5 || '-'}</td>
-          <td>${resp.q6 || '-'}</td>
-          <td>${resp.q7 || '-'}</td>
-          <td>${resp.q8 || '-'}</td>
-          <td>${resp.q9 || '-'}</td>
-          <td>${resp.q10 || '-'}</td>
-          <td>${resp.q11 || '-'}</td>
-          <td>${resp.q12 || '-'}</td>
-          <td>${resp.q13 || '-'}</td>
-          <td>${resp.q14 || '-'}</td>
+          <td>${resp.demo_nama || resp.user_name || '-'}</td>
+          <td>${resp.user_email || '-'}</td>
+          <td>${resp.demo_1 || '-'}</td><td>${resp.demo_2 || '-'}</td><td>${resp.demo_3 || '-'}</td><td>${resp.demo_4 || '-'}</td>
+          <td>${resp.q1 || '-'}</td><td>${resp.q2 || '-'}</td><td>${resp.q3 || '-'}</td><td>${resp.q4 || '-'}</td>
+          <td>${resp.q5 || '-'}</td><td>${resp.q6 || '-'}</td><td>${resp.q7 || '-'}</td><td>${resp.q8 || '-'}</td>
+          <td>${resp.q9 || '-'}</td><td>${resp.q10 || '-'}</td><td>${resp.q11 || '-'}</td><td>${resp.q12 || '-'}</td>
+          <td>${resp.q13 || '-'}</td><td>${resp.q14 || '-'}</td>
         `;
-
         tbody.appendChild(tr);
       });
     }
 
-    // Update Grafik & Sinkronisasi Semua Tab Active State
     function updateChart(questionId) {
       const question = questions.find(q => q.id === questionId);
-      if (!question) return;
+      if (!question || question.type === 'text') return;
 
       document.getElementById('current-chart-title').innerText = `[${question.id}] ${question.text}`;
       
-      // Update Active state di Side-Tab Kiri Grafik
       document.querySelectorAll('.q-tab-item').forEach(item => {
-        if (item.getAttribute('data-id') === questionId) {
-          item.classList.add('active');
-          item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        } else {
-          item.classList.remove('active');
-        }
+        item.classList.toggle('active', item.getAttribute('data-id') === questionId);
+        if (item.classList.contains('active')) item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       });
 
-      // Update Active state di Tabel Kanan
       document.querySelectorAll('.question-row').forEach(row => {
-        if (row.getAttribute('data-id') === questionId) {
-          row.classList.add('active');
-        } else {
-          row.classList.remove('active');
-        }
+        row.classList.toggle('active', row.getAttribute('data-id') === questionId);
       });
 
-      let labels = [];
-      let counts = [];
-
+      let labels = [], counts = [];
       if (question.type === 'choice') {
         labels = question.options;
-        counts = labels.map(option => {
-          return respondentsData.filter(resp => resp[questionId] === option).length;
-        });
+        counts = labels.map(option => respondentsData.filter(resp => resp[questionId] === option).length);
       } else if (question.type === 'number') {
         labels = ['< 20 Thn', '20 - 30 Thn', '> 30 Thn'];
-        const u20 = respondentsData.filter(r => Number(r[questionId]) < 20).length;
-        const u2030 = respondentsData.filter(r => Number(r[questionId]) >= 20 && Number(r[questionId]) <= 30).length;
-        const u30 = respondentsData.filter(r => Number(r[questionId]) > 30).length;
-        counts = [u20, u2030, u30];
+        counts = [
+          respondentsData.filter(r => Number(r[questionId]) < 20).length,
+          respondentsData.filter(r => Number(r[questionId]) >= 20 && Number(r[questionId]) <= 30).length,
+          respondentsData.filter(r => Number(r[questionId]) > 30).length
+        ];
       }
 
       myChart.data.labels = labels;
       myChart.data.datasets[0].data = counts;
       myChart.update();
     }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initChart();
-      fetchData();
-    });
   </script>
 </body>
 </html>
