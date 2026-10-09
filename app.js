@@ -33,6 +33,8 @@ const provider = new GoogleAuthProvider();
 const optionsLikert = ["Sangat Tidak Setuju (STS)", "Tidak Setuju (TS)", "Netral (N)", "Setuju (S)", "Sangat Setuju (SS)"];
 const questions = [
   { id: 'demo_1', text: 'Apakah Anda pernah berbelanja di Indomaret Bengkong Kolam 11 minimal 2 kali?', type: 'choice', options: ['Ya', 'Tidak'] },
+  // MODIFIKASI: Menambahkan Input Nama
+  { id: 'demo_nama', text: 'Siapa nama lengkap Anda?', type: 'text', placeholder: 'Ketik nama Anda' },
   { id: 'demo_2', text: 'Jenis Kelamin Anda?', type: 'choice', options: ['Laki-laki', 'Perempuan'] },
   { id: 'demo_3', text: 'Berapa usia Anda saat ini?', type: 'number', placeholder: 'Ketik usia Anda (Contoh: 25)' },
   { id: 'demo_4', text: 'Apa pekerjaan Anda saat ini?', type: 'choice', options: ['Pelajar/Mahasiswa', 'Karyawan Swasta', 'Wiraswasta', 'Ibu Rumah Tangga', 'Lainnya'] },
@@ -79,7 +81,7 @@ function tampilkanScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 }
 
-// Efek Suara Klik (Web Audio API)
+// Efek Suara Klik
 function playClickSound() {
   try {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -97,7 +99,7 @@ function playClickSound() {
   } catch (e) {}
 }
 
-// Cek Pengisian per Akun (1x Respon)
+// Cek Pengisian per Akun
 async function checkAccountRestriction(uid) {
   try {
     const q = query(collection(db, "jawaban_responden"), where("user_uid", "==", uid));
@@ -135,7 +137,6 @@ btnLoginGoogle.addEventListener('click', async () => {
   btnLoginGoogle.innerText = "Memproses...";
   try {
     await signInWithPopup(auth, provider);
-    // UI akan dihandle otomatis oleh onAuthStateChanged setelah login berhasil
   } catch (error) {
     console.error("Login gagal", error);
     btnLoginGoogle.disabled = false;
@@ -160,9 +161,9 @@ async function handleNextStep() {
     btnNext.style.display = 'block';
     
     try {
-      answersData.user_uid = currentUser.uid;
+      // MODIFIKASI: Menyertakan email dan detail akun ke Firestore
       answersData.user_email = currentUser.email;
-      answersData.user_name = currentUser.displayName;
+      answersData.user_uid = currentUser.uid;
       answersData.waktu_submit = serverTimestamp();
 
       await addDoc(collection(db, "jawaban_responden"), answersData);
@@ -221,20 +222,26 @@ function renderQuestion() {
         btn.classList.add('selected');
         answersData[q.id] = opt;
 
-        // Auto-next setelah 200ms
         setTimeout(() => { handleNextStep(); }, 200);
       };
 
       inputArea.appendChild(btn);
     });
-  } else if (q.type === 'number') {
+  } 
+  // MODIFIKASI: Mendukung pertanyaan Text dan Number
+  else if (q.type === 'number' || q.type === 'text') {
     btnNext.style.display = 'block';
     btnNext.disabled = true;
 
     const input = document.createElement('input');
-    input.type = 'number';
+    input.type = q.type;
     input.placeholder = q.placeholder;
     
+    // Fitur: Pre-fill otomatis nama pengguna dari Akun Google jika pertanyaan nama (demo_nama)
+    if (q.id === 'demo_nama' && !answersData[q.id] && currentUser) {
+      answersData[q.id] = currentUser.displayName || "";
+    }
+
     if (answersData[q.id]) {
       input.value = answersData[q.id];
       btnNext.disabled = false;
@@ -267,7 +274,7 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     if (document.getElementById('screen-intro').classList.contains('active')) {
       btnMulai.click();
-    } else if (document.getElementById('screen-quiz').classList.contains('active') && !btnNext.disabled && questions[currentStep].type === 'number') {
+    } else if (document.getElementById('screen-quiz').classList.contains('active') && !btnNext.disabled && (questions[currentStep].type === 'number' || questions[currentStep].type === 'text')) {
       btnNext.click();
     }
   }
