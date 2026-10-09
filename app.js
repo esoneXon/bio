@@ -17,14 +17,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCWErOEhDXiCyOYh3bggDRLMF7w4xImiKg",
-  authDomain: "tanyaaja-17b48.firebaseapp.com",
-  databaseURL: "https://tanyaaja-17b48.firebaseio.com",
-  projectId: "tanyaaja-17b48",
-  storageBucket: "tanyaaja-17b48.appspot.com",
-  messagingSenderId: "416065878381",
-  appId: "1:416065878381:web:8672bd86cccce067694264",
-  measurementId: "G-DSZ87SCW64"
+  apiKey: "AIzaSyDG5v8O1XEAybZ-jeIBiZbEdW94n3KUX3w",
+  authDomain: "kuisidm.firebaseapp.com",
+  projectId: "kuisidm",
+  storageBucket: "kuisidm.firebasestorage.app",
+  messagingSenderId: "596850482999",
+  appId: "1:596850482999:web:173879f737a39013ea04b2",
+  measurementId: "G-XW7KMCN52S"
 };
 
 const app = initializeApp(firebaseConfig);
