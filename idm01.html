@@ -7,94 +7,180 @@
   <style>
     body { font-family: sans-serif; padding: 40px; background-color: #f4f7f6; text-align: center; }
     .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    
     .btn-group { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-    button { padding: 15px 25px; font-size: 16px; font-weight: bold; color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+    button { padding: 15px 25px; font-size: 16px; font-weight: bold; color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    
     #btnUnduhAngka { background-color: #007bff; }
     #btnUnduhAngka:hover { background-color: #0056b3; }
+    
     #btnUnduhTeks { background-color: #28a745; }
     #btnUnduhTeks:hover { background-color: #218838; }
+    
+    #btnLogin { background-color: #db4437; margin: 20px auto; width: 100%; max-width: 300px; }
+    #btnLogin:hover { background-color: #c23321; }
+
+    #btnLogout { background-color: #6c757d; padding: 8px 15px; font-size: 12px; margin-top: 20px; }
+    
     button:disabled { background-color: #ccc !important; cursor: not-allowed; }
     p { color: #555; margin-bottom: 20px; line-height: 1.5; }
+    
+    /* Panel Sections */
+    #downloadSection { display: none; }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h2>Panel Admin Kuesioner</h2>
-    <p>Silakan pilih format unduhan data Anda. Versi "Angka" cocok untuk diolah di aplikasi statistik (SPSS), sedangkan versi "Teks" cocok untuk dibaca dan dilampirkan pada laporan.</p>
-    
-    <div class="btn-group">
-      <button id="btnUnduhAngka">Unduh Versi Terdata (Angka & Kode Singkat)</button>
-      <button id="btnUnduhTeks">Unduh Versi Konversi (Teks Pertanyaan & Jawaban)</button>
+
+    <!-- BAGIAN LOGIN ADMIN (Wajib agar bisa baca database) -->
+    <div id="loginSection">
+      <p>Akses ke database telah diamankan. Silakan login menggunakan akun Google Anda untuk mengunduh data responden.</p>
+      <button id="btnLogin">
+        <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#FFF" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FFC107" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#FF3D00" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#4CAF50" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571c.001-.001.002-.001.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
+        Login sebagai Admin
+      </button>
     </div>
-    
-    <p id="statusText" style="margin-top: 20px; font-weight: bold; color: #333;"></p>
+
+    <!-- BAGIAN UNDUH DATA (Tampil setelah Login) -->
+    <div id="downloadSection">
+      <p style="background: #e0f2fe; padding: 10px; border-radius: 5px; color: #0369a1; font-weight: bold;">
+        Halo, <span id="adminName">Admin</span>
+      </p>
+      <p>Silakan pilih format unduhan data Anda. Versi <b>"Angka"</b> cocok untuk diolah di aplikasi statistik (SPSS), sedangkan versi <b>"Teks"</b> cocok untuk dibaca dan dilampirkan pada laporan.</p>
+      
+      <div class="btn-group">
+        <button id="btnUnduhAngka">📊 Unduh Versi Angka (Kode SPSS)</button>
+        <button id="btnUnduhTeks">📝 Unduh Versi Teks (Keterangan Lengkap)</button>
+      </div>
+      
+      <p id="statusText" style="margin-top: 20px; font-weight: bold; color: #333;"></p>
+      <button id="btnLogout">Keluar (Logout)</button>
+    </div>
+
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // Konfigurasi Firebase Anda
+    // Konfigurasi Proyek Firebase (kuisidm)
     const firebaseConfig = {
-      apiKey: "AIzaSyCWErOEhDXiCyOYh3bggDRLMF7w4xImiKg",
-      authDomain: "tanyaaja-17b48.firebaseapp.com",
-      databaseURL: "https://tanyaaja-17b48.firebaseio.com",
-      projectId: "tanyaaja-17b48",
-      storageBucket: "tanyaaja-17b48.appspot.com",
-      messagingSenderId: "416065878381",
-      appId: "1:416065878381:web:8672bd86cccce067694264"
+      apiKey: "AIzaSyDG5v8O1XEAybZ-jeIBiZbEdW94n3KUX3w",
+      authDomain: "kuisidm.firebaseapp.com",
+      projectId: "kuisidm",
+      storageBucket: "kuisidm.firebasestorage.app",
+      messagingSenderId: "596850482999",
+      appId: "1:596850482999:web:173879f737a39013ea04b2",
+      measurementId: "G-XW7KMCN52S"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
+    // DOM Elements
+    const loginSection = document.getElementById('loginSection');
+    const downloadSection = document.getElementById('downloadSection');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnLogout = document.getElementById('btnLogout');
+    const adminName = document.getElementById('adminName');
     const btnUnduhAngka = document.getElementById('btnUnduhAngka');
     const btnUnduhTeks = document.getElementById('btnUnduhTeks');
     const statusText = document.getElementById('statusText');
 
+    // CEK STATUS LOGIN
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginSection.style.display = 'none';
+        downloadSection.style.display = 'block';
+        adminName.textContent = user.email;
+      } else {
+        loginSection.style.display = 'block';
+        downloadSection.style.display = 'none';
+      }
+    });
+
+    // FUNGSI LOGIN & LOGOUT
+    btnLogin.addEventListener('click', async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        alert("Gagal login: " + error.message);
+      }
+    });
+
+    btnLogout.addEventListener('click', () => {
+      signOut(auth);
+    });
+
+    // MAPPING DATA
     const headerMapping = {
       "waktu_submit": "Waktu Submit",
-      "demo_1": "1. Apakah Anda pernah berbelanja di Indomaret Bengkong Kolam 11 minimal 2 kali?",
+      "user_email": "Email Akun Google",
+      "user_name": "Nama Akun Google",
+      "user_uid": "UID Sistem",
+      "ip_address": "Alamat IP",
+      "user_agent": "Device/Browser",
+      "demo_nama": "Nama Lengkap Responden",
+      "demo_1": "1. Belanja minimal 2 kali?",
       "demo_2": "2. Jenis Kelamin",
-      "demo_3": "3. Usia Anda saat ini",
+      "demo_3": "3. Usia",
       "demo_4": "4. Pekerjaan",
-      "q1": "1 (X1). Produk makanan/minuman yang dijual di gerai ini selalu segar dan tidak kedaluwarsa.",
-      "q2": "2 (X1). Variasi dan ketersediaan produk harian yang saya butuhkan di gerai ini tergolong lengkap.",
-      "q3": "3 (X1). Kemasan produk fisik yang dipajang di rak dalam kondisi baik (tidak penyok/rusak).",
-      "q4": "4 (X2). Fasilitas gerai (AC dingin, ruangan bersih, pencahayaan terang) membuat saya nyaman.",
-      "q5": "5 (X2). Proses transaksi di kasir dilayani dengan cepat, tepat, dan antrean teratur.",
-      "q6": "6 (X2). Karyawan sigap dan tanggap membantu ketika saya kesulitan mencari letak barang.",
-      "q7": "7 (X2). Karyawan memberikan informasi harga promo secara jujur dan sesuai dengan label harga.",
-      "q8": "8 (X2). Karyawan menyapa, senyum, dan bersikap ramah selama melayani proses belanja.",
-      "q9": "9 (Y). Pengalaman berbelanja di gerai ini sudah sesuai dengan apa yang saya harapkan.",
-      "q10": "10 (Y). Secara keseluruhan, saya merasa puas dengan produk dan layanan di gerai ini.",
-      "q11": "11 (Y). Saya merasa keputusan saya memilih belanja di gerai ini sudah sangat tepat.",
-      "q12": "12 (Z). Saya akan terus kembali berbelanja di gerai ini untuk kebutuhan harian di masa depan.",
-      "q13": "13 (Z). Saya tetap memilih gerai ini meskipun ada minimarket pesaing lain di sekitar Bengkong Kolam.",
-      "q14": "14 (Z). Saya bersedia merekomendasikan gerai Indomaret ini kepada keluarga, teman, atau tetangga."
-    };
-
-    const skalaLikertMapping = {
-      "1": "Sangat Tidak Setuju (STS)",
-      "2": "Tidak Setuju (TS)",
-      "3": "Netral (N)",
-      "4": "Setuju (S)",
-      "5": "Sangat Setuju (SS)"
+      "q1": "1 (X1). Produk makanan/minuman selalu segar dan tidak kedaluwarsa.",
+      "q2": "2 (X1). Variasi dan ketersediaan produk harian tergolong lengkap.",
+      "q3": "3 (X1). Kemasan produk fisik yang dipajang di rak dalam kondisi baik.",
+      "q4": "4 (X2). Fasilitas gerai (AC, bersih, terang) membuat nyaman.",
+      "q5": "5 (X2). Proses transaksi di kasir cepat, tepat, dan teratur.",
+      "q6": "6 (X2). Karyawan sigap membantu ketika kesulitan.",
+      "q7": "7 (X2). Karyawan memberikan informasi harga promo jujur sesuai label.",
+      "q8": "8 (X2). Karyawan menyapa, senyum, dan bersikap ramah.",
+      "q9": "9 (Y). Pengalaman berbelanja sesuai dengan harapan.",
+      "q10": "10 (Y). Secara keseluruhan, merasa puas.",
+      "q11": "11 (Y). Keputusan memilih belanja di gerai ini tepat.",
+      "q12": "12 (Z). Terus kembali berbelanja di masa depan.",
+      "q13": "13 (Z). Tetap memilih gerai ini meskipun ada pesaing.",
+      "q14": "14 (Z). Bersedia merekomendasikan kepada keluarga/teman."
     };
 
     const urutanKolom = [
-      "waktu_submit", "demo_1", "demo_2", "demo_3", "demo_4",
-      "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14"
+      "waktu_submit", "user_email", "demo_nama", "demo_1", "demo_2", "demo_3", "demo_4",
+      "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14",
+      "ip_address", "user_agent", "user_uid"
     ];
 
-    async function prosesUnduhData(modeKonversi) {
+    // Kamus Konversi Teks ke Angka (Untuk Mode SPSS)
+    const teksKeAngka = {
+      // Skala Likert
+      "Sangat Tidak Setuju (STS)": 1,
+      "Tidak Setuju (TS)": 2,
+      "Netral (N)": 3,
+      "Setuju (S)": 4,
+      "Sangat Setuju (SS)": 5,
+      // Demografi
+      "Ya": 1,
+      "Tidak": 2,
+      "Laki-laki": 1,
+      "Perempuan": 2,
+      "Pelajar/Mahasiswa": 1,
+      "Karyawan Swasta": 2,
+      "Wiraswasta": 3,
+      "Ibu Rumah Tangga": 4,
+      "Lainnya": 5
+    };
+
+    async function prosesUnduhData(modeTeks) {
       btnUnduhAngka.disabled = true;
       btnUnduhTeks.disabled = true;
       statusText.textContent = "Sedang mengambil data dari database...";
 
       try {
-        const querySnapshot = await getDocs(collection(db, "jawaban_responden"));
+        // Ambil data diurutkan dari yang paling awal isi
+        const q = query(collection(db, "jawaban_responden"), orderBy("waktu_submit", "asc"));
+        const querySnapshot = await getDocs(q);
         
         if (querySnapshot.empty) {
           alert("Belum ada data jawaban di database.");
@@ -105,28 +191,28 @@
         let dataArray = [];
         querySnapshot.forEach((doc) => {
           let data = doc.data();
-          if (data.waktu_submit) {
+          if (data.waktu_submit && data.waktu_submit.toDate) {
             data.waktu_submit = data.waktu_submit.toDate().toLocaleString('id-ID');
           }
           dataArray.push(data);
         });
 
-        // 1. Tentukan Header (Kode Singkat vs Teks Panjang)
+        // 1. Tentukan Header Kolom
         const headerCsv = urutanKolom.map(kunci => {
-          let namaKolom = modeKonversi ? (headerMapping[kunci] || kunci) : kunci;
+          let namaKolom = modeTeks ? (headerMapping[kunci] || kunci) : kunci;
           return `"${namaKolom}"`;
         }).join(",");
         
         let csvContent = headerCsv + "\n";
 
-        // 2. Tentukan Isi (Angka Mentah vs Teks Keterangan)
+        // 2. Isi Baris Data
         dataArray.forEach(row => {
           let rowData = urutanKolom.map(kunci => {
             let isiSel = row[kunci] === undefined || row[kunci] === null ? "" : row[kunci];
             
-            // Konversi jawaban khusus mode teks
-            if (modeKonversi && kunci.startsWith("q") && skalaLikertMapping[isiSel]) {
-              isiSel = skalaLikertMapping[isiSel];
+            // Konversi menjadi Angka jika Admin memilih versi Unduh Angka (SPSS)
+            if (!modeTeks && teksKeAngka[isiSel] !== undefined) {
+              isiSel = teksKeAngka[isiSel];
             }
 
             return `"${String(isiSel).replace(/"/g, '""').replace(/\n/g, " ")}"`;
@@ -134,8 +220,8 @@
           csvContent += rowData.join(",") + "\n";
         });
 
-        // 3. Nama File & Pengunduhan
-        const namaFile = modeKonversi ? "Data_Kuesioner_Teks_Konversi.csv" : "Data_Kuesioner_Angka_SPSS.csv";
+        // 3. Nama File & Eksekusi Pengunduhan
+        const namaFile = modeTeks ? "Data_Kuesioner_Lengkap_Teks.csv" : "Data_Kuesioner_SPSS_Angka.csv";
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
@@ -147,18 +233,18 @@
         link.click();
         document.body.removeChild(link);
 
-        statusText.textContent = `Berhasil mengunduh ${dataArray.length} data (${modeKonversi ? 'Versi Teks' : 'Versi Angka'}).`;
+        statusText.textContent = `Berhasil mengunduh ${dataArray.length} data responden (${modeTeks ? 'Versi Teks' : 'Versi Angka'}).`;
       } catch (error) {
         console.error(error);
-        statusText.textContent = "Gagal mengambil data.";
-        alert("Terjadi kesalahan saat mengambil data.");
+        statusText.textContent = "Gagal mengambil data. Pastikan Anda punya akses admin.";
+        alert("Terjadi kesalahan: " + error.message);
       } finally {
         btnUnduhAngka.disabled = false;
         btnUnduhTeks.disabled = false;
       }
     }
 
-    // Pasang Event Listener ke masing-masing tombol
+    // Pasang Event Listener ke tombol
     btnUnduhAngka.addEventListener('click', () => prosesUnduhData(false));
     btnUnduhTeks.addEventListener('click', () => prosesUnduhData(true));
   </script>
