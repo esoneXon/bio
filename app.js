@@ -10,9 +10,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { 
   getAuth, 
-  signInWithRedirect, 
+  signInWithPopup, 
   GoogleAuthProvider, 
-  getRedirectResult, 
   onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -110,12 +109,6 @@ async function checkAccountRestriction(uid) {
   }
 }
 
-// Tangkap Error Hasil Redirect Login
-getRedirectResult(auth).catch((error) => {
-  console.error("Error redirect login:", error);
-  alert("Gagal login dengan Google. Pastikan domain tempat kuis dibuka sudah didaftarkan di Authorized Domains Firebase.");
-});
-
 // Listener Status Auth Firebase
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -136,15 +129,15 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Tombol Login Google
-btnLoginGoogle.addEventListener('click', () => {
+// Tombol Login Google (Popup)
+btnLoginGoogle.addEventListener('click', async () => {
   btnLoginGoogle.disabled = true;
   btnLoginGoogle.innerText = "Memproses...";
   try {
-    signInWithRedirect(auth, provider);
+    await signInWithPopup(auth, provider);
+    // UI akan dihandle otomatis oleh onAuthStateChanged setelah login berhasil
   } catch (error) {
     console.error("Login gagal", error);
-    alert("Terjadi kesalahan saat memulai login.");
     btnLoginGoogle.disabled = false;
     btnLoginGoogle.innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo"> Lanjutkan dengan Google`;
   }
