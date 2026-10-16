@@ -1,0 +1,18 @@
+{
+  "id": "./bargen.html",
+  "name": "BARGEN — Barcode Generator",
+  "short_name": "BARGEN",
+  "description": "Generator barcode satuan dan massal, database produk, project, dan cetak label.",
+  "lang": "id-ID",
+  "start_url": "./bargen.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f7fb",
+  "theme_color": "#111827",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
