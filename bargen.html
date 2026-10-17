@@ -91,7 +91,7 @@
   <div class="welcome"><div><h2>Generator Barcode Massal</h2><p>Tempel satu PLU per baris untuk menghasilkan banyak barcode sekaligus.</p></div></div>
   <div class="split">
     <div class="panel"><div class="panel-head"><div><h3>Daftar kode</h3><p>Tempel daftar PLU, SKU, atau barcode</p></div></div>
-      <div class="field"><label for="bulkInput">Satu kode per baris</label><textarea id="bulkInput" inputmode="decimal" placeholder="8991234567890&#10;8991234567891&#10;8991234567892"></textarea><span class="help">Baris kosong akan diabaikan. Duplikat bisa dilewati otomatis.</span></div>
+      <div class="field"><label for="bulkInput">Satu kode per baris</label><textarea id="bulkInput" inputmode="text" enterkeyhint="enter" autocapitalize="off" spellcheck="false" placeholder="8991234567890&#10;8991234567891&#10;8991234567892"></textarea><span class="help">Baris kosong akan diabaikan. Duplikat bisa dilewati otomatis.</span></div>
       <div class="form-grid" style="margin-top:14px">
         <div class="field"><label for="bulkFormat">Format barcode</label><select id="bulkFormat"><option value="CODE128">Code 128</option><option value="EAN13">EAN-13</option><option value="UPCA">UPC-A</option><option value="CODE39">Code 39</option><option value="ITF14">ITF-14</option><option value="EAN8">EAN-8</option></select></div>
         <div class="field"><label for="bulkProject">Masukkan ke project</label><select id="bulkProject"><option value="">Tanpa project</option></select></div>
@@ -266,7 +266,7 @@ $('importBackupBtn').addEventListener('click',()=>$('backupFile').click());$('ba
 function boot(){history.replaceState({bargen:true,page:'dashboard'},'','#dashboard');openDB().then(async d=>{db=d;await refresh();$('bulkColumns').value=state.settings.columns||3;$('bulkPaper').value=state.settings.paper||'A4';}).catch(e=>{console.error(e);toast('Database browser tidak dapat dibuka. Pastikan browser mendukung IndexedDB.')});setTimeout(()=>$('splashScreen').classList.add('hide'),1700)}
 window.addEventListener('beforeunload',stopScanner);
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.warn('Service worker tidak aktif:', err)));
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js', {scope: './'}).catch(err => console.warn('Service worker tidak aktif:', err)));
 }
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('modalBackdrop').classList.contains('open'))closeModal();else if($('sidebar').classList.contains('open'))$('sidebar').classList.remove('open');else goBack()}});
 boot();
