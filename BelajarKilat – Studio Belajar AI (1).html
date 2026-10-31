@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BelajarKilat – Studio Belajar AI</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7fb;--sf:#fff;--tx:#1b1f2a;--mu:#667085;--ac:#5b5bf0;--ac2:#eef0ff;--bd:#e3e6ee;--ok:#16a34a;--no:#dc2626}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1117;--sf:#181b24;--tx:#eceef4;--mu:#9aa3b5;--ac:#8b8bff;--ac2:#232649;--bd:#2a2f3d;--ok:#4ade80;--no:#f87171}}
+:root[data-theme="dark"]{--bg:#0f1117;--sf:#181b24;--tx:#eceef4;--mu:#9aa3b5;--ac:#8b8bff;--ac2:#232649;--bd:#2a2f3d;--ok:#4ade80;--no:#f87171}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:0}h2{font-size:18px;margin:0 0 10px}
+.sub{color:var(--mu);font-size:14px;margin:2px 0 14px}
+nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
+nav button{flex:none;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:8px 14px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer}
+nav button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+input[type=text],textarea{width:100%;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:10px;padding:10px;font:inherit;margin-bottom:8px}
+textarea{min-height:150px;resize:vertical}
+.btn{border:0;background:var(--ac);color:#fff;padding:10px 16px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+.btn.sec{background:var(--ac2);color:var(--ac)}.btn:disabled{opacity:.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.note{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;border:1px solid var(--bd);border-radius:10px;margin-bottom:8px;cursor:pointer}
+.note.on{border-color:var(--ac);background:var(--ac2)}
+.note small{color:var(--mu)}
+.x{background:none;border:0;color:var(--no);font-size:18px;cursor:pointer}
+.fc{min-height:190px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;border:2px solid var(--ac);border-radius:16px;background:var(--sf);font-size:19px;cursor:pointer;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--bd);background:var(--bg);color:var(--tx);padding:10px;border-radius:10px;margin-top:6px;font:inherit;cursor:pointer}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,transparent)}
+.opt.no{border-color:var(--no);background:color-mix(in srgb,var(--no) 18%,transparent)}
+.msg{padding:10px 12px;border-radius:12px;margin-bottom:8px;max-width:92%}
+.msg.u{background:var(--ac);color:#fff;margin-left:auto}.msg.a{background:var(--ac2)}
+.md p{margin:0 0 8px}.md ul{margin:0 0 8px;padding-left:20px}
+.mu{color:var(--mu);font-size:14px}.err{color:var(--no);font-size:14px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="row" style="justify-content:space-between"><h1>📚 BelajarKilat</h1><button class="btn sec" id="th" title="Ganti tema">🌓</button></div>
+<p class="sub">Ubah materi jadi ringkasan, flashcard, kuis, dan tutor AI.</p>
+<nav id="tabs"></nav>
+<div id="view"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+const TABS=[['materi','Materi'],['ringkasan','Ringkasan'],['kartu','Flashcard'],['kuis','Kuis'],['peta','Peta Konsep'],['tutor','Tutor AI']];
+let S={tab:'materi',cfg:{c:10,q:5},notes:[],cur:null,busy:false,err:'',card:{i:0,flip:false},chat:[]};
+let sample=null;
+const el=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function md(t){const L=esc(t).split('\n');let o='',ul=false;for(let l of L){l=l.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');const m=l.match(/^\s*[-*•]\s+(.*)/);if(m){if(!ul){o+='<ul>';ul=true}o+='<li>'+m[1]+'</li>'}else{if(ul){o+='</ul>';ul=false}if(l.trim())o+='<p>'+l.replace(/^#+\s*/,'<b>')+(/^#+\s/.test(l)?'</b>':'')+'</p>'}}return o+(ul?'</ul>':'')}
+function load(){try{S.notes=JSON.parse(localStorage.getItem('bk_notes')||'[]')}catch(e){S.notes=[]}try{S.cur=localStorage.getItem('bk_cur')}catch(e){}}
+function save(){try{localStorage.setItem('bk_notes',JSON.stringify(S.notes));localStorage.setItem('bk_cur',S.cur||'')}catch(e){}}
+const note=()=>S.notes.find(n=>n.id===S.cur);
+function setTab(t){S.tab=t;S.err='';render()}
+function render(){
+ const st0=stats()[dkey(new Date())]||0;document.querySelector('.sub').textContent='Ubah materi jadi ringkasan, flashcard, kuis, dan tutor AI. 🔥 '+streak()+' hari beruntun · target hari ini '+Math.min(3,st0)+'/3';
+ const tb=document.getElementById('tabs');tb.innerHTML='';
+ TABS.forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;if(k===S.tab)b.className='on';b.onclick=()=>setTab(k);tb.appendChild(b)});
+ const v=document.getElementById('view');v.innerHTML='';
+ const n=note();
+ if(S.tab!=='materi'&&!n){v.innerHTML='<div class="card">Pilih atau tambahkan materi dulu di tab Materi.</div>';return}
+ if(S.tab!=='materi'&&!sample){v.innerHTML='<div class="card">Fitur AI belum tersedia di tampilan ini. Buka halaman ini lewat claude.ai dan izinkan akses.</div>';return}
+ ({materi:vMateri,ringkasan:vRingkasan,kartu:vKartu,kuis:vKuis,peta:vPeta,tutor:vTutor})[S.tab](v,n);
+}
+function vMateri(v){
+ const f=el(`<div class="card"><h2>Tambah materi</h2>
+ <input type="text" id="ti" placeholder="Judul materi">
+ <textarea id="tx" placeholder="Tempel teks materi di sini, atau unggah file PDF / .txt / .md / .csv"></textarea>
+ <div class="row"><input type="file" id="fi" accept=".txt,.md,.csv,.json,.pdf" class="hide"><button class="btn sec" id="up">Unggah file</button><button class="btn" id="sv">Simpan materi</button></div></div>`);
+ v.appendChild(f);
+ f.querySelector('#up').onclick=()=>f.querySelector('#fi').click();
+ f.querySelector('#fi').onchange=e=>{const fl=e.target.files[0];if(!fl)return;const box=f.querySelector('#tx');const set=t=>{box.value=t;if(!f.querySelector('#ti').value)f.querySelector('#ti').value=fl.name.replace(/\.[^.]+$/,'')};if(/\.pdf$/i.test(fl.name)){readPdf(fl,box).then(set).catch(()=>{box.value='';alert('PDF tidak bisa dibaca. Kemungkinan hasil scan (berupa gambar), bukan teks.')});return}const r=new FileReader();r.onload=()=>set(r.result);r.readAsText(fl)};
+ f.querySelector('#sv').onclick=()=>{const t=f.querySelector('#tx').value.trim();if(!t)return;const id='n'+Date.now();S.notes.unshift({id,title:f.querySelector('#ti').value.trim()||'Tanpa judul',text:t});S.cur=id;save();render()};
+ const l=el('<div class="card"><h2>Materi saya</h2></div>');
+ if(S.notes.length>2){const si=document.createElement('input');si.type='text';si.placeholder='Cari materi atau isinya…';si.value=S.q||'';si.oninput=()=>{S.q=si.value;render();const e=document.querySelector('#view input[placeholder^="Cari"]');if(e){e.focus();e.setSelectionRange(e.value.length,e.value.length)}};l.firstChild.appendChild(si)}
+ if(!S.notes.length)l.appendChild(el('<p class="mu">Belum ada materi.</p>'));
+ S.notes.filter(n=>!S.q||(n.title+' '+n.text).toLowerCase().includes(S.q.toLowerCase())).forEach(n=>{const d=el(`<div class="note ${n.id===S.cur?'on':''}"><div><b>${esc(n.title)}</b><br><small>${n.text.length} karakter${n.summary?' · ringkasan':''}${n.cards?' · kartu':''}${n.quiz?' · kuis':''}</small></div><button class="x" title="Hapus">✕</button></div>`).firstChild;
+  d.onclick=()=>{S.cur=n.id;S.chat=[];S.card={i:0,flip:false};save();render()};
+  d.querySelector('.x').onclick=e=>{e.stopPropagation();S.notes=S.notes.filter(m=>m.id!==n.id);if(S.cur===n.id)S.cur=null;save();render()};
+  l.appendChild(d)});
+ v.appendChild(l);
+ const cn=note();if(cn){const p=el('<div class="card"><h2>Catatan pribadi: </h2><textarea id="pn" style="min-height:90px" placeholder="Tulis catatanmu sendiri…"></textarea></div>');p.querySelector('h2').textContent+=cn.title;const ta=p.querySelector('#pn');ta.value=cn.memo||'';ta.oninput=()=>{cn.memo=ta.value;save()};v.appendChild(p)}
+ const bk=el('<div class="card"><h2>Cadangan</h2><div class="row"><button class="btn sec" id="bx">Cadangkan semua</button><button class="btn sec" id="bi">Pulihkan dari file</button><input type="file" id="bf" accept=".json" class="hide"></div></div>');
+ bk.querySelector('#bx').onclick=()=>dl('belajarkilat-cadangan.json',JSON.stringify(S.notes));
+ bk.querySelector('#bi').onclick=()=>bk.querySelector('#bf').click();
+ bk.querySelector('#bf').onchange=e=>{const fl=e.target.files[0];if(!fl)return;const r=new FileReader();r.onload=()=>{try{const a=JSON.parse(r.result);if(!Array.isArray(a)||a.some(x=>!x||typeof x.text!=='string'))throw 0;const ids=new Set(S.notes.map(x=>x.id));a.forEach(x=>{const id=String(x.id||'n'+Math.random());if(!ids.has(id))S.notes.push({...x,id})});save();render()}catch(err){alert('File cadangan tidak valid.')}};r.readAsText(fl)};
+ v.appendChild(bk);
+}
+async function readPdf(file,box){
+ if(!window.pdfjsLib)throw 0;
+ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ box.value='Membaca PDF…';
+ const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;let out='';
+ for(let p=1;p<=pdf.numPages;p++){const pg=await pdf.getPage(p);const c=await pg.getTextContent();out+=c.items.map(i=>i.str).join(' ')+'\n\n';box.value='Membaca halaman '+p+'/'+pdf.numPages+'…'}
+ if(out.trim().length<20)throw 0;return out}
+const SRC=n=>'MATERI:\n'+n.text.slice(0,20000);
+const slug=s=>(String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))||'materi';
+async function dl(name,data){try{const d=await claude.use('downloads');if(!d){alert('Unduh tidak tersedia di tampilan ini.');return}await d.save({filename:name,data})}catch(e){}}
+function cfgSel(k,opts,label){const c=el('<div class="row mu" style="margin-bottom:8px"></div>');const r=c.firstChild;r.append(label+': ');const s=document.createElement('select');s.style.cssText='padding:6px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);color:var(--tx)';opts.forEach(o=>{const e=document.createElement('option');e.value=o;e.textContent=o;if(S.cfg[k]===o)e.selected=true;s.appendChild(e)});s.onchange=()=>{S.cfg[k]=+s.value};r.appendChild(s);return c}
+function stats(){try{return JSON.parse(localStorage.getItem('bk_st')||'{}')}catch(e){return {}}}
+const dkey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function bump(){const st=stats();const k=dkey(new Date());st[k]=(st[k]||0)+1;try{localStorage.setItem('bk_st',JSON.stringify(st))}catch(e){}}
+function streak(){const st=stats();let n=0;const d=new Date();if(!(st[dkey(d)]>=1))d.setDate(d.getDate()-1);while(st[dkey(d)]>=1){n++;d.setDate(d.getDate()-1)}return n}
+function examBar(n,ex){
+ const c=el('<div class="card row" style="justify-content:space-between"></div>');const k=c.firstChild;
+ const b=document.createElement('button');b.className='btn';
+ if(!ex||ex.done){b.textContent='Mulai mode ujian';b.onclick=()=>{n.quiz.forEach(q=>q.pick=null);n.rec=false;S.exam={id:n.id,end:Date.now()+n.quiz.length*60000,done:false};clearInterval(S.tm);S.tm=setInterval(()=>{const e=S.exam;if(!e||e.done){clearInterval(S.tm);return}const s=Math.max(0,Math.round((e.end-Date.now())/1000));const t=document.getElementById('tmr');if(t)t.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');if(s<=0){e.done=true;clearInterval(S.tm);render()}},500);render()};k.appendChild(b);k.appendChild(el('<span class="mu">Jawaban baru terlihat setelah selesai. Waktu 1 menit per soal.</span>'))}
+ else{k.appendChild(el('<b>⏱ <span id="tmr"></span></b>'));b.textContent='Selesai';b.onclick=()=>{ex.done=true;clearInterval(S.tm);render()};k.appendChild(b)}
+ return c}
+async function run(fn){S.busy=true;S.err='';render();try{await fn();bump()}catch(e){S.err=e&&e.code==='not_granted'?'Izin AI ditolak.':e&&e.code==='rate_limited'?'Terlalu cepat, coba lagi sebentar.':'Gagal memproses. Coba lagi.'}S.busy=false;save();render()}
+function head(t,btn,fn,has){const c=el(`<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${t}</h2><button class="btn" ${S.busy?'disabled':''}>${S.busy?'Memproses…':btn}</button></div>${S.err?'<p class="err">'+S.err+'</p>':''}</div>`);c.querySelector('button').onclick=()=>run(fn);return c}
+function vRingkasan(v,n){
+ v.appendChild(head('Ringkasan',n.summary?'Buat ulang':'Buat ringkasan',async()=>{
+  const r=await sample('Kamu asisten belajar. Buat ringkasan dalam Bahasa Indonesia dari materi berikut: mulai dengan 1 kalimat inti, lalu poin-poin konsep utama dan definisi penting (gunakan - untuk poin dan **tebal** untuk istilah kunci).\n\n'+SRC(n),{cache:false});n.summary=r.text}));
+ if(n.summary){const c=el('<div class="card md"></div>');c.innerHTML=md(n.summary);const b=document.createElement('button');b.className='btn sec';b.textContent='Unduh .md';b.onclick=()=>dl(slug(n.title)+'-ringkasan.md','# '+n.title+'\n\n'+n.summary);v.appendChild(c);v.appendChild(b)}
+}
+function vKartu(v,n){
+ v.appendChild(cfgSel('c',[5,10,15,20],'Jumlah kartu'));v.appendChild(head('Flashcard',n.cards?'Buat ulang':'Buat flashcard',async()=>{
+  const r=await sample.json('Buat '+S.cfg.c+' flashcard Bahasa Indonesia dari materi ini. Balas HANYA JSON array berisi objek {"q":"pertanyaan singkat","a":"jawaban singkat"}.\n\n'+SRC(n),{cache:false});n.cards=r;S.card={i:0,flip:false}}));
+ if(!n.cards||!n.cards.length)return;
+ const c=n.cards[S.card.i%n.cards.length];
+ const d=el(`<div><div class="fc">${esc(S.card.flip?c.a:c.q)}</div><div class="row" style="justify-content:space-between"><button class="btn sec" id="pv">✗ Belum</button><span class="mu">Dikuasai ${n.cards.filter(k=>(k.b||0)>=2).length}/${n.cards.length} · ketuk kartu untuk membalik</span><button class="btn" id="nx">✓ Tahu</button></div></div>`);
+ d.querySelector('.fc').onclick=()=>{S.card.flip=!S.card.flip;render()};
+ const go=k=>{S.card.i=(S.card.i+k+n.cards.length)%n.cards.length;S.card.flip=false;render()};
+ const mark=k=>{c.b=k?(c.b||0)+1:0;save();let best=S.card.i,bb=1e9;for(let s=1;s<=n.cards.length;s++){const ix=(S.card.i+s)%n.cards.length,b=n.cards[ix].b||0;if(b<bb){bb=b;best=ix}}S.card.i=best;S.card.flip=false;render()};d.querySelector('#pv').onclick=()=>mark(0);d.querySelector('#nx').onclick=()=>mark(1);v.appendChild(d);const eb=document.createElement('button');eb.className='btn sec';eb.textContent='Unduh .csv';eb.onclick=()=>dl(slug(n.title)+'-flashcard.csv','Pertanyaan,Jawaban\n'+n.cards.map(k=>[k.q,k.a].map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'));v.appendChild(eb);
+}
+function vKuis(v,n){
+ v.appendChild(cfgSel('q',[3,5,10,15],'Jumlah soal'));v.appendChild(head('Kuis',n.quiz?'Buat ulang':'Buat kuis',async()=>{
+  const r=await sample.json('Buat '+S.cfg.q+' soal pilihan ganda Bahasa Indonesia dari materi ini. Balas HANYA JSON array berisi {"q":"soal","o":["A","B","C","D"],"a":indeksJawabanBenar0sampai3,"e":"penjelasan singkat"}.\n\n'+SRC(n),{cache:false});n.quiz=r.map(x=>({...x,pick:null}));n.rec=false;S.exam=null}));
+ if(!n.quiz)return;const ex=S.exam&&S.exam.id===n.id?S.exam:null;v.appendChild(examBar(n,ex));
+ n.quiz.forEach((q,i)=>{const c=el(`<div class="card"><b>${i+1}. ${esc(q.q)}</b></div>`);
+  q.o.forEach((o,j)=>{const b=document.createElement('button');const rev=q.pick!==null&&(!ex||ex.done);b.className='opt'+(rev?(j===q.a?' ok':j===q.pick?' no':''):'');if(ex&&!ex.done&&q.pick===j)b.style.borderColor='var(--ac)';b.textContent=o;b.onclick=()=>{if(ex&&ex.done)return;if(ex||q.pick===null){q.pick=j;save();render()}};c.firstChild.appendChild(b)});
+  if(q.pick!==null&&(!ex||ex.done))c.firstChild.appendChild(el(`<p class="mu">${esc(q.e||'')}</p>`));v.appendChild(c)});
+ const done=n.quiz.filter(q=>q.pick!==null),ok=done.filter(q=>q.pick===q.a).length;
+ const fin=ex?ex.done:done.length===n.quiz.length;if(fin&&!n.rec){n.rec=true;bump();n.hist=(n.hist||[]);n.hist.unshift({t:Date.now(),s:ok,n:n.quiz.length,x:!!ex});n.hist=n.hist.slice(0,10);save()}
+ if(!ex||ex.done)v.appendChild(el(`<div class="card">Skor: <b>${ok}/${n.quiz.length}</b> (${done.length} terjawab)</div>`));
+ if(n.hist&&n.hist.length)v.appendChild(el('<div class="card"><b>Riwayat skor</b>'+n.hist.map(h=>'<div class="mu">'+new Date(h.t).toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+' · '+h.s+'/'+h.n+(h.x?' · ujian':'')+'</div>').join('')+'</div>'));
+}
+function vPeta(v,n){
+ v.appendChild(head('Peta Konsep',n.map?'Buat ulang':'Buat peta',async()=>{
+  const r=await sample.json('Buat peta konsep Bahasa Indonesia dari materi ini. Balas HANYA JSON {"t":"topik utama","b":[{"t":"cabang","c":["poin","poin"]}]} dengan 4-6 cabang dan 2-4 poin pendek tiap cabang.\n\n'+SRC(n),{cache:false});n.map=r}));
+ if(!n.map)return;
+ const cols=['#5b5bf0','#16a34a','#ea580c','#db2777','#0891b2','#ca8a04'];
+ v.appendChild(el(`<div class="card" style="text-align:center;font-weight:700;font-size:18px;border:2px solid var(--ac)">${esc(n.map.t)}</div>`));
+ (n.map.b||[]).forEach((b,i)=>{const col=cols[i%cols.length];v.appendChild(el(`<div class="card" style="border-left:6px solid ${col}"><b style="color:${col}">${esc(b.t)}</b><ul style="margin:6px 0 0;padding-left:20px">${(b.c||[]).map(x=>'<li>'+esc(x)+'</li>').join('')}</ul></div>`))});
+}
+function vTutor(v,n){
+ const c=el('<div class="card"><h2>Tutor AI</h2><div id="ch"></div><textarea id="q" style="min-height:60px" placeholder="Tanya apa saja soal materi ini…"></textarea><button class="btn" id="go">Kirim</button><p class="err" id="er"></p></div>');
+ const ch=c.querySelector('#ch');
+ if(!S.chat.length)ch.innerHTML='<p class="mu">Tanya konsep yang belum paham, minta contoh, atau minta dijelaskan lebih sederhana.</p>';
+ S.chat.forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.role==='user'?'u':'a md');if(m.role==='user')d.textContent=m.content;else d.innerHTML=md(m.content);ch.appendChild(d)});
+ const go=c.querySelector('#go');
+ go.onclick=async()=>{const q=c.querySelector('#q').value.trim();if(!q)return;S.chat.push({role:'user',content:q});const a={role:'assistant',content:''};S.chat.push(a);render();
+  const intro=[{role:'user',content:'Kamu tutor yang sabar. Jawab dalam Bahasa Indonesia berdasarkan materi ini, jelas dan ringkas.\n\n'+SRC(n)+(n.memo?'\n\nCATATAN PRIBADI PENGGUNA:\n'+n.memo.slice(0,3000):'')},{role:'assistant',content:'Siap, silakan bertanya.'}];
+  const hist=S.chat.slice(0,-1);
+  try{await sample(intro.concat(hist),{cache:false,onText:({text})=>{a.content=text;const last=document.querySelector('#ch .msg:last-child');if(last)last.innerHTML=md(text)}});}catch(e){a.content='Maaf, gagal menjawab. Coba lagi.'}
+  render()};
+ v.appendChild(c);
+}
+load();render();
+(function(){try{const t=localStorage.getItem('bk_th');if(t)document.documentElement.dataset.theme=t}catch(e){}
+document.getElementById('th').onclick=()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark';try{localStorage.setItem('bk_th',r.dataset.theme)}catch(e){}}})();
+(async()=>{try{sample=await claude.use('sample')}catch(e){sample=null}render()})();
+</script>
+</body>
+</html>
