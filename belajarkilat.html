@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BelajarKilat – Studio Belajar AI</title>
+<title>BelajarKilat – Versi API Sendiri</title>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7fb;--sf:#fff;--tx:#1b1f2a;--mu:#667085;--ac:#5b5bf0;--ac2:#eef0ff;--bd:#e3e6ee;--ok:#16a34a;--no:#dc2626}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1117;--sf:#181b24;--tx:#eceef4;--mu:#9aa3b5;--ac:#8b8bff;--ac2:#232649;--bd:#2a2f3d;--ok:#4ade80;--no:#f87171}}
@@ -47,6 +47,50 @@ textarea{min-height:150px;resize:vertical}
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
+
+const AI={
+ gemini:{name:'Google Gemini',model:'gemini-2.5-flash',link:'https://aistudio.google.com/apikey'},
+ openrouter:{name:'OpenRouter',model:'',link:'https://openrouter.ai/keys'},
+ deepseek:{name:'DeepSeek',model:'deepseek-chat',link:'https://platform.deepseek.com/api_keys'}};
+function cfgAI(){try{return JSON.parse(localStorage.getItem('bk_ai')||'{}')}catch(e){return {}}}
+async function callAI(msgs){
+ const c=cfgAI(),p=c.p||'gemini';
+ if(!c.key)throw {msg:'Isi API key dulu di Pengaturan AI (tab Materi).'};
+ const model=c.m||AI[p].model;
+ if(!model)throw {msg:'Isi nama model dulu di Pengaturan AI (OpenRouter: pilih model berakhiran :free).'};
+ let url,headers={'Content-Type':'application/json'},body;
+ if(p==='gemini'){
+  url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent';
+  headers['x-goog-api-key']=c.key;
+  body={contents:msgs.map(m=>({role:m.role==='user'?'user':'model',parts:[{text:m.content}]}))};
+ }else{
+  url=p==='openrouter'?'https://openrouter.ai/api/v1/chat/completions':'https://api.deepseek.com/chat/completions';
+  headers.Authorization='Bearer '+c.key;
+  body={model,messages:msgs};
+ }
+ let r;try{r=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)})}catch(e){throw {msg:'Gagal terhubung ke '+AI[p].name+'. Cek internet dan API key. Jika DeepSeek diblokir browser, pakai DeepSeek lewat OpenRouter.'}}
+ const j=await r.json().catch(()=>({}));
+ if(!r.ok){const m=j.error&&(j.error.message||j.error);throw {msg:'Error '+r.status+': '+(typeof m==='string'?m:'permintaan ditolak')}}
+ const t=p==='gemini'?(j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts.map(x=>x.text||'').join('')):(j.choices&&j.choices[0]&&j.choices[0].message.content);
+ if(!t)throw {msg:'Respons kosong dari AI. Coba lagi atau ganti model.'};
+ return t}
+function makeSample(){
+ const s=async(input,o)=>{const msgs=typeof input==='string'?[{role:'user',content:input}]:input;const text=await callAI(msgs);if(o&&o.onText)o.onText({text});return {text,truncated:false}};
+ s.json=async(input)=>{const r=await s(input+'\n\nBalas HANYA JSON valid, tanpa teks lain dan tanpa markdown.');const m=r.text.replace(/```json|```/g,'').trim();
+  try{return JSON.parse(m)}catch(e){const a=m.search(/[\[{]/),b=Math.max(m.lastIndexOf(']'),m.lastIndexOf('}'));try{return JSON.parse(m.slice(a,b+1))}catch(e2){throw {msg:'AI tidak membalas dalam format yang benar. Coba lagi atau ganti model.'}}}};
+ return s}
+function aiCard(){const c=cfgAI();
+ const d=el('<div class="card"><h2>Pengaturan AI</h2><div class="row" style="margin-bottom:8px"><select id="ap" style="padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);color:var(--tx)"></select></div><input type="password" id="ak" placeholder="API key" autocomplete="off"><input type="text" id="am"><p class="mu" id="al"></p></div>');
+ const sp=d.querySelector('#ap'),ak=d.querySelector('#ak'),am=d.querySelector('#am'),al=d.querySelector('#al');
+ Object.keys(AI).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=AI[k].name;sp.appendChild(o)});
+ sp.value=c.p||'gemini';ak.value=c.key||'';am.value=c.m||'';
+ const sync=()=>{const p=sp.value;am.placeholder='Model (kosong = '+(AI[p].model||'isi manual, mis. nama-model:free')+')';al.textContent='';const a=document.createElement('a');a.href=AI[p].link;a.target='_blank';a.rel='noopener';a.textContent='Ambil API key '+AI[p].name;al.appendChild(a);
+  if(p==='openrouter')al.append(' · pilih model berakhiran :free di openrouter.ai/models');
+  if(p==='deepseek')al.append(' · DeepSeek berbayar (murah), bukan gratis');
+  if(p==='gemini')al.append(' · tier gratis hanya untuk model Flash')};
+ const st=()=>{try{localStorage.setItem('bk_ai',JSON.stringify({p:sp.value,key:ak.value.trim(),m:am.value.trim()}))}catch(e){}};
+ sp.onchange=()=>{am.value='';sync();st()};ak.oninput=st;am.oninput=st;sync();return d}
+
 const TABS=[['materi','Materi'],['ringkasan','Ringkasan'],['kartu','Flashcard'],['kuis','Kuis'],['peta','Peta Konsep'],['tutor','Tutor AI']];
 let S={tab:'materi',cfg:{c:10,q:5},notes:[],cur:null,busy:false,err:'',card:{i:0,flip:false},chat:[]};
 let sample=null;
@@ -67,7 +111,7 @@ function render(){
  if(S.tab!=='materi'&&!sample){v.innerHTML='<div class="card">Fitur AI belum tersedia di tampilan ini. Buka halaman ini lewat claude.ai dan izinkan akses.</div>';return}
  ({materi:vMateri,ringkasan:vRingkasan,kartu:vKartu,kuis:vKuis,peta:vPeta,tutor:vTutor})[S.tab](v,n);
 }
-function vMateri(v){
+function vMateri(v){v.appendChild(aiCard());
  const f=el(`<div class="card"><h2>Tambah materi</h2>
  <input type="text" id="ti" placeholder="Judul materi">
  <textarea id="tx" placeholder="Tempel teks materi di sini, atau unggah file PDF / .txt / .md / .csv"></textarea>
@@ -100,7 +144,7 @@ async function readPdf(file,box){
  if(out.trim().length<20)throw 0;return out}
 const SRC=n=>'MATERI:\n'+n.text.slice(0,20000);
 const slug=s=>(String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))||'materi';
-async function dl(name,data){try{const d=await claude.use('downloads');if(!d){alert('Unduh tidak tersedia di tampilan ini.');return}await d.save({filename:name,data})}catch(e){}}
+async function dl(name,data){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data]));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function cfgSel(k,opts,label){const c=el('<div class="row mu" style="margin-bottom:8px"></div>');const r=c.firstChild;r.append(label+': ');const s=document.createElement('select');s.style.cssText='padding:6px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);color:var(--tx)';opts.forEach(o=>{const e=document.createElement('option');e.value=o;e.textContent=o;if(S.cfg[k]===o)e.selected=true;s.appendChild(e)});s.onchange=()=>{S.cfg[k]=+s.value};r.appendChild(s);return c}
 function stats(){try{return JSON.parse(localStorage.getItem('bk_st')||'{}')}catch(e){return {}}}
 const dkey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -112,7 +156,7 @@ function examBar(n,ex){
  if(!ex||ex.done){b.textContent='Mulai mode ujian';b.onclick=()=>{n.quiz.forEach(q=>q.pick=null);n.rec=false;S.exam={id:n.id,end:Date.now()+n.quiz.length*60000,done:false};clearInterval(S.tm);S.tm=setInterval(()=>{const e=S.exam;if(!e||e.done){clearInterval(S.tm);return}const s=Math.max(0,Math.round((e.end-Date.now())/1000));const t=document.getElementById('tmr');if(t)t.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');if(s<=0){e.done=true;clearInterval(S.tm);render()}},500);render()};k.appendChild(b);k.appendChild(el('<span class="mu">Jawaban baru terlihat setelah selesai. Waktu 1 menit per soal.</span>'))}
  else{k.appendChild(el('<b>⏱ <span id="tmr"></span></b>'));b.textContent='Selesai';b.onclick=()=>{ex.done=true;clearInterval(S.tm);render()};k.appendChild(b)}
  return c}
-async function run(fn){S.busy=true;S.err='';render();try{await fn();bump()}catch(e){S.err=e&&e.code==='not_granted'?'Izin AI ditolak.':e&&e.code==='rate_limited'?'Terlalu cepat, coba lagi sebentar.':'Gagal memproses. Coba lagi.'}S.busy=false;save();render()}
+async function run(fn){S.busy=true;S.err='';render();try{await fn();bump()}catch(e){S.err=(e&&e.msg)||'Gagal memproses. Coba lagi.'}S.busy=false;save();render()}
 function head(t,btn,fn,has){const c=el(`<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${t}</h2><button class="btn" ${S.busy?'disabled':''}>${S.busy?'Memproses…':btn}</button></div>${S.err?'<p class="err">'+S.err+'</p>':''}</div>`);c.querySelector('button').onclick=()=>run(fn);return c}
 function vRingkasan(v,n){
  v.appendChild(head('Ringkasan',n.summary?'Buat ulang':'Buat ringkasan',async()=>{
@@ -158,14 +202,14 @@ function vTutor(v,n){
  go.onclick=async()=>{const q=c.querySelector('#q').value.trim();if(!q)return;S.chat.push({role:'user',content:q});const a={role:'assistant',content:''};S.chat.push(a);render();
   const intro=[{role:'user',content:'Kamu tutor yang sabar. Jawab dalam Bahasa Indonesia berdasarkan materi ini, jelas dan ringkas.\n\n'+SRC(n)+(n.memo?'\n\nCATATAN PRIBADI PENGGUNA:\n'+n.memo.slice(0,3000):'')},{role:'assistant',content:'Siap, silakan bertanya.'}];
   const hist=S.chat.slice(0,-1);
-  try{await sample(intro.concat(hist),{cache:false,onText:({text})=>{a.content=text;const last=document.querySelector('#ch .msg:last-child');if(last)last.innerHTML=md(text)}});}catch(e){a.content='Maaf, gagal menjawab. Coba lagi.'}
+  try{await sample(intro.concat(hist),{cache:false,onText:({text})=>{a.content=text;const last=document.querySelector('#ch .msg:last-child');if(last)last.innerHTML=md(text)}});}catch(e){a.content=(e&&e.msg)||'Maaf, gagal menjawab. Coba lagi.'}
   render()};
  v.appendChild(c);
 }
 load();render();
 (function(){try{const t=localStorage.getItem('bk_th');if(t)document.documentElement.dataset.theme=t}catch(e){}
 document.getElementById('th').onclick=()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark';try{localStorage.setItem('bk_th',r.dataset.theme)}catch(e){}}})();
-(async()=>{try{sample=await claude.use('sample')}catch(e){sample=null}render()})();
+sample=makeSample();render();
 </script>
 </body>
 </html>
