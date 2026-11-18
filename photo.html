@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BOBBLE Photobooth — A Bouncy World of Fuzzy Friends</title>
+<meta name="description" content="Photobooth BOBBLE: ambil foto dengan filter magis, stiker lucu, dan strip 4 foto bergaya dunia mainan 3D.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BOBBLE PHOTOBOOTH — photobooth dalam dunia mainan 3D
+   Konsep: kartu photobooth melayang di atas diorama bukit & bola
+   fuzzy, persis gaya situs BOBBLE.
+   ============================================================ */
+:root{
+  --lav:#b7bddd; --lav2:#a7aed6; --ink:#2a2340; --muted:#5d5677;
+  --pink:#ff6fb5; --deepink:#e84fa5; --pink2:#ff9ad0;
+  --mint:#7fe8c5; --mintink:#0f7a5c; --gold:#ffcf5c;
+  --grad-cta:linear-gradient(120deg,#ff7ab8 0%,#ff8a5c 100%);
+  --glass:rgba(255,255,255,.16);
+  --glassline:rgba(255,255,255,.35);
+  --disp:'Baloo 2', ui-rounded, 'Segoe UI', system-ui, sans-serif;
+  --body:'Nunito', 'Segoe UI', system-ui, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:var(--body); color:var(--ink);
+  background:
+    radial-gradient(900px 500px at 12% 6%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(1000px 700px at 88% 0%, #cbcfee 0%, transparent 55%),
+    linear-gradient(180deg, var(--lav) 0%, var(--lav2) 100%);
+}
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.6px);
+  background-size:26px 26px; opacity:.5;
+}
+/* ---------- DIORAMA ---------- */
+.world{position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden}
+.w-hill{position:absolute; border-radius:50%}
+.w-hill.h1{left:-15%; bottom:-52%; width:90%; aspect-ratio:2.2/1;
+  background:radial-gradient(circle at 50% 18%, #b4ef6e, #55c24d 55%, #1c7f46)}
+.w-hill.h2{right:-22%; bottom:-58%; width:88%; aspect-ratio:2.2/1;
+  background:radial-gradient(circle at 45% 20%, #a3ea5f, #46b348 55%, #15713f)}
+.w-hill.h3{left:16%; bottom:-64%; width:92%; aspect-ratio:2.4/1;
+  background:radial-gradient(circle at 50% 15%, #8fe054, #2f9c4a 60%, #0f5e35)}
+.w-ball{position:fixed; border-radius:50%; z-index:3; pointer-events:none;
+  background:radial-gradient(circle at 32% 28%, #ffd6ec, #ff8fc6 55%, #e84fa5);
+  box-shadow:0 24px 50px -14px rgba(190,40,115,.55),
+             inset -10px -14px 26px rgba(170,20,95,.4),
+             0 0 0 12px rgba(255,160,205,.16);
+  animation:bob 5s ease-in-out infinite;
+}
+.w-ball.b1{width:160px; height:160px; left:-70px; bottom:-72px}
+.w-ball.b2{width:90px; height:90px; right:8%; bottom:-40px; animation-delay:1.2s}
+.w-ball.b3{width:56px; height:56px; left:34%; bottom:-34px; animation-delay:.6s}
+.w-ball.b4{width:110px; height:110px; right:18%; bottom:-56px; animation-delay:2s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.w-flower{position:absolute; bottom:6%; width:7px; height:7px; border-radius:50%;
+  background:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.35); opacity:.9}
+
+/* ---------- FRAME APLIKASI ---------- */
+.frame{position:relative; z-index:2; margin:auto; height:100dvh;
+  display:grid; place-items:center; padding:clamp(10px,3vh,40px) clamp(10px,2.6vw,40px)}
+.card-frame{
+  position:relative; width:min(1180px, 100%, calc((100dvh - 2*clamp(10px,3vh,40px)) * 1.42));
+  aspect-ratio:1.42; max-height:100%; min-height:0;
+  border-radius:clamp(18px,3vw,32px);
+  background:linear-gradient(180deg,#8fd0ff 0%,#a8dcff 55%,#ffe9c4 100%);
+  overflow:hidden; border:6px solid rgba(255,255,255,.95);
+  box-shadow:0 50px 100px -34px rgba(38,26,92,.55), 0 18px 44px -18px rgba(38,26,92,.35);
+  isolation:isolate;
+}
+/* awan latar dalam frame */
+.in-cloud{position:absolute; z-index:1; filter:blur(1px); opacity:.95; pointer-events:none}
+.in-cloud .puff{position:absolute; background:#fff; border-radius:50%;
+  box-shadow:inset -8px -10px 18px rgba(150,170,220,.35), 0 12px 26px -10px rgba(80,90,160,.25)}
+.drift-a{animation:drift 70s linear infinite alternate}
+.drift-b{animation:drift 95s linear infinite alternate-reverse; animation-delay:-30s}
+@keyframes drift{from{transform:translateX(-6%)} to{transform:translateX(6%)}}
+.sun-mini{position:absolute; z-index:1; right:4%; top:5%; width:clamp(56px,7vw,96px); aspect-ratio:1;
+  border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle at 35% 30%, #fff6cf, #ffd76e 46%, #ffab4a 78%, #ff8b3d);
+  box-shadow:0 0 60px rgba(255,190,80,.8), inset -12px -16px 30px rgba(214,110,40,.35);
+  animation:bob 5s ease-in-out infinite}
+.hill-in{position:absolute; z-index:1; border-radius:50%; pointer-events:none}
+.spark{position:absolute; z-index:1; color:#fff; font-size:1rem; pointer-events:none;
+  text-shadow:0 0 12px rgba(255,255,255,.9); animation:twinkle 2.6s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.25; transform:scale(.7)}50%{opacity:1; transform:scale(1.15)}}
+
+/* ---------- NAVBAR ---------- */
+.nav{
+  position:absolute; z-index:20; top:0; left:0; right:0;
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  gap:12px; padding:clamp(10px,2vh,20px) clamp(14px,2.4vw,28px);
+}
+.nav-left,.nav-right{display:flex; align-items:center; gap:10px; min-width:0}
+.nav-right{justify-content:flex-end}
+.avatar{
+  width:42px; height:42px; border-radius:50%; flex:none; cursor:pointer; text-decoration:none;
+  border:3px solid #fff; box-shadow:0 6px 16px -6px rgba(30,20,80,.4);
+  background:linear-gradient(160deg,#ff9ad0,#ff6fb5); display:grid; place-items:center;
+  transition:transform .18s ease;
+}
+.avatar:hover{transform:scale(1.08)}
+.avatar svg{width:32px; height:32px}
+.pill{
+  font-family:var(--disp); font-weight:700; font-size:.76rem; letter-spacing:.05em;
+  color:#fff; text-decoration:none; cursor:pointer; white-space:nowrap;
+  padding:9px 18px; border-radius:999px;
+  background:var(--glass); border:1px solid var(--glassline);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  transition:background .18s ease, color .18s ease, transform .18s ease;
+}
+.pill:hover{background:rgba(255,255,255,.32); transform:translateY(-1px)}
+.pill.on{background:#fff; color:var(--ink); border-color:#fff}
+.logo{display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; text-decoration:none}
+.logo svg{width:30px; height:20px; filter:drop-shadow(0 3px 6px rgba(30,20,80,.3))}
+.logo b{
+  font-family:var(--disp); font-weight:800; font-size:1.3rem; letter-spacing:.02em;
+  color:#fff; text-shadow:0 3px 10px rgba(30,20,80,.35); line-height:1;
+}
+.logo b i{font-style:normal; display:inline-block; transform:rotate(-6deg) translateY(-1px); color:#ffe08a}
+.nav-ic{
+  width:38px; height:38px; border-radius:50%; cursor:pointer; flex:none;
+  background:var(--glass); border:1px solid var(--glassline);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  display:grid; place-items:center; color:#fff;
+  transition:background .18s ease, transform .18s ease;
+}
+.nav-ic:hover{background:rgba(255,255,255,.32); transform:translateY(-1px)}
+.nav-ic svg{width:16px; height:16px}
+.burger{display:none}
+/* toast notifikasi */
+.toast{
+  position:absolute; z-index:60; left:50%; top:16%; transform:translateX(-50%) translateY(-12px);
+  background:rgba(40,28,90,.82); color:#fff; font-family:var(--disp); font-weight:700;
+  font-size:.85rem; padding:11px 20px; border-radius:999px; border:1px solid rgba(255,255,255,.3);
+  opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; white-space:nowrap;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+/* ---------- VIEW (layar app) ---------- */
+.view{position:absolute; inset:0; display:none}
+.view.active{display:block}
+.rise,.pop{opacity:0}
+.view.active .rise{animation:rise .6s cubic-bezier(.22,.9,.3,1.15) both; animation-delay:var(--d,0s)}
+.view.active .pop{animation:pop .55s cubic-bezier(.34,1.56,.64,1) both; animation-delay:var(--d,.15s)}
+@keyframes rise{from{opacity:0; transform:translateY(30px) scale(.97)} to{opacity:1; transform:none}}
+@keyframes pop{from{opacity:0; transform:scale(.55)} to{opacity:1; transform:scale(1)}}
+
+/* ---------- TIPOGRAFI ---------- */
+.eyebrow{
+  display:inline-block; font-family:var(--disp); font-weight:700; font-size:clamp(.68rem,1.3vw,.9rem);
+  letter-spacing:.32em; text-transform:uppercase; color:#fff;
+  text-shadow:0 2px 12px rgba(30,20,80,.45); margin-bottom:12px;
+}
+.h1{
+  font-family:var(--disp); font-weight:800; color:#fff; line-height:.98;
+  font-size:clamp(1.9rem,5vw,4.3rem); letter-spacing:.005em;
+  text-shadow:0 4px 24px rgba(30,20,80,.4), 0 2px 0 rgba(120,80,180,.18);
+}
+.h1 .tiny{font-size:.52em; display:block; letter-spacing:.02em; margin-bottom:.12em}
+.lead{
+  color:#fff; font-weight:700; font-size:clamp(.84rem,1.4vw,1.02rem); line-height:1.6;
+  max-width:52ch; text-shadow:0 2px 10px rgba(30,20,80,.35); margin-top:14px;
+}
+
+/* ---------- TOMBOL ---------- */
+.cta-row{display:flex; gap:12px; flex-wrap:wrap; margin-top:22px; align-items:center}
+.btn{
+  font-family:var(--disp); font-weight:800; font-size:clamp(.78rem,1.4vw,.95rem); letter-spacing:.04em;
+  display:inline-flex; align-items:center; gap:10px; cursor:pointer; text-decoration:none;
+  border-radius:999px; padding:8px 8px 8px 20px; border:none; white-space:nowrap;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, background .18s ease;
+}
+.btn-grad{color:#fff; background:var(--grad-cta); box-shadow:0 14px 30px -10px rgba(232,79,165,.65)}
+.btn-grad:hover{transform:translateY(-3px) scale(1.03); box-shadow:0 20px 38px -10px rgba(232,79,165,.75)}
+.btn-grad .c-ic{width:36px; height:36px; border-radius:50%; background:#fff; display:grid; place-items:center; color:var(--deepink); flex:none}
+.btn-grad .c-ic svg{width:15px; height:15px}
+.btn-ghost{
+  color:var(--ink); background:rgba(255,255,255,.86); border:1.5px solid #fff; padding:13px 20px;
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  box-shadow:0 6px 16px -8px rgba(30,20,80,.35);
+}
+.btn-ghost:hover{background:#fff; transform:translateY(-3px)}
+.btn-ghost svg{width:15px; height:15px}
+.btn-dark{color:#fff; background:var(--ink); padding:13px 20px; box-shadow:0 14px 30px -12px rgba(30,20,80,.6)}
+.btn-dark:hover{transform:translateY(-3px) scale(1.02)}
+.btn-dark svg{width:15px; height:15px}
+.btn:disabled{opacity:.45; pointer-events:none}
+
+/* ---------- LAYOUT DUA KOLOM ---------- */
+.split{position:absolute; inset:0; z-index:6; display:grid; grid-template-columns:1fr 1.08fr;
+  gap:clamp(16px,3vw,46px); align-items:center;
+  padding:clamp(64px,11vh,96px) clamp(20px,4vw,56px) clamp(48px,9vh,72px)}
+.split .left{min-width:0; min-height:0}
+.split .right{min-width:0; min-height:0; display:grid; justify-items:center; align-content:center; gap:14px; overflow:visible}
+.center-col{position:absolute; inset:0; z-index:6; display:grid; place-content:center; justify-items:center;
+  text-align:center; padding:clamp(64px,11vh,96px) clamp(16px,4vw,52px) clamp(48px,9vh,72px)}
+
+/* ---------- MENU MOBILE ---------- */
+.mmenu{
+  position:absolute; z-index:23; top:calc(clamp(10px,2vh,20px) + 42px + 10px); left:50%;
+  transform:translateX(-50%) translateY(-8px); opacity:0; pointer-events:none;
+  display:flex; flex-wrap:wrap; justify-content:center; gap:8px; width:min(380px,84%);
+  padding:12px; border-radius:20px;
+  background:rgba(40,28,90,.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.25);
+  transition:opacity .22s ease, transform .22s ease;
+}
+.mmenu.open{opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0)}
+
+/* ---------- BOOTH (kamera) ---------- */
+.booth{
+  position:relative; z-index:6; width:100%; max-width:520px; aspect-ratio:4/3;
+  border-radius:clamp(16px,2.4vw,26px); overflow:hidden;
+  border:6px solid #fff; background:#1d1633;
+  box-shadow:0 34px 70px -22px rgba(30,20,80,.55);
+}
+.booth video, .booth canvas{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.booth canvas{z-index:3; pointer-events:none}
+.booth video{z-index:1}
+.booth.mir video{transform:scaleX(-1)}
+.booth .cam-off{
+  position:absolute; inset:0; z-index:2; display:grid; place-content:center; justify-items:center;
+  gap:10px; text-align:center; color:#cfd6ff; font-weight:800; font-size:.8rem; padding:18px;
+  background:repeating-linear-gradient(45deg,#241b42 0 14px,#1d1633 14px 28px);
+}
+.cam-off .big{font-size:2.2rem; animation:bob 2.5s ease-in-out infinite}
+/* overlay countdown besar */
+.count{
+  position:absolute; z-index:10; inset:0; display:none; place-content:center; text-align:center;
+  font-family:var(--disp); font-weight:800; color:#fff; font-size:clamp(4rem,13vw,9rem);
+  text-shadow:0 8px 30px rgba(30,20,80,.6); pointer-events:none;
+}
+.count.show{display:grid}
+.count span{display:inline-block; animation:countpop .9s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes countpop{0%{transform:scale(.3); opacity:0}30%{transform:scale(1.15); opacity:1}80%{opacity:1}100%{transform:scale(1); opacity:0}}
+.flash{position:absolute; z-index:11; inset:0; background:#fff; opacity:0; pointer-events:none}
+.flash.go{animation:flashy .45s ease-out both}
+@keyframes flashy{0%{opacity:.95}100%{opacity:0}}
+/* stiker di booth */
+.stickers{position:absolute; inset:0; z-index:4; pointer-events:none}
+.stk{position:absolute; font-size:2.6rem; filter:drop-shadow(0 6px 10px rgba(20,10,60,.35));
+  animation:bob 3s ease-in-out infinite; user-select:none}
+/* label kecil di booth */
+.booth .b-lbl{
+  position:absolute; z-index:5; left:12px; bottom:12px;
+  font-family:var(--disp); font-weight:700; font-size:.7rem; letter-spacing:.06em;
+  background:rgba(255,255,255,.88); color:var(--ink); padding:6px 12px; border-radius:999px;
+}
+/* bar status mode strip */
+.strip-dots{display:flex; gap:8px; align-items:center; justify-content:center}
+.sdot{width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,.45); border:2px solid rgba(255,255,255,.7)}
+.sdot.fill{background:var(--pink); border-color:#fff; box-shadow:0 0 10px rgba(255,110,180,.8)}
+
+/* baris filter banyak: scroll horizontal rapi */
+.fx-row{max-height:96px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(42,35,64,.4) transparent; padding-right:4px}
+.fx-row::-webkit-scrollbar{width:6px}
+.fx-row::-webkit-scrollbar-thumb{background:rgba(42,35,64,.35); border-radius:99px}
+@media (max-width:920px){
+  .chip-row.fx-row{max-height:56px; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden;
+    -webkit-overflow-scrolling:touch; padding-bottom:6px}
+  .chip-row.fx-row .chip{flex:none}
+  .chip-row.fx-row::-webkit-scrollbar{height:5px; width:auto}
+}
+
+/* ---------- PANEL KONTROL ---------- */
+.panel{display:flex; flex-direction:column; gap:10px; width:100%; max-width:520px}
+.panel h3{
+  font-family:var(--disp); font-weight:800; font-size:.78rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink);
+  background:rgba(255,255,255,.75); border-radius:8px; padding:4px 10px; width:fit-content;
+}
+.chip-row{display:flex; gap:8px; flex-wrap:wrap}
+.chip{
+  font-family:var(--disp); font-weight:700; font-size:.74rem; cursor:pointer;
+  color:var(--ink); background:rgba(255,255,255,.82); border:1.5px solid rgba(255,255,255,.95);
+  border-radius:999px; padding:8px 15px; transition:all .18s ease;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  box-shadow:0 6px 16px -8px rgba(30,20,80,.35);
+}
+.chip:hover{background:#fff; transform:translateY(-1px)}
+.chip.on{background:var(--ink); color:#fff; border-color:var(--ink); box-shadow:0 10px 22px -8px rgba(30,20,80,.55)}
+.chip .em{margin-right:4px}
+
+/* ---------- STRIP HASIL ---------- */
+.strip-card{
+  position:relative; z-index:6; background:#fff; border-radius:18px; padding:12px 12px 8px;
+  box-shadow:0 34px 70px -20px rgba(30,20,80,.55);
+  width:min(220px,100%); max-height:100%; display:flex; flex-direction:column;
+  animation:bob 5s ease-in-out infinite;
+}
+.strip-inner{display:grid; grid-template-rows:repeat(4,1fr); gap:8px; flex:1; min-height:0}
+.strip-cell{position:relative; border-radius:8px; overflow:hidden; background:#efe9ff; aspect-ratio:11/7}
+.strip-cell img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.strip-cell .empty{
+  position:absolute; inset:0; display:grid; place-content:center; font-size:1.4rem; opacity:.5;
+}
+.strip-card footer{
+  display:flex; align-items:center; justify-content:space-between; padding:9px 4px 2px;
+}
+.strip-card footer b{font-family:var(--disp); font-size:1.02rem; letter-spacing:.02em}
+.strip-card footer b i{font-style:normal; color:var(--deepink); display:inline-block; transform:rotate(-6deg)}
+.strip-card footer time{font-size:.62rem; font-weight:900; color:var(--muted); letter-spacing:.08em}
+
+/* ---------- GALERI ---------- */
+.gal-grid{
+  position:absolute; z-index:6; left:50%; transform:translateX(-50%);
+  width:min(900px, calc(100% - 40px));
+  display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(10px,1.6vw,18px);
+  overflow-y:auto; padding:4px 4px 16px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.6) transparent;
+}
+.gal-grid::-webkit-scrollbar{width:8px}
+.gal-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.55); border-radius:99px}
+.gal-item{
+  position:relative; border-radius:16px; overflow:hidden; border:5px solid #fff; aspect-ratio:4/3;
+  box-shadow:0 18px 36px -14px rgba(30,20,80,.5); cursor:pointer; background:#efe9ff;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+}
+.gal-item:hover{transform:translateY(-4px) scale(1.02)}
+.gal-item img, .gal-item video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.gal-item .tag{
+  position:absolute; left:8px; bottom:8px; z-index:2; font-family:var(--disp); font-weight:700;
+  font-size:.6rem; letter-spacing:.05em; background:rgba(255,255,255,.9); color:var(--ink);
+  padding:4px 9px; border-radius:99px;
+}
+.gal-item .del{
+  position:absolute; right:8px; top:8px; z-index:2; width:28px; height:28px; border-radius:50%;
+  border:none; cursor:pointer; background:rgba(40,28,90,.75); color:#fff; font-size:.9rem;
+  display:grid; place-items:center; opacity:0; transition:opacity .18s;
+}
+.gal-item:hover .del{opacity:1}
+.gal-empty{
+  grid-column:1/-1; text-align:center; color:#fff; font-weight:800; padding:40px 10px;
+  font-size:.9rem; text-shadow:0 2px 8px rgba(30,20,80,.4);
+}
+.gal-empty .big{font-size:2.4rem; display:block; margin-bottom:8px}
+
+/* header galeri: sejajar atas, tidak menengah frame */
+.gal-head{place-content:start; align-items:center; padding-top:clamp(58px,9vh,80px); padding-bottom:0; pointer-events:none}
+.gal-head .cta-row{pointer-events:auto}
+.gal-grid{top:clamp(252px,32vh,300px); bottom:clamp(44px,6vh,60px)}
+
+/* ---------- LIGHTBOX ---------- */
+.lightbox{position:absolute; inset:0; z-index:50; display:none; place-content:center; justify-items:center;
+  background:rgba(24,16,54,.78); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); padding:24px}
+.lightbox.open{display:grid}
+.lb-frame{max-width:min(760px,92%); max-height:78%; border-radius:20px; border:6px solid #fff;
+  overflow:hidden; box-shadow:0 40px 90px -20px rgba(10,5,40,.8); background:#fff}
+.lb-frame img{display:block; max-width:100%; max-height:100%; object-fit:contain}
+.lb-row{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; justify-content:center}
+
+/* ---------- HERO KANAN (ilustrasi kamera mini) ---------- */
+.cam-illus{
+  position:relative; z-index:6; width:min(320px,80%); aspect-ratio:1.15;
+  border-radius:26px; background:linear-gradient(160deg,#b78bff,#7e5be8);
+  box-shadow:0 30px 60px -18px rgba(60,30,150,.55), inset 0 -14px 30px rgba(40,15,110,.35);
+  display:grid; place-items:center; animation:bob 5s ease-in-out infinite;
+}
+.cam-illus .lens{
+  width:56%; aspect-ratio:1; border-radius:50%;
+  background:radial-gradient(circle at 38% 32%, #e9f4ff, #9fc4ee 34%, #3f6db8 68%, #233d78);
+  box-shadow:inset 0 -10px 22px rgba(10,20,60,.5), 0 10px 24px -8px rgba(10,20,60,.5);
+  display:grid; place-items:center; font-size:2.1rem;
+}
+.cam-illus .bubble{
+  position:absolute; background:#fff; border-radius:50%; font-family:var(--disp); font-weight:800;
+  display:grid; place-items:center; color:var(--ink); box-shadow:0 10px 22px -8px rgba(30,20,80,.5);
+  animation:bob 3.4s ease-in-out infinite;
+}
+.cam-illus .bb1{width:74px; height:74px; left:-16px; top:-18px; font-size:.72rem; transform:rotate(-7deg)}
+.cam-illus .bb2{width:64px; height:64px; right:-14px; top:34%; font-size:.66rem; transform:rotate(6deg); animation-delay:.8s}
+.cam-illus .bb3{width:58px; height:58px; left:14%; bottom:-20px; font-size:.62rem; transform:rotate(-4deg); animation-delay:1.5s}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:920px){
+  /* bola fuzzy hanya muncul sedikit di sudut — jangan menutupi tombol */
+  .w-ball.b1{width:130px; height:130px; left:-85px; bottom:-95px}
+  .w-ball.b4{width:90px; height:90px; right:-75px; bottom:-85px}
+  .w-ball.b2,.w-ball.b3{display:none}
+  .card-frame{width:100%; height:100%; aspect-ratio:auto; border-width:5px; border-radius:clamp(14px,4vw,24px)}
+  .frame{padding:clamp(10px,2.4vh,20px) clamp(10px,2.6vw,18px)}
+  .nav{grid-template-columns:auto 1fr auto}
+  .nav-links-l,.nav-links-r{display:none}
+  .burger{display:grid}
+  .split{grid-template-columns:1fr; grid-template-rows:auto 1fr; align-content:stretch; align-items:start; gap:8px;
+    padding:clamp(54px,8.5vh,76px) clamp(12px,4.5vw,28px) clamp(84px,13vh,110px); overflow:hidden}
+  .split .right{order:-1; min-height:0; overflow:hidden; align-content:start}
+  .split .left{overflow:visible; min-height:0}
+  .booth{aspect-ratio:auto; height:min(22dvh,200px); width:100%}
+  .view[data-view=booth] .panel{margin-top:8px!important; gap:6px}
+  .panel{gap:8px}
+  .panel h3{font-size:.68rem; padding:3px 8px}
+  .chip{font-size:.62rem; padding:6px 11px; border-radius:999px}
+  .chip .em{margin-right:3px}
+  .cta-row{gap:8px; margin-top:8px}
+  .btn{font-size:.66rem; padding:5px 5px 5px 12px}
+  .btn .c-ic{width:28px; height:28px}
+  .btn-ghost,.btn-dark{padding:9px 13px; font-size:.66rem}
+  /* strip: susun 2x2 agar muat di layar portrait */
+  .view[data-view=strip] .split{grid-template-rows:auto 1fr}
+  .view[data-view=strip] .split .right{order:0; min-height:0; max-height:none; overflow:visible}
+  .strip-card{width:min(320px,94%)}
+  .strip-inner{grid-template-rows:none; grid-template-columns:1fr 1fr; aspect-ratio:auto; flex:none}
+  .strip-cell{aspect-ratio:4/3; min-height:0; height:auto}
+  .center-col{padding:clamp(72px,12vh,104px) clamp(14px,5vw,30px) clamp(96px,15vh,124px)}
+  .h1{font-size:clamp(1.5rem,7.2vw,2.4rem)}
+  .lead{font-size:.78rem; margin-top:8px; line-height:1.5}
+  .eyebrow{margin-bottom:6px}
+  .cta-row{margin-top:14px; gap:8px}
+  .btn{font-size:.7rem; padding:6px 6px 6px 14px}
+  .btn .c-ic{width:30px; height:30px}
+  .btn-ghost,.btn-dark{padding:10px 14px}
+  .booth{max-width:min(420px,94%)}
+  .cam-illus{width:min(200px,52%)}
+  .cam-illus .bb1{width:58px; height:58px; font-size:.6rem}
+  .cam-illus .bb2{width:50px; height:50px; font-size:.56rem}
+  .cam-illus .bb3{width:46px; height:46px; font-size:.52rem}
+  .panel{max-width:min(420px,94%)}
+  .chip{font-size:.66rem; padding:7px 12px}
+  .gal-grid{grid-template-columns:repeat(2,1fr); top:clamp(240px,32vh,300px)}
+  .gal-head{padding-top:clamp(70px,11vh,90px)}
+  .count{font-size:clamp(3.4rem,22vw,6rem)}
+}
+@media (max-width:560px){
+  .split .right{overflow:hidden}
+  .booth{height:min(24dvh,220px)}
+  .strip-card{width:min(250px,88%)}
+  .lead{display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important; animation-iteration-count:1!important; transition-duration:.001s!important}
+}
+
+</style>
+</head>
+<body>
+<!-- ================= DIORAMA ================= -->
+<div class="world" aria-hidden="true">
+  <div class="w-hill h1"></div><div class="w-hill h2"></div><div class="w-hill h3"></div>
+  <span class="w-flower" style="left:8%"></span><span class="w-flower" style="left:14%"></span>
+  <span class="w-flower" style="left:22%"></span><span class="w-flower" style="left:88%"></span>
+  <span class="w-flower" style="left:93%"></span>
+</div>
+<div class="w-ball b1" aria-hidden="true"></div>
+<div class="w-ball b4" aria-hidden="true"></div>
+
+<div class="frame">
+<div class="card-frame" id="cardFrame">
+
+  <!-- ================= NAVBAR ================= -->
+  <nav class="nav">
+    <div class="nav-left">
+      <a class="avatar" href="#" data-view="booth" title="Masuk photobooth" aria-label="Masuk photobooth">
+        <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="17" r="8" fill="#fff"/><path d="M8 44c2-9 8-13 16-13s14 4 16 13" fill="#fff"/></svg>
+      </a>
+      <div class="nav-links nav-links-l">
+        <a class="pill on" data-view="home">HOME</a>
+        <a class="pill" data-view="booth">BOOTH</a>
+        <a class="pill" data-view="strip">STRIP 4</a>
+      </div>
+    </div>
+    <a class="logo" href="#" data-view="home" aria-label="BOBBLE beranda">
+      <svg viewBox="0 0 34 22" fill="#fff"><ellipse cx="9" cy="13" rx="8" ry="7"/><circle cx="17" cy="9" r="6.5"/><circle cx="25" cy="12" r="7.5"/><rect x="8" y="13" width="19" height="6" rx="3"/></svg>
+      <b>BOBB<i>L</i>E</b>
+    </a>
+    <div class="nav-right">
+      <div class="nav-links nav-links-r">
+        <a class="pill" data-view="gallery">GALLERY</a>
+        <a class="pill" data-view="booth">FILTERS</a>
+        <a class="pill" data-view="strip">STRIP MODE</a>
+      </div>
+      <button class="nav-ic" id="btnShotTop" aria-label="Ambil foto" title="Ambil foto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.6"/></svg>
+      </button>
+      <button class="nav-ic" data-view="gallery" aria-label="Galeri" title="Galeri">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="m4.5 18.5 4.5-4.5 3.5 3.5 3-3 4 4"/></svg>
+      </button>
+      <button class="nav-ic burger" id="burger" aria-label="Buka menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- menu mobile -->
+  <div class="mmenu" id="mmenu">
+    <a class="pill on" data-view="home">HOME</a>
+    <a class="pill" data-view="booth">BOOTH</a>
+    <a class="pill" data-view="strip">STRIP 4</a>
+    <a class="pill" data-view="gallery">GALLERY</a>
+  </div>
+
+  <!-- toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ================= VIEW: HOME ================= -->
+  <section class="view active" data-view="home">
+    <div class="in-cloud drift-a" style="left:6%; top:16%; width:190px; height:60px">
+      <div class="puff" style="left:0; top:22px; width:90px; height:38px"></div>
+      <div class="puff" style="left:52px; top:0; width:70px; height:52px"></div>
+      <div class="puff" style="left:110px; top:18px; width:80px; height:42px"></div>
+    </div>
+    <div class="sun-mini"><svg viewBox="0 0 100 100"><circle cx="50" cy="46" r="7" fill="#7a4a1f"/><path d="M42 60q8 6 16 0" stroke="#7a4a1f" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="40" cy="38" r="3.4" fill="#7a4a1f"/><circle cx="60" cy="38" r="3.4" fill="#7a4a1f"/></svg></div>
+    <div class="hill-in" style="left:-14%; bottom:-42%; width:74%; aspect-ratio:2/1; background:radial-gradient(circle at 50% 15%, #b4ef6e, #4fb84a 55%, #1c7f46)"></div>
+    <div class="hill-in" style="right:-12%; bottom:-46%; width:64%; aspect-ratio:2/1; background:radial-gradient(circle at 45% 15%, #a3ea5f, #3fa043 55%, #15713f)"></div>
+    <span class="spark" style="left:44%; top:14%">✦</span>
+    <span class="spark" style="left:70%; top:44%; animation-delay:.9s">✦</span>
+    <div class="split">
+      <div class="left">
+        <span class="eyebrow rise" style="--d:.05s">Welcome to</span>
+        <h1 class="h1"><span class="tiny rise" style="--d:.12s">A Bouncy</span><span class="rise" style="--d:.2s;display:block">PHOTOBOOTH</span><span class="rise" style="--d:.28s;display:block">WORLD</span></h1>
+        <p class="lead rise" style="--d:.36s">Ambil foto seru dengan filter magis, stiker lucu, dan strip 4 foto bergaya dunia Bobble. Semua berjalan langsung di browser — tanpa upload, hasilmu langsung bisa diunduh.</p>
+        <div class="cta-row rise" style="--d:.44s">
+          <a class="btn btn-grad" href="#" data-view="booth">START SNAPPING <span class="c-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
+          <a class="btn btn-ghost" href="#" data-view="gallery">MY GALLERY <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="m4.5 18.5 4.5-4.5 3.5 3.5 3-3 4 4"/></svg></a>
+        </div>
+      </div>
+      <div class="right">
+        <div class="cam-illus pop" style="--d:.5s">
+          <div class="lens">📷</div>
+          <span class="bubble bb1">SAY CHEESE!</span>
+          <span class="bubble bb2">✨ FILTER</span>
+          <span class="bubble bb3">1 2 3!</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW: BOOTH ================= -->
+  <section class="view" data-view="booth">
+    <div class="split">
+      <div class="left">
+        <span class="eyebrow rise" style="--d:.05s">Photobooth</span>
+        <h1 class="h1" style="font-size:clamp(1.5rem,3.4vw,2.9rem)"><span class="tiny rise" style="--d:.1s">Strike a pose,</span><span class="rise" style="--d:.16s">FRIENDS!</span></h1>
+        <div class="panel rise" style="--d:.24s; margin-top:16px">
+          <h3>Filter Magis</h3>
+          <div class="chip-row fx-row" id="filterRow">
+            <button class="chip on" data-fx="none"><span class="em">🌈</span>Normal</button>
+            <button class="chip" data-fx="bobble"><span class="em">🧸</span>Bobble</button>
+            <button class="chip" data-fx="candy"><span class="em">🍬</span>Candy</button>
+            <button class="chip" data-fx="vortex"><span class="em">🌀</span>Vortex</button>
+            <button class="chip" data-fx="minty"><span class="em">🌿</span>Minty</button>
+            <button class="chip" data-fx="sunny"><span class="em">☀️</span>Sunny</button>
+            <button class="chip" data-fx="mono"><span class="em">🖤</span>Mono</button>
+            <button class="chip" data-fx="bubblegum"><span class="em">🫧</span>Bubblegum</button>
+            <button class="chip" data-fx="grape"><span class="em">🍇</span>Grape</button>
+            <button class="chip" data-fx="lava"><span class="em">🌋</span>Lava</button>
+            <button class="chip" data-fx="ocean"><span class="em">🌊</span>Ocean</button>
+            <button class="chip" data-fx="sepia"><span class="em">📜</span>Sepia</button>
+            <button class="chip" data-fx="invert"><span class="em">🔃</span>Negative</button>
+            <button class="chip" data-fx="dreamy"><span class="em">💭</span>Dreamy</button>
+            <button class="chip" data-fx="neon"><span class="em">💜</span>Neon</button>
+            <button class="chip" data-fx="polaroid"><span class="em">🖼️</span>Polaroid</button>
+            <button class="chip" data-fx="comic"><span class="em">💥</span>Comic</button>
+            <button class="chip" data-fx="pixel"><span class="em">👾</span>Pixel</button>
+            <button class="chip" data-fx="fisheye"><span class="em">🐟</span>Fisheye</button>
+            <button class="chip" data-fx="thermal"><span class="em">🌡️</span>Thermal</button>
+            <button class="chip" data-fx="hologram"><span class="em">🪩</span>Holo</button>
+          </div>
+          <h3>Beauty Cam ✨</h3>
+          <div class="chip-row fx-row" id="beautyRow">
+            <button class="chip on" data-beauty="off">Natural</button>
+            <button class="chip" data-beauty="smooth"><span class="em">🫧</span>Smooth</button>
+            <button class="chip" data-beauty="glow"><span class="em">💡</span>Glow</button>
+            <button class="chip" data-beauty="brighten"><span class="em">🔆</span>Bright</button>
+            <button class="chip" data-beauty="porcelain"><span class="em">🪞</span>Porcelain</button>
+            <button class="chip" data-beauty="honey"><span class="em">🍯</span>Honey</button>
+            <button class="chip" data-beauty="rose"><span class="em">🌹</span>Rosy</button>
+            <button class="chip" data-beauty="slim"><span class="em">🪄</span>Slim</button>
+            <button class="chip" data-beauty="eyepop"><span class="em">👁️</span>Eye Pop</button>
+            <button class="chip" data-beauty="bokeh"><span class="em">🌾</span>Bokeh</button>
+            <button class="chip" data-beauty="fresh"><span class="em">🍏</span>Fresh</button>
+          </div>
+          <h3>Stiker</h3>
+          <div class="chip-row" id="stkRow">
+            <button class="chip on" data-stk="">Tanpa Stiker</button>
+            <button class="chip" data-stk="party">🎉 Party</button>
+            <button class="chip" data-stk="hearts">💖 Hati</button>
+            <button class="chip" data-stk="stars">⭐ Bintang</button>
+            <button class="chip" data-stk="bunny">🐰 Telinga</button>
+          </div>
+          <h3>Opsi</h3>
+          <div class="chip-row">
+            <button class="chip on" id="chipCount">⏱ Countdown 3s</button>
+            <button class="chip on" id="chipMirror">🪞 Mirror</button>
+          </div>
+          <div class="cta-row" style="margin-top:4px">
+            <button class="btn btn-grad" id="btnShot">TAKE PHOTO <span class="c-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></button>
+            <button class="btn btn-ghost" id="btnSwitch">SWITCH CAM <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9a8 8 0 0 1 13-3l3 3M20 15a8 8 0 0 1-13 3l-3-3"/><path d="M20 4v5h-5M4 20v-5h5"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="booth pop" style="--d:.34s" id="booth">
+          <div class="cam-off" id="camOff"><span class="big">📷</span>Kamera belum aktif<br><span style="font-weight:700; opacity:.8">Klik TAKE PHOTO untuk izinkan kamera</span></div>
+          <video id="video" autoplay playsinline muted></video>
+          <canvas id="fxCanvas"></canvas>
+          <div class="stickers" id="stkLayer"></div>
+          <div class="count" id="countdown"></div>
+          <div class="flash" id="flash"></div>
+          <span class="b-lbl" id="boothLbl">● BOBBLE BOOTH</span>
+        </div>
+        <div class="strip-dots" id="stripDots" style="display:none"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW: STRIP ================= -->
+  <section class="view" data-view="strip">
+    <div class="split">
+      <div class="left">
+        <span class="eyebrow rise" style="--d:.05s">Strip Mode</span>
+        <h1 class="h1" style="font-size:clamp(1.5rem,3.4vw,2.9rem)"><span class="tiny rise" style="--d:.1s">Empat pose,</span><span class="rise" style="--d:.16s">SATU CERITA</span></h1>
+        <p class="lead rise" style="--d:.24s">Mode strip klasik: ambil 4 foto berurutan dengan countdown otomatis, lalu jadikan satu strip foto ala mesin photobooth sungguhan. Momen terbaikmu, tersusun rapi.</p>
+        <div class="cta-row rise" style="--d:.32s">
+          <button class="btn btn-grad" id="btnStripStart">START STRIP <span class="c-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></button>
+          <button class="btn btn-dark" id="btnStripDl" disabled>⬇ UNDUH STRIP</button>
+          <button class="btn btn-ghost" id="btnStripReset">RESET</button>
+        </div>
+        <div class="cta-row rise" style="--d:.38s; gap:8px">
+          <span class="chip" style="pointer-events:none">💡 Hasil juga tersimpan di Gallery</span>
+        </div>
+      </div>
+      <div class="right">
+        <div class="strip-card pop" style="--d:.3s" id="stripCard">
+          <div class="strip-inner" id="stripInner">
+            <div class="strip-cell"><span class="empty">1</span></div>
+            <div class="strip-cell"><span class="empty">2</span></div>
+            <div class="strip-cell"><span class="empty">3</span></div>
+            <div class="strip-cell"><span class="empty">4</span></div>
+          </div>
+          <footer><b>BOBB<i>L</i>E ✦ PHOTO STRIP</b><time id="stripTime">—</time></footer>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW: GALLERY ================= -->
+  <section class="view" data-view="gallery">
+    <div class="center-col gal-head">
+      <span class="eyebrow rise" style="--d:.04s">Gallery</span>
+      <h1 class="h1" style="font-size:clamp(1.4rem,3.2vw,2.6rem)"><span class="rise" style="--d:.1s;display:block">MY BOBBLE SHOTS</span></h1>
+      <div class="cta-row rise" style="--d:.16s; justify-content:center; margin-top:16px">
+        <button class="btn btn-grad" data-view="booth">+ FOTO BARU <span class="c-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
+      </div>
+    </div>
+    <div class="gal-grid" id="galGrid"></div>
+    <p class="lead" id="galHint" style="position:absolute; z-index:6; bottom:clamp(18px,3vh,30px); left:50%; transform:translateX(-50%); margin:0; font-size:.74rem; text-align:center; white-space:nowrap">Klik foto untuk melihat besar · tombol ✕ untuk hapus</p>
+  </section>
+
+  <!-- ================= LIGHTBOX ================= -->
+  <div class="lightbox" id="lightbox">
+    <div class="lb-frame"><img id="lbImg" alt="Foto hasil photobooth"></div>
+    <div class="lb-row">
+      <button class="btn btn-grad" id="btnLbDl">⬇ UNDUH PNG</button>
+      <button class="btn btn-ghost" id="btnLbClose">TUTUP ✕</button>
+    </div>
+  </div>
+
+</div><!-- /card-frame -->
+</div><!-- /frame -->
+
+<div class="w-ball b2" aria-hidden="true"></div>
+<div class="w-ball b3" aria-hidden="true"></div>
+<script>
+/* ============================================================
+   BOBBLE PHOTOBOOTH — engine
+   Kamera → countdown → flash → capture (canvas) → filter/overlay
+   → galeri (memori) → strip 4 foto → unduh PNG.
+   ============================================================ */
+'use strict';
+const $  = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+
+/* ---------- state ---------- */
+const video   = $('#video');
+const fxCanvas = $('#fxCanvas');
+const fxCtx   = fxCanvas.getContext('2d');
+const countEl = $('#countdown');
+const flashEl = $('#flash');
+const booth   = $('#booth');
+const toastEl = $('#toast');
+let stream = null, facing = 'user', fxRunning = false;
+let curFx = 'none', curStk = '', useCount = true, useMirror = true;
+let shooting = false;
+const gallery = [];          // {url, filter, time}
+const strip = [null, null, null, null];  // dataURL per sel
+let stripDone = false;
+let lbCurrent = null;        // url untuk lightbox
+
+/* ---------- helper ---------- */
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+function fmtTime(d){
+  const p = (n) => String(n).padStart(2, '0');
+  return p(d.getDate()) + '.' + p(d.getMonth()+1) + '.' + d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+/* ---------- navigasi view ---------- */
+const VIEWS = ['home', 'booth', 'strip', 'gallery'];
+function show(view){
+  if (VIEWS.indexOf(view) < 0) view = 'home';
+  $$('.view').forEach(v => v.classList.toggle('active', v.dataset.view === view));
+  $$('.pill').forEach(p => p.classList.toggle('on', p.dataset.view === view));
+  $('#mmenu').classList.remove('open');
+  if (view === 'booth') startFx();
+  else if (view !== 'strip') stopFx();
+  if (view === 'gallery') renderGallery();
+}
+$$('[data-view]').forEach(el => {
+  el.addEventListener('click', (e) => { e.preventDefault(); show(el.dataset.view); });
+});
+$('#burger').addEventListener('click', () => $('#mmenu').classList.toggle('open'));
+
+/* ---------- kamera ---------- */
+async function startCam(){
+  if (stream) return true;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    toast('Browser tidak mendukung kamera 😢');
+    return false;
+  }
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 960 } },
+      audio: false
+    });
+    video.srcObject = stream;
+    await video.play().catch(()=>{});
+    $('#camOff').style.display = 'none';
+    return true;
+  }catch(err){
+    $('#camOff').style.display = 'grid';
+    $('#camOff').innerHTML = '<span class="big">🚫</span>Kamera tidak dapat diakses<br><span style="font-weight:700;opacity:.8">Izinkan kamera di browser, atau coba muat ulang halaman</span>';
+    toast('Izin kamera ditolak 😢');
+    return false;
+  }
+}
+function stopCam(){
+  if (stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
+}
+$('#btnSwitch').addEventListener('click', async () => {
+  facing = facing === 'user' ? 'environment' : 'user';
+  stopCam(); stopFx();
+  const ok = await startCam();
+  if (ok){ startFx(); toast('Kamera: ' + (facing === 'user' ? 'depan 🤳' : 'belakang 📷')); }
+});
+
+/* ---------- BEAUTY CAM: 10 filter beauty (dipakai fxDraw & compose) ---------- */
+const BEAUTY_DEFS = {
+  off:       { name: null },
+  smooth:    { name: 'Smooth',  down: .5,  mix: .55 },
+  glow:      { name: 'Glow',    down: .5,  mix: .4, tone: { r:1.04, g:1.02, b:1.0,  a:10 } },
+  brighten:  { name: 'Bright',  tone: { r:1.14, g:1.14, b:1.12, a:6 } },
+  porcelain: { name: 'Porcelain', down: .42, mix: .62, tone: { r:1.02, g:1.0, b:1.04, a:16 } },
+  honey:     { name: 'Honey',   down: .55, mix: .45, tone: { r:1.1, g:1.03, b:.88, a:8 } },
+  rose:      { name: 'Rosy',    down: .5,  mix: .4, rose: .22 },
+  slim:      { name: 'Slim',    slim: .82 },
+  eyepop:    { name: 'Eye Pop', down: .5,  mix: .35, eyepop: 1 },
+  bokeh:     { name: 'Bokeh',   down: .3,  mix: .95, vignette: .5 },
+  fresh:     { name: 'Fresh',   down: .55, mix: .5,  tone: { r:.99, g:1.05, b:1.02, a:8 }, clarity: 1 }
+};
+let curBeauty = 'off';
+/* buffer beauty reusable (hindari alokasi tiap frame) */
+const beautyBuf = document.createElement('canvas');
+function beautyPass(ctx, w, h){
+  const B = BEAUTY_DEFS[curBeauty];
+  if (!B || curBeauty === 'off') return;
+  /* SLIM: squash vertikal di area tengah (wajah) */
+  if (B.slim){
+    const squash = B.slim;                         // <1 = pipi lebih ramping
+    const cy0 = h * .5, half = h * .56;
+    ctx.save();
+    if (useMirror && facing === 'user'){ ctx.translate(w, 0); ctx.scale(-1, 1); }
+    ctx.drawImage(ctx.canvas, 0, cy0 - half*2, w, half*2, 0, cy0 - half*squash*2, w, half*squash*2);
+    ctx.restore();
+    return;
+  }
+  /* EYE POP: zoom lembut 2 lensa di area mata (y ≈ 40% tinggi) */
+  if (B.eyepop){
+    const eyes = [[w*.32, h*.42], [w*.68, h*.42]];
+    for (const [ex, ey] of eyes){
+      const R = Math.min(w, h) * .13, Z = 1.35;
+      ctx.save();
+      ctx.beginPath(); ctx.arc(ex, ey, R, 0, 7); ctx.clip();
+      ctx.clearRect(ex - R, ey - R, R*2, R*2);
+      ctx.save();
+      if (useMirror && facing === 'user'){ ctx.translate(w, 0); ctx.scale(-1, 1); }
+      ctx.drawImage(ctx.canvas, (w - w*Z)/2, (h - h*Z)/2, w*Z, h*Z);
+      ctx.restore();
+      ctx.restore();
+    }
+  }
+  /* SMOOTHING: downscale → upscale (kehalusan) di-mix ke gambar asli */
+  if (B.down){
+    const bw = Math.max(24, Math.round(w * B.down / 2) * 2), bh = Math.max(24, Math.round(h * B.down / 2) * 2);
+    if (beautyBuf.width !== bw || beautyBuf.height !== bh){ beautyBuf.width = bw; beautyBuf.height = bh; }
+    const bc = beautyBuf.getContext('2d');
+    bc.imageSmoothingEnabled = true;
+    bc.clearRect(0, 0, bw, bh);
+    bc.drawImage(ctx.canvas, 0, 0, bw, bh);
+    ctx.save();
+    ctx.globalAlpha = B.mix;
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(beautyBuf, 0, 0, bw, bh, 0, 0, w, h);
+    ctx.restore();
+  }
+  /* TONE: koreksi warna + kecerahan */
+  if (B.tone || B.rose){
+    const d = ctx.getImageData(0, 0, w, h), p = d.data;
+    const T = B.tone, roseA = B.rose || 0;
+    for (let i = 0; i < p.length; i += 4){
+      let r = p[i], g = p[i+1], b = p[i+2];
+      if (T){
+        r = r * T.r + T.a; g = g * T.g + T.a*.8; b = b * T.b + T.a*.6;
+      }
+      if (roseA){ r += (255 - r) * roseA * .3; g -= g * roseA * .1; b += (232 - b) * roseA * .12; }
+      p[i] = r > 255 ? 255 : r; p[i+1] = g > 255 ? 255 : g; p[i+2] = b > 255 ? 255 : b;
+    }
+    ctx.putImageData(d, 0, 0);
+  }
+  /* CLARITY (fresh): unsharp ringan — mix versi blur dengan 'overlay-shake' sederhana */
+  if (B.clarity){
+    ctx.save();
+    ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .18;
+    ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+  }
+  /* BOKEH: vignette lembut — pusat tajam (sudah di-mix kuat), tepi memudar */
+  if (B.vignette){
+    ctx.save();
+    const g = ctx.createRadialGradient(w/2, h*.46, Math.min(w,h)*.3, w/2, h*.46, Math.max(w,h)*.75);
+    g.addColorStop(0, 'rgba(255,255,255,0)');
+    g.addColorStop(1, 'rgba(255,236,200,' + B.vignette + ')');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+  }
+}
+/* ---------- render FX ke canvas (preview filter) ---------- */
+const FX_DEFS = {
+  none:      { name: 'Normal' },
+  bobble:    { name: 'Bobble' },
+  candy:     { name: 'Candy' },
+  vortex:    { name: 'Vortex' },
+  minty:     { name: 'Minty' },
+  sunny:     { name: 'Sunny' },
+  mono:      { name: 'Mono' },
+  bubblegum: { name: 'Bubblegum' },
+  grape:     { name: 'Grape' },
+  lava:      { name: 'Lava' },
+  ocean:     { name: 'Ocean' },
+  sepia:     { name: 'Sepia' },
+  invert:    { name: 'Negative' },
+  dreamy:    { name: 'Dreamy' },
+  neon:      { name: 'Neon' },
+  polaroid:  { name: 'Polaroid' },
+  comic:     { name: 'Comic' },
+  pixel:     { name: 'Pixel' },
+  fisheye:   { name: 'Fisheye' },
+  thermal:   { name: 'Thermal' },
+  hologram:  { name: 'Holo' }
+};
+/* daftar filter yang butuh piksel-manipulation pasca-gambar */
+function fxPixelPass(ctx, w, h, mode){
+  const d = ctx.getImageData(0, 0, w, h);
+  const p = d.data;
+  for (let i = 0; i < p.length; i += 4){
+    let r = p[i], g = p[i+1], b = p[i+2];
+    if (mode === 'sepia'){
+      const nr = r*.393 + g*.769 + b*.189, ng = r*.349 + g*.686 + b*.168, nb = r*.272 + g*.534 + b*.131;
+      r = nr; g = ng; b = nb;
+    } else if (mode === 'invert'){
+      r = 255 - r; g = 255 - g; b = 255 - b;
+    } else if (mode === 'comic'){
+      // posterize dua-tingkat ala komik pop
+      r = (r > 128) ? 235 : 40; g = (g > 128) ? 90 : 40; b = (b > 128) ? 240 : 60;
+    } else if (mode === 'thermal'){
+      const v = (r + g + b) / 765;           // 0..1
+      const seg = Math.min(4, Math.floor(v * 5));
+      const pal = [[10,0,90],[130,0,180],[240,60,40],[255,190,0],[255,255,220]][seg];
+      r = pal[0]; g = pal[1]; b = pal[2];
+    } else if (mode === 'dreamy'){
+      r = Math.min(255, r*1.06 + 14); g = Math.min(255, g*1.02 + 8); b = Math.min(255, b*1.08 + 22);
+    } else if (mode === 'hologram'){
+      const s = Math.sin((i / 4 / w) * .06 + (r + g) * .02) * .5 + .5;
+      r = 80 + s*175; g = r*.85; b = 220 - s*90;
+    }
+    p[i] = r; p[i+1] = g; p[i+2] = b;
+  }
+  ctx.putImageData(d, 0, 0);
+}
+function fxDraw(ctx, w, h, mode, t){
+  if (video.readyState < 2) return;
+  ctx.save();
+  // gambar video (mirror bila perlu — kamera depan)
+  const mir = useMirror && facing === 'user';
+  if (mir){ ctx.translate(w, 0); ctx.scale(-1, 1); }
+  ctx.drawImage(video, 0, 0, w, h);
+  ctx.restore();
+  // pass beauty (sebelum lapisan FX agar tone kulit dikoreksi dulu)
+  beautyPass(ctx, w, h);
+  // lapisan filter
+  ctx.save();
+  if (mode === 'bobble'){
+    ctx.globalAlpha = .34; ctx.globalCompositeOperation = 'soft-light';
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, '#ff8fc6'); g.addColorStop(.5, '#b78bff'); g.addColorStop(1, '#7fe8c5');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = .5; ctx.globalCompositeOperation = 'overlay';
+    ctx.beginPath(); ctx.arc(w*.5, h*.5, Math.min(w,h)*.4, 0, 7); ctx.fillStyle = 'rgba(255,214,236,.55)'; ctx.fill();
+  } else if (mode === 'candy'){
+    ctx.globalAlpha = .3; ctx.globalCompositeOperation = 'overlay';
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#ff9ad0'); g.addColorStop(1, '#ffd76e');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = .16; ctx.globalCompositeOperation = 'soft-light';
+    for (let i = 0; i < 14; i++){
+      const x = ((i * 197) % w), y = ((i * 131 + t*8) % h);
+      ctx.beginPath(); ctx.arc(x, y, 10 + (i%3)*7, 0, 7); ctx.fillStyle = ['#ff6fb5','#ffcf5c','#7fe8c5'][i%3]; ctx.fill();
+    }
+  } else if (mode === 'vortex'){
+    ctx.globalAlpha = .42; ctx.globalCompositeOperation = 'overlay';
+    const g = ctx.createRadialGradient(w/2, h/2, 10, w/2, h/2, Math.max(w,h)*.7);
+    g.addColorStop(0, '#38e1c6'); g.addColorStop(.5, '#b06ee8'); g.addColorStop(1, '#141a4a');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = .2; ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 5; i++){
+      const r = (t*60 + i*80) % (Math.max(w,h)*.8);
+      ctx.beginPath(); ctx.arc(w/2, h/2, r, 0, 7);
+      ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.lineWidth = 2; ctx.stroke();
+    }
+  } else if (mode === 'minty'){
+    ctx.globalAlpha = .3; ctx.globalCompositeOperation = 'soft-light';
+    ctx.fillStyle = '#7fe8c5'; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = .24; ctx.globalCompositeOperation = 'overlay';
+    const g = ctx.createLinearGradient(0, h, 0, 0);
+    g.addColorStop(0, '#0f7a5c'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  } else if (mode === 'sunny'){
+    ctx.globalAlpha = .34; ctx.globalCompositeOperation = 'overlay';
+    const g = ctx.createRadialGradient(w*.72, h*.2, 8, w*.72, h*.2, Math.max(w,h)*.85);
+    g.addColorStop(0, '#ffcf5c'); g.addColorStop(.6, '#ffab4a'); g.addColorStop(1, 'rgba(255,150,60,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  } else if (mode === 'mono'){
+    ctx.globalCompositeOperation = 'saturation';
+    ctx.fillStyle = 'hsl(0,0%,50%)'; ctx.fillRect(0, 0, w, h);
+    ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .12;
+    ctx.fillStyle = '#2a2340'; ctx.fillRect(0, 0, w, h);
+  } else if (mode === 'bubblegum'){
+    // gradasi pink-biru lembut + vignette bubble
+    ctx.globalAlpha = .38; ctx.globalCompositeOperation = 'soft-light';
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, '#ff9ad0'); g.addColorStop(.55, '#9ecbff'); g.addColorStop(1, '#ffd1ec');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = .3; ctx.globalCompositeOperation = 'overlay';
+    for (let i = 0; i < 8; i++){
+      const x = (i*.13+.05)*w, y = ((i*.17+.1)%1)*h, r = (18+(i%4)*14);
+      ctx.beginPath(); ctx.arc(x, y, r, 0, 7);
+      ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 2.5; ctx.stroke();
+    }
+  } else if (mode === 'grape'){
+    ctx.globalAlpha = .5; ctx.globalCompositeOperation = 'overlay';
+    const g = ctx.createLinearGradient(0, h, w, 0);
+    g.addColorStop(0, '#5b2a86'); g.addColorStop(.5, '#8e44ad'); g.addColorStop(1, '#c39bd3');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = .25; ctx.globalCompositeOperation = 'soft-light';
+    ctx.fillStyle = '#2d0b4e'; ctx.fillRect(0, 0, w, h);
+  } else if (mode === 'lava'){
+    ctx.globalAlpha = .45; ctx.globalCompositeOperation = 'hard-light';
+    const g = ctx.createRadialGradient(w*.5, h*.85, 10, w*.5, h*.85, Math.max(w,h)*.9);
+    g.addColorStop(0, '#ff3d00'); g.addColorStop(.5, '#ff8f00'); g.addColorStop(1, '#3e0005');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = .22; ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 6; i++){
+      const r = ((t*40 + i*66) % 400) + 10;
+      ctx.beginPath(); ctx.arc(w*.5 + Math.sin(i*2.1)*w*.3, h*.9 - r*.5, r*.4, 0, 7);
+      ctx.fillStyle = 'rgba(255,120,20,.35)'; ctx.fill();
+    }
+  } else if (mode === 'ocean'){
+    ctx.globalAlpha = .4; ctx.globalCompositeOperation = 'overlay';
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#7ce0ff'); g.addColorStop(.6, '#1e7fd6'); g.addColorStop(1, '#04214f');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = .28; ctx.globalCompositeOperation = 'soft-light';
+    for (let i = 0; i < 5; i++){
+      ctx.beginPath();
+      const yb = h*(.25 + i*.16), amp = 10 + i*4;
+      ctx.moveTo(0, yb);
+      for (let x = 0; x <= w; x += 24){
+        ctx.lineTo(x, yb + Math.sin(x/w*6 + t + i)*amp);
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.lineWidth = 2.5; ctx.stroke();
+    }
+  } else if (mode === 'neon'){
+    // garis scan neon di atas gambar yang dipertajam
+    ctx.globalAlpha = .3; ctx.globalCompositeOperation = 'overlay';
+    ctx.fillStyle = '#1a0533'; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = .55; ctx.globalCompositeOperation = 'lighter';
+    const hues = ['#ff2bd6', '#2bffea', '#ffe22b'];
+    for (let i = 0; i < 3; i++){
+      const yb = h*(.3 + i*.22), ph = t*1.4 + i*2;
+      ctx.beginPath();
+      ctx.moveTo(0, yb);
+      for (let x = 0; x <= w; x += 18){
+        ctx.lineTo(x, yb + Math.sin(x/w*7 + ph)*h*.06);
+      }
+      ctx.strokeStyle = hues[i]; ctx.lineWidth = 3; ctx.shadowColor = hues[i]; ctx.shadowBlur = 14; ctx.stroke();
+    }
+    ctx.shadowBlur = 0;
+  } else if (mode === 'polaroid'){
+    // bingkai tebal + lapisan hangat klasik
+    ctx.globalAlpha = .18; ctx.globalCompositeOperation = 'overlay';
+    ctx.fillStyle = '#ffe9c4'; ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#fffdf6';
+    ctx.fillRect(0, 0, w, h*.06); ctx.fillRect(0, h-h*.14, w, h*.14);
+    ctx.fillRect(0, 0, w*.05, h); ctx.fillRect(w-w*.05, 0, w*.05, h);
+    ctx.fillStyle = '#8a8577'; ctx.font = '700 ' + Math.round(h*.045) + 'px "Nunito", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('BOBBLE', w/2, h - h*.05);
+    ctx.textAlign = 'left';
+  } else if (mode === 'fisheye'){
+    // lensa bulge: gambar dasar, lalu pusat di-zoom dalam clip lingkaran
+    ctx.save();
+    if (mir){ ctx.translate(w, 0); ctx.scale(-1, 1); }
+    ctx.drawImage(video, 0, 0, w, h);
+    ctx.restore();
+    const cxp = w/2, cyp = h/2, lensR = Math.min(w, h)*.46, zoom = 1.42;
+    const dw = w*zoom, dh = h*zoom;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cxp, cyp, lensR, 0, 7); ctx.clip();
+    ctx.clearRect(cxp - lensR, cyp - lensR, lensR*2, lensR*2);
+    ctx.save();
+    if (mir){ ctx.translate(w, 0); ctx.scale(-1, 1); }
+    ctx.drawImage(video, (w - dw)/2, (h - dh)/2, dw, dh);
+    ctx.restore();
+    // tepi lensa
+    ctx.beginPath(); ctx.arc(cxp, cyp, lensR, 0, 7);
+    ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 4; ctx.stroke();
+    ctx.restore();
+    ctx.globalAlpha = .3; ctx.globalCompositeOperation = 'overlay';
+    const g = ctx.createRadialGradient(cxp, cyp, lensR*.5, cxp, cyp, Math.max(w,h)*.75);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, '#141c38');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  }
+  ctx.restore();
+  /* --- pass piksel untuk filter yang butuh --- */
+  if (mode === 'sepia' || mode === 'invert' || mode === 'comic' || mode === 'thermal' || mode === 'dreamy' || mode === 'hologram'){
+    fxPixelPass(ctx, w, h, mode);
+  } else if (mode === 'pixel'){
+    // pixelate: kecilkan ke buffer 44px lalu besarkan kembali (nearest)
+    const S = 44;
+    const tmp = document.createElement('canvas');
+    tmp.width = S; tmp.height = Math.max(1, Math.round(S * h / w));
+    const tctx = tmp.getContext('2d');
+    tctx.imageSmoothingEnabled = true;
+    tctx.drawImage(ctx.canvas, 0, 0, tmp.width, tmp.height);
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(tmp, 0, 0, tmp.width, tmp.height, 0, 0, w, h);
+    ctx.imageSmoothingEnabled = true;
+  }
+}
+function fitCanvas(cv, vw, vh){
+  if (cv.width !== vw || cv.height !== vh){ cv.width = vw; cv.height = vh; }
+}
+function fxLoop(t){
+  if (!fxRunning) return;
+  const w = booth.clientWidth, h = booth.clientHeight;
+  fitCanvas(fxCanvas, w, h);
+  fxDraw(fxCtx, w, h, curFx, (t || 0) / 100);
+  requestAnimationFrame(fxLoop);
+}
+function startFx(){ if (fxRunning) return; fxRunning = true; requestAnimationFrame(fxLoop); }
+function stopFx(){ fxRunning = false; }
+
+/* ---------- stiker overlay ---------- */
+const STK_DEFS = {
+  party:  ['🎉','🎈','🎊','🥳'],
+  hearts: ['💖','💕','💗','❤️'],
+  stars:  ['⭐','✨','🌟','💫'],
+  bunny:  ['🐰','🥕','🌷','🐣']
+};
+function renderStickers(){
+  const layer = $('#stkLayer');
+  layer.innerHTML = '';
+  if (!curStk) return;
+  const set = STK_DEFS[curStk] || [];
+  const spots = [
+    { left:'4%',  top:'6%',  r:-10, s:1 },
+    { right:'5%', top:'10%', r:12,  s:.85 },
+    { left:'8%',  bottom:'14%', r:8, s:.75 },
+    { right:'7%', bottom:'8%', r:-14, s:1.05 },
+    { left:'42%', top:'3%', r:6, s:.7 },
+  ];
+  set.forEach((em, i) => {
+    const sp = spots[i % spots.length];
+    const el = document.createElement('span');
+    el.className = 'stk';
+    el.textContent = em;
+    el.style.left = sp.left || 'auto';
+    el.style.right = sp.right || 'auto';
+    el.style.top = sp.top || 'auto';
+    el.style.bottom = sp.bottom || 'auto';
+    el.style.transform = 'rotate(' + sp.r + 'deg) scale(' + sp.s + ')';
+    el.style.animationDelay = (i * .4) + 's';
+    el.style.fontSize = (2.6 * sp.s) + 'rem';
+    layer.appendChild(el);
+  });
+}
+
+/* ---------- kontrol chip ---------- */
+$$('#filterRow .chip').forEach(ch => ch.addEventListener('click', () => {
+  $$('#filterRow .chip').forEach(c => c.classList.remove('on'));
+  ch.classList.add('on');
+  curFx = ch.dataset.fx;
+  toast('Filter: ' + (FX_DEFS[curFx] ? FX_DEFS[curFx].name : curFx));
+}));
+$$('#beautyRow .chip').forEach(ch => ch.addEventListener('click', () => {
+  $$('#beautyRow .chip').forEach(c => c.classList.remove('on'));
+  ch.classList.add('on');
+  curBeauty = ch.dataset.beauty;
+  const nm = BEAUTY_DEFS[curBeauty] && BEAUTY_DEFS[curBeauty].name;
+  toast(nm ? 'Beauty: ' + nm + ' ✨' : 'Beauty: Natural');
+}));
+/* label gabungan filter+beauty utk foto & galeri */
+function fxLabel(){
+  const fx = FX_DEFS[curFx] ? (FX_DEFS[curFx].name || curFx) : curFx;
+  const B = BEAUTY_DEFS[curBeauty];
+  return B && B.name ? fx + ' · ' + B.name : fx;
+}
+$$('#stkRow .chip').forEach(ch => ch.addEventListener('click', () => {
+  $$('#stkRow .chip').forEach(c => c.classList.remove('on'));
+  ch.classList.add('on');
+  curStk = ch.dataset.stk;
+  renderStickers();
+}));
+$('#chipCount').addEventListener('click', function(){
+  useCount = !useCount;
+  this.classList.toggle('on', useCount);
+  this.textContent = useCount ? '⏱ Countdown 3s' : '⚡ Tanpa countdown';
+});
+$('#chipMirror').addEventListener('click', function(){
+  useMirror = !useMirror;
+  this.classList.toggle('on', useMirror);
+  booth.classList.toggle('mir', useMirror && facing === 'user');
+});
+
+/* ---------- ambil foto ---------- */
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+async function countdown(from){
+  countEl.classList.add('show');
+  for (let i = from; i >= 1; i--){
+    countEl.innerHTML = '<span>' + i + '</span>';
+    await sleep(900);
+  }
+  countEl.classList.remove('show');
+}
+function flash(){
+  flashEl.classList.remove('go'); void flashEl.offsetWidth; flashEl.classList.add('go');
+}
+/* komposisi foto final: video + filter + stiker + bingkai brand */
+function composePhoto(){
+  const W = 900, H = 675; // rasio 4:3
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  fxDraw(ctx, W, H, curFx, 0);
+  // stiker ikut ke hasil foto
+  const set = curStk ? (STK_DEFS[curStk] || []) : [];
+  const spots = [
+    { left:36,  top:40,  r:-10, s:1 },
+    { right:46, top:60,  r:12,  s:.85 },
+    { left:70,  bottom:90, r:8, s:.75 },
+    { right:60, bottom:55, r:-14, s:1.05 },
+  ];
+  set.forEach((em, i) => {
+    const sp = spots[i % spots.length];
+    const x = sp.left != null ? sp.left : W - sp.right;
+    const y = sp.top != null ? sp.top : H - sp.bottom;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(sp.r * Math.PI / 180);
+    ctx.font = (52 * sp.s) + 'px serif';
+    ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(20,10,60,.35)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 6;
+    ctx.fillText(em, 0, 0);
+    ctx.restore();
+  });
+  // bingkai brand
+  ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 14;
+  ctx.strokeRect(7, 7, W-14, H-14);
+  ctx.font = '700 26px "Baloo 2", "Nunito", sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.shadowColor = 'rgba(30,20,80,.45)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;
+  ctx.fillText('BOBBLE ✦ PHOTOBOOTH', 26, H - 52);
+  ctx.font = '700 18px "Nunito", sans-serif';
+  ctx.fillText(fxLabel().toUpperCase() + ' · ' + fmtTime(new Date()), 26, H - 26);
+  ctx.shadowBlur = 0;
+  return cv.toDataURL('image/png');
+}
+function addGallery(url){
+  gallery.unshift({ url, filter: fxLabel(), time: fmtTime(new Date()) });
+}
+async function takePhoto(){
+  if (shooting) return;
+  shooting = true;
+  $('#btnShot').disabled = true; $('#btnShotTop').disabled = true;
+  show('booth');
+  const ok = await startCam();
+  if (!ok){ shooting = false; $('#btnShot').disabled = false; $('#btnShotTop').disabled = false; return; }
+  startFx();
+  if (useCount) await countdown(3);
+  flash();
+  await sleep(140);
+  const url = composePhoto();
+  addGallery(url);
+  toast('Foto tersimpan! Cek Gallery 📸');
+  shooting = false;
+  $('#btnShot').disabled = false; $('#btnShotTop').disabled = false;
+}
+$('#btnShot').addEventListener('click', takePhoto);
+$('#btnShotTop').addEventListener('click', takePhoto);
+
+/* ---------- strip 4 foto ---------- */
+function renderStripDots(){
+  const el = $('#stripDots');
+  el.innerHTML = '';
+  for (let i = 0; i < 4; i++){
+    const d = document.createElement('span');
+    d.className = 'sdot' + (strip[i] ? ' fill' : '');
+    el.appendChild(d);
+  }
+}
+function renderStrip(){
+  const cells = $$('#stripInner .strip-cell');
+  cells.forEach((c, i) => {
+    c.innerHTML = strip[i]
+      ? '<img src="' + strip[i] + '" alt="Strip foto ' + (i+1) + '">'
+      : '<span class="empty">' + (i+1) + '</span>';
+  });
+  $('#btnStripDl').disabled = !stripDone;
+  $('#stripTime').textContent = stripDone ? fmtTime(new Date()) : '—';
+}
+async function startStrip(){
+  if (shooting) return;
+  shooting = true;
+  $('#btnStripStart').disabled = true;
+  stripDone = false;
+  for (let i = 0; i < 4; i++) strip[i] = null;
+  renderStrip();
+  const ok = await startCam();
+  if (!ok){ shooting = false; $('#btnStripStart').disabled = false; return; }
+  for (let i = 0; i < 4; i++){
+    show('booth');
+    await sleep(300);
+    if (useCount) await countdown(3);
+    flash();
+    await sleep(140);
+    strip[i] = composePhoto();
+    renderStrip(); renderStripDots();
+    show('strip');
+    toast('Pose ' + (i+1) + '/4 tersimpan ✨');
+    await sleep(700);
+  }
+  const url = await composeStripPng();
+  addGallery(url);
+  stripDone = true;
+  renderStrip();
+  toast('Strip selesai! Tersimpan di Gallery 🎉');
+  shooting = false;
+  $('#btnStripStart').disabled = false;
+}
+function composeStripPng(){
+  const PW = 600, CH = 430, PAD = 24, HEAD = 70, FOOT = 64; // potret 600 lebar
+  const H = HEAD + 4 * CH + 3 * 14 + FOOT + PAD;
+  const cv = document.createElement('canvas');
+  cv.width = PW + PAD * 2; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.fillStyle = '#2a2340';
+  ctx.font = '800 34px "Baloo 2", "Nunito", sans-serif';
+  ctx.fillText('BOBB', 90, 48);
+  ctx.fillStyle = '#e84fa5';
+  ctx.save(); ctx.translate(228, 48); ctx.rotate(-6 * Math.PI / 180); ctx.fillText('L', 0, 0); ctx.restore();
+  ctx.fillStyle = '#2a2340';
+  ctx.fillText('E ✦ PHOTO STRIP', 248, 48);
+  let y = HEAD;
+  return new Promise((resolve) => {
+    const imgs = strip.map(s => { const im = new Image(); im.src = s; return im; });
+    let loaded = 0, done = () => {
+      let yy = HEAD;
+      imgs.forEach(im => {
+        ctx.save();
+        ctx.beginPath(); ctx.rect(PAD, yy, PW, CH); ctx.clip();
+        const r = Math.max(PW / im.width, CH / im.height);
+        const dw = im.width * r, dh = im.height * r;
+        ctx.drawImage(im, PAD + (PW - dw) / 2, yy + (CH - dh) / 2, dw, dh);
+        ctx.restore();
+        yy += CH + 14;
+      });
+      ctx.fillStyle = '#5d5677';
+      ctx.font = '700 20px "Nunito", sans-serif';
+      ctx.fillText(fmtTime(new Date()), PAD, H - 26);
+      ctx.textAlign = 'right';
+      ctx.fillText('bobble.world', PAD + PW, H - 26);
+      ctx.textAlign = 'left';
+      resolve(cv.toDataURL('image/png'));
+    };
+    if (imgs.every(im => im.complete)) { done(); return; }
+    imgs.forEach(im => im.addEventListener('load', () => { if (++loaded === 4) done(); }, { once: true }));
+  });
+}
+$('#btnStripStart').addEventListener('click', startStrip);
+$('#btnStripReset').addEventListener('click', () => {
+  for (let i = 0; i < 4; i++) strip[i] = null;
+  stripDone = false; renderStrip(); toast('Strip dikosongkan 🧹');
+});
+
+/* ---------- galeri ---------- */
+function renderGallery(){
+  const grid = $('#galGrid');
+  grid.innerHTML = '';
+  if (!gallery.length){
+    grid.innerHTML = '<div class="gal-empty"><span class="big">🎈</span>Belum ada foto.<br>Yuk ambil foto pertamamu di booth!</div>';
+    return;
+  }
+  gallery.forEach((g, i) => {
+    const it = document.createElement('div');
+    it.className = 'gal-item pop'; it.style.setProperty('--d', (i * .05) + 's');
+    it.innerHTML = '<img src="' + g.url + '" alt="Foto ' + (i+1) + '">' +
+      '<span class="tag">' + g.filter + '</span>' +
+      '<button class="del" aria-label="Hapus foto">✕</button>';
+    it.addEventListener('click', (e) => {
+      if (e.target.classList.contains('del')){
+        gallery.splice(i, 1); renderGallery(); toast('Foto dihapus 🗑'); return;
+      }
+      openLightbox(g.url);
+    });
+    grid.appendChild(it);
+  });
+}
+function openLightbox(url){
+  lbCurrent = url;
+  $('#lbImg').src = url;
+  $('#lightbox').classList.add('open');
+}
+$('#btnLbClose').addEventListener('click', () => $('#lightbox').classList.remove('open'));
+$('#lightbox').addEventListener('click', (e) => { if (e.target.id === 'lightbox') e.currentTarget.classList.remove('open'); });
+function download(url, name){
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+$('#btnLbDl').addEventListener('click', () => { if (lbCurrent) download(lbCurrent, 'bobble-photo.png'); });
+$('#btnStripDl').addEventListener('click', async () => {
+  const url = await composeStripPng();
+  download(url, 'bobble-strip.png');
+});
+
+/* ---------- keyboard ---------- */
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape'){ $('#lightbox').classList.remove('open'); $('#mmenu').classList.remove('open'); }
+  if (e.key === ' ' && $('.view[data-view=booth]').classList.contains('active')){
+    e.preventDefault(); takePhoto();
+  }
+});
+
+/* ---------- init ---------- */
+renderStrip(); renderStripDots(); renderGallery();
+</script>
+</body>
+</html>
