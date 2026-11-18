@@ -898,14 +898,24 @@ function fxPixelPass(ctx, w, h, mode){
   }
   ctx.putImageData(d, 0, 0);
 }
-function fxDraw(ctx, w, h, mode, t){
-  if (video.readyState < 2) return;
+/* gambar video dengan center-crop (seperti object-fit:cover) — wajah tidak gepeng
+   walau rasio kamera (mis. 16:9) ≠ rasio kanvas (4:3) */
+function drawVideoCover(ctx, w, h, mir, zoom){
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw || !vh) return;
+  const z = zoom || 1;
+  const scale = Math.max(w / vw, h / vh) * z;
+  const dw = vw * scale, dh = vh * scale;
   ctx.save();
+  if (mir){ ctx.translate(w, 0); ctx.scale(-1, 1); }
+  ctx.drawImage(video, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  ctx.restore();
+}
+function fxDraw(ctx, w, h, mode, t){
+  if (video.readyState < 2 || w < 2 || h < 2) return; // kanvas 0px (view tersembunyi) → jangan gambar
   // gambar video (mirror bila perlu — kamera depan)
   const mir = useMirror && facing === 'user';
-  if (mir){ ctx.translate(w, 0); ctx.scale(-1, 1); }
-  ctx.drawImage(video, 0, 0, w, h);
-  ctx.restore();
+  drawVideoCover(ctx, w, h, mir);
   // pass beauty (sebelum lapisan FX agar tone kulit dikoreksi dulu)
   beautyPass(ctx, w, h);
   // lapisan filter
@@ -1030,19 +1040,12 @@ function fxDraw(ctx, w, h, mode, t){
     ctx.textAlign = 'left';
   } else if (mode === 'fisheye'){
     // lensa bulge: gambar dasar, lalu pusat di-zoom dalam clip lingkaran
-    ctx.save();
-    if (mir){ ctx.translate(w, 0); ctx.scale(-1, 1); }
-    ctx.drawImage(video, 0, 0, w, h);
-    ctx.restore();
+    drawVideoCover(ctx, w, h, mir);
     const cxp = w/2, cyp = h/2, lensR = Math.min(w, h)*.46, zoom = 1.42;
-    const dw = w*zoom, dh = h*zoom;
     ctx.save();
     ctx.beginPath(); ctx.arc(cxp, cyp, lensR, 0, 7); ctx.clip();
     ctx.clearRect(cxp - lensR, cyp - lensR, lensR*2, lensR*2);
-    ctx.save();
-    if (mir){ ctx.translate(w, 0); ctx.scale(-1, 1); }
-    ctx.drawImage(video, (w - dw)/2, (h - dh)/2, dw, dh);
-    ctx.restore();
+    drawVideoCover(ctx, w, h, mir, zoom);
     // tepi lensa
     ctx.beginPath(); ctx.arc(cxp, cyp, lensR, 0, 7);
     ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 4; ctx.stroke();
@@ -1076,8 +1079,10 @@ function fitCanvas(cv, vw, vh){
 function fxLoop(t){
   if (!fxRunning) return;
   const w = booth.clientWidth, h = booth.clientHeight;
-  fitCanvas(fxCanvas, w, h);
-  fxDraw(fxCtx, w, h, curFx, (t || 0) / 100);
+  if (w > 1 && h > 1 && video.readyState >= 2){   // hanya render saat booth terlihat & video siap
+    fitCanvas(fxCanvas, w, h);
+    fxDraw(fxCtx, w, h, curFx, (t || 0) / 100);
+  }
   requestAnimationFrame(fxLoop);
 }
 function startFx(){ if (fxRunning) return; fxRunning = true; requestAnimationFrame(fxLoop); }
@@ -1168,13 +1173,38 @@ async function countdown(from){
 function flash(){
   flashEl.classList.remove('go'); void flashEl.offsetWidth; flashEl.classList.add('go');
 }
+/* tunggu video punya frame (siap digambar) — mencegah foto transparan */
+async function waitVideoReady(maxMs){
+  const t0 = Date.now();
+  while (video.readyState < 2 && Date.now() - t0 < (maxMs || 2000)){
+    await sleep(60);
+  }
+  return video.readyState >= 2;
+}
 /* komposisi foto final: video + filter + stiker + bingkai brand */
-function composePhoto(){
+async function composePhoto(){
+  const ready = await waitVideoReady(2000);
   const W = 900, H = 675; // rasio 4:3
   const cv = document.createElement('canvas');
   cv.width = W; cv.height = H;
   const ctx = cv.getContext('2d');
-  fxDraw(ctx, W, H, curFx, 0);
+  if (!ready){
+    // video belum siap (izin ditolak / belum aktif) — isi kartu brand, jangan foto transparan
+    ctx.fillStyle = '#241b42'; ctx.fillRect(0, 0, W, H);
+    const g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, '#3a2a6b'); g.addColorStop(1, '#1d1633');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '700 90px "Baloo 2", "Nunito", sans-serif';
+    ctx.fillStyle = '#e84fa5';
+    ctx.fillText('📷', W/2, H/2 - 40);
+    ctx.fillStyle = '#cfd6ff';
+    ctx.font = '800 34px "Baloo 2", "Nunito", sans-serif';
+    ctx.fillText('Kamera belum aktif', W/2, H/2 + 70);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  } else {
+    fxDraw(ctx, W, H, curFx, 0);
+  }
   // stiker ikut ke hasil foto
   const set = curStk ? (STK_DEFS[curStk] || []) : [];
   const spots = [
@@ -1222,7 +1252,7 @@ async function takePhoto(){
   if (useCount) await countdown(3);
   flash();
   await sleep(140);
-  const url = composePhoto();
+  const url = await composePhoto();
   addGallery(url);
   toast('Foto tersimpan! Cek Gallery 📸');
   shooting = false;
@@ -1266,7 +1296,7 @@ async function startStrip(){
     if (useCount) await countdown(3);
     flash();
     await sleep(140);
-    strip[i] = composePhoto();
+    strip[i] = await composePhoto();
     renderStrip(); renderStripDots();
     show('strip');
     toast('Pose ' + (i+1) + '/4 tersimpan ✨');
@@ -1294,20 +1324,30 @@ function composeStripPng(){
   ctx.save(); ctx.translate(228, 48); ctx.rotate(-6 * Math.PI / 180); ctx.fillText('L', 0, 0); ctx.restore();
   ctx.fillStyle = '#2a2340';
   ctx.fillText('E ✦ PHOTO STRIP', 248, 48);
+  /* gambar satu sel strip (fallback latar polos bila foto tak ada) */
+  const drawCell = (im, yy) => {
+    ctx.save();
+    ctx.beginPath(); ctx.rect(PAD, yy, PW, CH); ctx.clip();
+    ctx.fillStyle = '#f4f1fa'; ctx.fillRect(PAD, yy, PW, CH);
+    if (im && im.width){
+      const r = Math.max(PW / im.width, CH / im.height);
+      const dw = im.width * r, dh = im.height * r;
+      ctx.drawImage(im, PAD + (PW - dw) / 2, yy + (CH - dh) / 2, dw, dh);
+    } else {
+      ctx.fillStyle = '#cfc7e8';
+      ctx.font = '800 90px "Baloo 2", "Nunito", sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('📷', PAD + PW/2, yy + CH/2);
+      ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    }
+    ctx.restore();
+  };
   let y = HEAD;
   return new Promise((resolve) => {
-    const imgs = strip.map(s => { const im = new Image(); im.src = s; return im; });
+    const imgs = strip.map(s => { const im = new Image(); if (s) im.src = s; return im; });
     let loaded = 0, done = () => {
       let yy = HEAD;
-      imgs.forEach(im => {
-        ctx.save();
-        ctx.beginPath(); ctx.rect(PAD, yy, PW, CH); ctx.clip();
-        const r = Math.max(PW / im.width, CH / im.height);
-        const dw = im.width * r, dh = im.height * r;
-        ctx.drawImage(im, PAD + (PW - dw) / 2, yy + (CH - dh) / 2, dw, dh);
-        ctx.restore();
-        yy += CH + 14;
-      });
+      imgs.forEach(im => { drawCell(im, yy); yy += CH + 14; });
       ctx.fillStyle = '#5d5677';
       ctx.font = '700 20px "Nunito", sans-serif';
       ctx.fillText(fmtTime(new Date()), PAD, H - 26);
@@ -1316,8 +1356,13 @@ function composeStripPng(){
       ctx.textAlign = 'left';
       resolve(cv.toDataURL('image/png'));
     };
-    if (imgs.every(im => im.complete)) { done(); return; }
-    imgs.forEach(im => im.addEventListener('load', () => { if (++loaded === 4) done(); }, { once: true }));
+    const need = imgs.filter(im => im.src).length;
+    if (!need || imgs.every(im => !im.src || im.complete)) { done(); return; }
+    imgs.forEach(im => {
+      if (!im.src) return;
+      im.addEventListener('load', () => { if (++loaded === need) done(); }, { once: true });
+      im.addEventListener('error', () => { if (++loaded === need) done(); }, { once: true }); // jangan menggantung bila foto korup
+    });
   });
 }
 $('#btnStripStart').addEventListener('click', startStrip);
@@ -1363,6 +1408,7 @@ function download(url, name){
 }
 $('#btnLbDl').addEventListener('click', () => { if (lbCurrent) download(lbCurrent, 'bobble-photo.png'); });
 $('#btnStripDl').addEventListener('click', async () => {
+  if (!strip.some(s => s)){ toast('Ambil 4 pose dulu di Strip yuk! 📸'); return; }
   const url = await composeStripPng();
   download(url, 'bobble-strip.png');
 });
