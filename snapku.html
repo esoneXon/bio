@@ -791,9 +791,57 @@ body.fs #fsIdle,body.fs #fsStyle,body.fs #fsResult{z-index:120}
   .mq-track,.marquee-track{animation:none}
   .mq{overflow-x:auto;-webkit-mask-image:none;mask-image:none}
 }
+
+/* ================= perbaikan tumpang tindih + keramahan ================= */
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.skip-link{position:absolute;left:-999px;top:8px;z-index:400;background:var(--grad);color:#fff;padding:10px 16px;border-radius:10px;font-weight:700}
+.skip-link:focus{left:8px}
+.mq-frames{padding-bottom:34px}
+.stage-canvas-wrap{min-height:260px;max-height:68dvh}
+body.fs .stage-canvas-wrap{max-height:none}
+.mode-tab{white-space:nowrap}
+/* tombol keluar (✕) tidak lagi jatuh ke alur layout */
+.fs-exit{position:absolute;top:calc(10px + env(safe-area-inset-top));right:10px;z-index:5}
+.fs-style-head{padding:0 54px}
+.fs-style-head h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs-style-head .fs-exit{top:50%;right:0;margin-top:-21px}
+/* susunan atas layar penuh: baris 1 langkah + tombol, baris 2 tab mode, baris 3 lencana */
+body.fs .fs-steps{left:12px;right:auto;justify-content:flex-start;flex-wrap:nowrap;max-width:calc(100% - 164px);overflow:hidden}
+body.fs .mode-tabs{top:calc(60px + env(safe-area-inset-top));width:max-content;max-width:calc(100% - 24px)}
+body.fs .stage-badges{top:calc(112px + env(safe-area-inset-top));left:12px;right:12px;justify-content:center}
+.fs-step b{font:inherit}
+#toast{pointer-events:none}
+.cta-strip .btn{margin:5px}
+/* toast di layar penuh pindah ke atas agar tidak menutupi tombol Snap */
+body.fs #toast{bottom:auto;top:calc(116px + env(safe-area-inset-top));transform:translate(-50%,-20px)}
+body.fs #toast.show{transform:translate(-50%,0)}
+@media (max-width:900px){
+  body.fs .fs-step:not(.now) .lbl{display:none}
+  .fs-step{padding:5px 9px}
+}
+@media (max-height:560px){
+  body.fs .stage-badges{display:none}
+  body.fs .mode-tabs{top:calc(10px + env(safe-area-inset-top));left:auto;right:166px;transform:none}
+  body.fs .fs-steps{max-width:calc(100% - 420px)}
+  body.fs #toast{top:calc(64px + env(safe-area-inset-top))}
+}
+@media (max-width:640px){
+  .stage-actions #btnCam{flex:1 1 100%}
+  .stage-actions .btn,.stage-actions .fs-ic{flex:1 1 auto}
+  #cameraOff{padding-top:44px!important}
+  .btn{min-height:44px}
+  .nav-mobile a{padding:14px 8px}
+  input[type=text],input[type=number],select{font-size:16px!important}
+  .fs-style-head h3{font-size:1.05rem}
+}
+@media (prefers-reduced-motion:reduce){
+  .spark,.badge.rec{animation:none}
+  html{scroll-behavior:auto}
+}
 </style>
 </head>
 <body class="app">
+<a class="skip-link" href="#appViews">Lewati ke konten</a>
 <div id="appViews">
 
 <header>
@@ -1026,10 +1074,10 @@ body.fs #fsIdle,body.fs #fsStyle,body.fs #fsResult{z-index:120}
       <!-- STAGE -->
       <div class="stage">
         <div class="fs-steps">
-          <span class="fs-step now" id="step1">1 · Mulai</span>
-          <span class="fs-step" id="step2">2 · Gaya</span>
-          <span class="fs-step" id="step3">3 · Jepret</span>
-          <span class="fs-step" id="step4">4 · Hasil</span>
+          <span class="fs-step now" id="step1"><b>1</b><span class="lbl">Mulai</span></span>
+          <span class="fs-step" id="step2"><b>2</b><span class="lbl">Gaya</span></span>
+          <span class="fs-step" id="step3"><b>3</b><span class="lbl">Jepret</span></span>
+          <span class="fs-step" id="step4"><b>4</b><span class="lbl">Hasil</span></span>
         </div>
         <div class="fs-topbtns">
           <button class="fs-ic" id="btnFsStyle" title="Atur gaya (layout, filter, stiker)">⚙️</button>
@@ -1461,7 +1509,20 @@ body.fs #fsIdle,body.fs #fsStyle,body.fs #fsResult{z-index:120}
     </div>
   </div>
 </div>
-<div id="toast"></div>
+<div class="modal" id="upModal" role="dialog" aria-modal="true" aria-labelledby="upTitle">
+  <div class="modal-card" style="width:min(400px,100%)">
+    <div class="modal-head"><h3 id="upTitle">Buka fitur ini</h3><button class="modal-close" data-close="upModal" aria-label="Tutup">✕</button></div>
+    <div class="modal-body" style="text-align:center">
+      <div style="font-size:2.2rem">🔓</div>
+      <p id="upText" style="margin:10px 0 18px;color:var(--muted)"></p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-ghost" data-close="upModal">Nanti saja</button>
+        <button class="btn btn-grad" id="upGo">Lanjut ke Pembayaran</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
 <div id="confetti"></div>
 <div id="printArea"></div>
 <input type="file" id="fileInput" accept="image/png,image/jpeg" multiple style="display:none">
@@ -1562,7 +1623,8 @@ const showToast = (msg, kind) => {
   t.textContent = msg;
   t.className = kind ? 'show ' + kind : 'show';
   clearTimeout(t._tm);
-  t._tm = setTimeout(() => t.classList.remove('show'), 2600);
+  // pesan panjang diberi waktu baca lebih lama
+  t._tm = setTimeout(() => t.classList.remove('show'), Math.min(9000, Math.max(2600, msg.length * 55)));
 };
 function savePlan() { try { localStorage.setItem('snapku_plan', S.plan); } catch (e) {} }
 function loadPlan() {
@@ -1615,11 +1677,13 @@ function confettiBurst() {
 const PRICES = { pro: { price: 19000, old: 49000, label: 'Pro' }, studio: { price: 39000, old: 99000, label: 'Studio' } };
 let pendingPlan = null;
 function fmtIDR(v) { return 'Rp ' + v.toLocaleString('id-ID'); }
+const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function offerUpgrade(plan, featName) {
   const P = PRICES[plan];
-  if (confirm('Fitur "' + featName + '" tersedia di paket ' + P.label + ' (' + fmtIDR(P.price) + '/bln).\nBuka halaman checkout sekarang?')) {
-    openCheckout(plan);
-  }
+  $('#upTitle').textContent = 'Fitur paket ' + P.label;
+  $('#upText').innerHTML = '“' + esc(featName) + '” tersedia di paket <b>' + P.label + '</b> (' + fmtIDR(P.price) + '/bulan).';
+  $('#upGo').onclick = () => { $('#upModal').classList.remove('open'); openCheckout(plan); };
+  $('#upModal').classList.add('open');
 }
 function openCheckout(plan) {
   pendingPlan = plan;
@@ -1954,7 +2018,16 @@ async function startCamera() {
     showToast('Kamera aktif — atur gaya lalu tekan Snap! 📸');
   } catch (err) {
     console.error(err);
-    showToast('Gagal mengakses kamera: ' + err.message + '. Pastikan izin kamera & HTTPS.', 'err');
+    const friendly = {
+      NotAllowedError: 'Izin kamera ditolak. Klik ikon gembok di address bar, izinkan kamera, lalu coba lagi — atau pakai tab Upload Foto.',
+      NotFoundError: 'Kamera tidak ditemukan. Pakai tab Upload Foto sebagai gantinya.',
+      NotReadableError: 'Kamera sedang dipakai aplikasi lain. Tutup aplikasi itu lalu coba lagi.',
+      OverconstrainedError: 'Kamera tidak mendukung pengaturan yang diminta. Coba tombol Ganti Kamera.',
+    };
+    const msg = !navigator.mediaDevices
+      ? 'Browser memblokir kamera di halaman yang tidak aman. Buka lewat HTTPS, atau pakai tab Upload Foto.'
+      : (friendly[err && err.name] || 'Kamera tidak bisa dinyalakan. Coba lagi atau pakai tab Upload Foto.');
+    showToast(msg, 'err');
   }
 }
 
@@ -3389,6 +3462,14 @@ loadGallery();
 setMode('cam');
 
 
+
+/* aksesibilitas: label untuk tombol ikon + skip link */
+$$('button[title]').forEach(b => { if (!b.getAttribute('aria-label')) b.setAttribute('aria-label', b.title); });
+$('.skip-link').onclick = (e) => {
+  e.preventDefault();
+  const v = $('#appViews .view.on');
+  if (v) { v.setAttribute('tabindex', '-1'); v.focus(); }
+};
 
 /* marquee: gandakan isi agar loop mulus (translateX -50%) */
 $$('.mq-track').forEach(t => { t.innerHTML += t.innerHTML; });
